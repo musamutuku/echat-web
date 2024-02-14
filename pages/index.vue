@@ -155,11 +155,11 @@ function registerError(error) {
   password.value = "";
   confirm.value = "";
   showerror.value = true;
-  errormsg.value = 'Server error or connection failure!';
+  errormsg.value = 'Server failure or check on your connection!';
   setTimeout(() => {
     errormsg.value = '';
     showerror.value = false;
-  }, 3000);
+  }, 5000);
 }
 
 function registerError1(regUserMsg) {
@@ -183,6 +183,8 @@ const login = () => {
     loading.value = false;
     hideWaitMsg.value = "SIGN IN";
     loginMsg.value = 'Check on your connection and try again!';
+    username.value = '';
+    password.value = '';
     setTimeout(() => {
       loginMsg.value = '';
     }, 5000);
@@ -298,7 +300,7 @@ const logout = () => {
         <p class="bg-[#742929] text-white py-3 px-5">{{ errormsg }}</p>
       </div>
       <div v-show="showReg" class="flex flex-col justify-center">
-        <div class="bg-[#236E98] text-center py-3 mb-4 font-[quicksand] font-bold">
+        <div class="bg-[#236E98] text-center py-3 mb-4 font-[quicksand] w-[99%] mx-auto font-bold">
           <h2 class=" text-[25px] text-[#A4A716]">CREATE eCHAT ACCOUNT</h2>
         </div>
         <span class="font-semibold text-[#970606] font-[quicksand] text-center text-[13px]">{{ userError }}</span>
@@ -331,7 +333,7 @@ const logout = () => {
         </div>
       </div>
       <div v-show="showLog" class="flex flex-col justify-center">
-        <div class="bg-[#236E98] text-center pt-4 pb-7 mb-8 font-[quicksand] font-bold">
+        <div class="bg-[#236E98] text-center pt-3 pb-6 mb-8 font-[quicksand] font-bold w-[99%] mx-auto">
           <h2 class=" text-[32px] text-[#A4A716]">eCHAT</h2>
         </div>
         <h3 class="text-[#084407] font-bold text-[20px] text-center mb-5">USER LOGIN</h3>
