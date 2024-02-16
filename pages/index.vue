@@ -34,6 +34,14 @@ const hideWaitMsg1 = ref("SIGN UP");
 const loading = ref(false);
 const loginMsg = ref('');
 const loginSuccess = ref('');
+const showinbox = ref(false);
+const hideFeedback = ref(true);
+
+const toggleinbox = () => {
+  showinbox.value = true;
+  hide1.value = false;
+
+}
 
 const resetSuccess = () => {
   successMsg.value = '';
@@ -63,7 +71,7 @@ const regbtn = computed(() => {
   if (username.value != "" && email.value != "" && password.value != "" && confirm.value != "") {
     isdisabledReg.value = false;
     const color = { backgroundColor: '#6246CE' }
-    return color
+    return color;
   }
   isdisabledReg.value = true;
 });
@@ -76,10 +84,6 @@ const logbtn = computed(() => {
   }
   isdisabledLog.value = true;
 });
-
-const resetField = () => {
-  loginMsg.value = '';
-}
 
 
 //Registration
@@ -147,19 +151,21 @@ function registerSuccess(regMsg) {
 }
 
 function registerError(error) {
-  loading.value = false;
-  loadingMsg.value = false;
-  hideWaitMsg1.value = "SIGN UP";
-  username.value = "";
-  email.value = "";
-  password.value = "";
-  confirm.value = "";
-  showerror.value = true;
-  errormsg.value = 'Server failure or check on your connection!';
   setTimeout(() => {
-    errormsg.value = '';
-    showerror.value = false;
-  }, 5000);
+    loading.value = false;
+    loadingMsg.value = false;
+    hideWaitMsg1.value = "SIGN UP";
+    username.value = "";
+    email.value = "";
+    password.value = "";
+    confirm.value = "";
+    showerror.value = true;
+    errormsg.value = 'Server Error or connection failure!';
+    setTimeout(() => {
+      errormsg.value = '';
+      showerror.value = false;
+    }, 5000);
+  }, 3000);
 }
 
 function registerError1(regUserMsg) {
@@ -169,7 +175,7 @@ function registerError1(regUserMsg) {
   userError.value = regUserMsg;
   setTimeout(() => {
     userError.value = '';
-  }, 5000);
+  }, 3000);
 }
 
 
@@ -178,17 +184,20 @@ const login = () => {
   loadingMsg.value = true;
   loading.value = true;
   hideWaitMsg.value = "";
+  hideFeedback.value = true;
   setTimeout(() => {
-    loadingMsg.value = false;
-    loading.value = false;
-    hideWaitMsg.value = "SIGN IN";
-    loginMsg.value = 'Check on your connection and try again!';
-    username.value = '';
-    password.value = '';
-    setTimeout(() => {
-      loginMsg.value = '';
-    }, 5000);
-  }, 5000);
+    if (loginMsg.value == '') {
+      loginMsg.value = 'Check on your connection and try again!';
+      loadingMsg.value = false;
+      loading.value = false;
+      hideWaitMsg.value = "SIGN IN";
+      username.value = '';
+      password.value = '';
+      setTimeout(() => {
+        loginMsg.value = '';
+      }, 4000);
+    }
+  }, 20000);
   socket.emit('login', { username: username.value, password: password.value });
 };
 
@@ -210,6 +219,7 @@ onMounted(() => {
     loginSuccess.value = 'Logged in successfully';
     setTimeout(() => {
       loginSuccess.value = '';
+      hideFeedback.value = false;
     }, 3000);
   });
 
@@ -219,31 +229,52 @@ onMounted(() => {
     loading.value = false;
     hideWaitMsg.value = "SIGN IN";
     loginMsg.value = error.message;
+    username.value = '';
+    password.value = '';
+    hideFeedback.value = true;
     setTimeout(() => {
       loginMsg.value = '';
-    }, 5000);
+      hideFeedback.value = false;
+    }, 3000);
+  });
+
+  socket.on('storedMessages', (messagez) => {
+    const currentDate = new Date();
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const dayOfWeek = currentDate.getDay();
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const dayName = dayNames[dayOfWeek];
+    const dayOfMonth = currentDate.getDate();
+    const monthName = monthNames[currentDate.getMonth()];
+    const year = currentDate.getFullYear();
+    const hours = currentDate.getHours();
+    const minutes = currentDate.getMinutes();
+    const formattedDate = `${dayName}, ${dayOfMonth} ${monthName} ${year}, ${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
+    const userMessage = messagez.filter((msg) => msg.recipientUsername === user.value.username);
+    for (let i = 0; i < userMessage.length; i++) {
+      userMessage[i].id = formattedDate;
+      // if(userMessage[i].senderUsername == user.value.username){
+      //   userMessage[i].senderUsername = 'You';
+      // }
+    }
+    for (let i = 0; i < userMessage.length; i++) {
+        // Get the property value to compare
+        let propValue = userMessage[i].senderUsername;
+
+        // Iterate over the subsequent objects
+        for (let j = i + 1; j < userMessage.length; j++) {
+            // If the property value matches, remove the object with lower index
+            if (userMessage[j].senderUsername === propValue) {
+                userMessage.splice(i, 1); // Remove object at lower index
+                i--; // Adjust index to account for removed object
+                break; // Exit inner loop
+            }
+        }
+    }
+    messages.value = userMessage;
   });
 });
 
-socket.on('storedMessages', (userMessage) => {
-  const currentDate = new Date();
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  const dayOfWeek = currentDate.getDay();
-  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const dayName = dayNames[dayOfWeek];
-  const dayOfMonth = currentDate.getDate();
-  const monthName = monthNames[currentDate.getMonth()];
-  const year = currentDate.getFullYear();
-  const hours = currentDate.getHours();
-  const minutes = currentDate.getMinutes();
-  const formattedDate = `${dayName}, ${dayOfMonth} ${monthName} ${year}, ${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
-  for (let i = 0; i < userMessage.length; i++) {
-    userMessage[i].id = formattedDate;
-  }
-  messages.value = userMessage;
-  console.log('i mean thees', userMessage);
-  // messages.value.push({ id: checktime(), senderUsername: sender, message: msg });
-});
 
 const sendMessage = () => {
   socket.emit('sendMessage', {
@@ -285,6 +316,8 @@ const logout = () => {
   localStorage.removeItem('user');
   hide.value = true;
   hide1.value = false;
+  showinbox.value = false;
+  loginMsg.value = '';
 }
 </script>
 
@@ -337,16 +370,17 @@ const logout = () => {
           <h2 class=" text-[32px] text-[#A4A716]">eCHAT</h2>
         </div>
         <h3 class="text-[#084407] font-bold text-[20px] text-center mb-5">USER LOGIN</h3>
-        <span class="font-semibold text-[#970606] font-[quicksand] text-center text-[13px]">{{ loginMsg }}</span>
+        <span class="font-semibold text-[#970606] font-[quicksand] text-center text-[13px]" v-show="hideFeedback">{{
+          loginMsg }}</span>
         <div class="mx-auto py-5 flex flex-col gap-10">
           <div class="custom-input">
-            <input type="text" v-model="username" maxlength="50" @keydown="resetField" @input="isFocused = true"
-              @blur="isFocused = false" placeholder="Username">
+            <input type="text" v-model="username" maxlength="50" @input="isFocused = true" @blur="isFocused = false"
+              placeholder="Username">
             <div class="placeholder-image" v-show="!username && !isFocused"></div>
           </div>
           <div class="custom-input">
-            <input type="password" v-model="password" maxlength="50" @keydown="resetField" @input="isFocused1 = true"
-              @blur="isFocused1 = false" placeholder="Password">
+            <input type="password" v-model="password" maxlength="50" @input="isFocused1 = true" @blur="isFocused1 = false"
+              placeholder="Password">
             <div class="placeholder-image1" v-show="!password && !isFocused1"></div>
           </div>
           <button @click="login" :style="logbtn" :disabled="isdisabledLog"
@@ -363,8 +397,12 @@ const logout = () => {
     <div v-show="hide1">
       <div>
         <p>{{ loginSuccess }}</p>
+        <button>Start Chat</button>
+        <button @click="toggleinbox">inbox</button>
       </div>
-      <!-- <h1>Welcome, {{ user.value.username }}</h1> -->
+    </div>
+    <div v-show="showinbox">
+      <button @click="logout">Logout</button>
       <div>
         <label for="recipient">Recipient ID:</label>
         <input v-model="recipientUsername" id="recipient" />
