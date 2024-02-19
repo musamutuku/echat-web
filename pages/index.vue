@@ -7,6 +7,7 @@ const socket = io('http://localhost:3001');
 const user = ref(null);
 const message = ref('');
 const messages = ref([]);
+const messages1 = ref([]);
 const recipientUsername = ref('');
 
 const store = useAuthStore();
@@ -36,6 +37,32 @@ const loginMsg = ref('');
 const loginSuccess = ref('');
 const showinbox = ref(false);
 const hideFeedback = ref(true);
+const showmessenger = ref(false);
+const hideInbox = ref(true);
+// const recipientname = ref('');
+const senderRefs = ref([]);
+
+const populateListItemsRef = () => {
+  senderRefs.value = Array.from({ length: messages1.length }, (_, index) => {
+    return ref(null);
+  });
+};
+
+// Call populateListItemsRef on component mount
+// populateListItemsRef();
+
+const getSender = (index) => {
+  // recipientUsername.value = senderRef.value;
+  // const clickedItem = senderRefs.value[index].value;
+  // console.log(senderRefs.value[index]);
+  recipientUsername.value = messages1.value[index].senderUsername;
+  //  console.log(clickedItem);
+}
+
+const goback = () => {
+  showmessenger.value = !showmessenger.value;
+  hideInbox.value = !hideInbox.value;
+}
 
 const toggleinbox = () => {
   showinbox.value = true;
@@ -202,8 +229,6 @@ const login = () => {
 };
 
 
-
-
 onMounted(() => {
   // Listen for login success or failure events
   socket.on('loginSuccess', (userData, userToken) => {
@@ -249,54 +274,148 @@ onMounted(() => {
     const year = currentDate.getFullYear();
     const hours = currentDate.getHours();
     const minutes = currentDate.getMinutes();
+    const currenttime = `${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
     const formattedDate = `${dayName}, ${dayOfMonth} ${monthName} ${year}, ${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
     const userMessage = messagez.filter((msg) => msg.recipientUsername === user.value.username);
+    const userMessage1 = messagez.filter((msg) => msg.senderUsername === user.value.username);
+    console.log('fisrt b4', userMessage);
+    messages.value = messagez;
+    for (let i = 0; i < userMessage1.length; i++) {
+      // Get the property value to compare
+      let propValue = userMessage1[i].recipientUsername;
+
+      // Iterate over the subsequent objects
+      for (let j = i + 1; j < userMessage1.length; j++) {
+        // If the property value matches, remove the object with lower index
+        if (userMessage1[j].recipientUsername === propValue) {
+          userMessage1.splice(i, 1); // Remove object at lower index
+          i--; // Adjust index to account for removed object
+          break; // Exit inner loop
+        }
+      }
+    }
+
+    // messages.id = formattedDate;
+    // messages.time = currenttime;
+    let newArray = [];
     for (let i = 0; i < userMessage.length; i++) {
-      userMessage[i].id = formattedDate;
+      // userMessage[i].id = formattedDate;
+      // userMessage[i].time = currenttime;
       // if(userMessage[i].senderUsername == user.value.username){
       //   userMessage[i].senderUsername = 'You';
       // }
     }
     for (let i = 0; i < userMessage.length; i++) {
-        // Get the property value to compare
-        let propValue = userMessage[i].senderUsername;
+      // Get the property value to compare
+      let propValue = userMessage[i].senderUsername;
 
-        // Iterate over the subsequent objects
-        for (let j = i + 1; j < userMessage.length; j++) {
-            // If the property value matches, remove the object with lower index
-            if (userMessage[j].senderUsername === propValue) {
-                userMessage.splice(i, 1); // Remove object at lower index
-                i--; // Adjust index to account for removed object
-                break; // Exit inner loop
-            }
+      // Iterate over the subsequent objects
+      for (let j = i + 1; j < userMessage.length; j++) {
+        // If the property value matches, remove the object with lower index
+        if (userMessage[j].senderUsername === propValue) {
+          userMessage.splice(i, 1); // Remove object at lower index
+          i--; // Adjust index to account for removed object
+          break; // Exit inner loop 
         }
+      }
     }
-    messages.value = userMessage;
+    // messages1.value = userMessage;
+    // console.log(userMessage1);
+    // console.log(userMessage);
+    // let userFound = false;
+    // console.log('b4', userMessage1);
+    const msgArray = [];
+    for (let i = 0; i < userMessage.length; i++) {
+      const searchedUser = userMessage[i].senderUsername;
+      for (let j = 0; j < userMessage1.length; j++) {
+        const comparedUser = userMessage1[j].recipientUsername;
+        if (comparedUser == searchedUser) {
+          // console.log('ndiooo', comparedUser + '' + searchedUser);
+          // console.log('first',userMessage[i]);
+          // console.log('2nd',userMessage1[j]);
+          //  console.log(messagez);
+          //  console.log(messagez.indexOf(userMessage[i]));
+          //   console.log(messagez.indexOf(userMessage1[j]));
+          const index1 = messagez.indexOf(userMessage[i]);
+          const index2 = messagez.indexOf(userMessage1[j]);
+          if (index2 > index1) {
+            userMessage[i].message = userMessage1[j].message;
+            // break;
+            // userMessage1.splice(j, 1);
+            // console.log('afterr1',userMessage1);
+          }
+        }
+        if (comparedUser != searchedUser){
+          userMessage1.splice(j, 1);
+          j++;
+          break;  
+        } 
+        msgArray.push(userMessage1);  
+        // messages1.value = userMessage;
+        // messages1.value.push(userMessage1[j]);
+      }
+      // break;
+    }
+    console.log('check ths arry', userMessage);
+    console.log('the array',userMessage1);
+    console.log('newarray', msgArray);
+    userMessage.push(msgArray);
+    console.log('pp',userMessage);
+    messages1.value = userMessage;
+    ;
+    //messages1.value.push(userMessage1);
+
   });
+
+
 });
 
 
 const sendMessage = () => {
   socket.emit('sendMessage', {
+    id: checktime(),
     senderUsername: user.value.username,
     recipientUsername: recipientUsername.value,
-    message: message.value
+    message: message.value,
+    time: currenttime()
   });
-  messages.value.push({ id: checktime(), senderUsername: 'You', message: message.value });
+  messages.value.push({ id: checktime(), senderUsername: 'You', message: message.value, time: currenttime() });
+  let matchFound = false;
+  for (let i = 0; i < messages1.value.length; i++) {
+    if (messages1.value[i].senderUsername == recipientUsername.value) {
+      messages1.value[i].message = message.value;
+      matchFound = true;
+      break;
+    }
+  }
+  if (!matchFound) {
+    messages1.value.push({ id: checktime(), senderUsername: recipientUsername.value, message: message.value, time: currenttime() });
+  }
   message.value = '';
 };
 
 
-
 socket.on('receiveMessage', ({ senderUsername, message }) => {
   if (senderUsername != user.value.username) {
-    messages.value.push({ id: checktime(), senderUsername: senderUsername, message: message });
+    messages.value.push({ id: checktime(), senderUsername: senderUsername, message: message, time: currenttime() });
   }
+  const newmessage = { id: checktime(), senderUsername: senderUsername, message: message, time: currenttime() };
+  // messages1.value = messages1.push(newmessage);
+  const newvalue = newmessage.senderUsername;
+  for (let i = 0; i < messages1.value.length; i++) {
+    if (messages1.value[i].senderUsername === newvalue) {
+      // messages1.value[i] = newmessage;
+      messages1.value.splice(i, 1);
+      break;
+    }
+  }
+  messages1.value.push(newmessage);
 });
 
 socket.on('disconnect', () => {
   console.log('Disconnected from the server');
 });
+
 
 const checktime = () => {
   const currentDate = new Date();
@@ -311,6 +430,14 @@ const checktime = () => {
   const minutes = currentDate.getMinutes();
   const formattedDate = `${dayName}, ${dayOfMonth} ${monthName} ${year}, ${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
   return formattedDate;
+}
+
+const currenttime = () => {
+  const currentDate = new Date();
+  const hours = currentDate.getHours();
+  const minutes = currentDate.getMinutes();
+  const currenttime = `${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
+  return currenttime;
 }
 const logout = () => {
   localStorage.removeItem('user');
@@ -394,30 +521,125 @@ const logout = () => {
         </div>
       </div>
     </div>
-    <div v-show="hide1">
-      <div>
-        <p>{{ loginSuccess }}</p>
-        <button>Start Chat</button>
-        <button @click="toggleinbox">inbox</button>
+    <div v-show="hide1" class="sm:hidden">
+      <div class="flex flex-col gap-10 text-center">
+        <!-- <p>{{ loginSuccess }}</p> -->
+        <div class="flex justify-between mx-3 mt-3">
+          <span class="w-[10%]"><img src="@/assets/images/menu.svg"></span>
+          <span class="w-[20%] rounded-[50%] h-[70px]"><img src="@/assets/images/profile.jpg"
+              class="rounded-[100%] h-[100%] w-[100%]"></span>
+        </div>
+        <span class="font-[quicksand] text-[30px] text-[#A4A716] my-5 leading-10 font-bold">Welcome to Fast Chat Web
+          App</span>
+        <div class="flex w-fit mx-auto gap-8">
+          <div class="flex flex-col">
+            <span class=""><img src="@/assets/images/chat.png" class="w-[78%]"></span>
+            <button class="-mt-1">start chat</button>
+          </div>
+          <div class="flex flex-col hover:cursor-pointer" @click="toggleinbox">
+            <span class="mt-[-9px]"><img src="@/assets/images/inbox.png" class="w-[65px] h-[65px]"></span>
+            <button class="mt-[-7.5px]">inbox</button>
+          </div>
+        </div>
       </div>
     </div>
     <div v-show="showinbox">
-      <button @click="logout">Logout</button>
-      <div>
+      <!-- <button @click="logout">Logout</button>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                -->
+      <!-- <div class="hidden">
         <label for="recipient">Recipient ID:</label>
         <input v-model="recipientUsername" id="recipient" />
       </div>
-      <div>
+      <div class="hidden">
         <label for="message">Message:</label>
-        <input v-model="message" />
+        <input v-model="message"/>
         <button @click="sendMessage" id="message">Send Message</button>
-      </div>
-      <div>
-        <h2>Chat:</h2>
+      </div> -->
+      <div class="hidden">
+        <h2>Chat</h2>
         <ul>
           <li v-for="msg in messages" :key="msg.id">{{ msg.id }} {{ msg.senderUsername }}: {{ msg.message }}</li>
         </ul>
       </div>
+      <!-- <ul>
+          <li v-for="msg in messages1" :key="msg.id">
+            <div class="flex">
+              <span>Mary{{ msg.senderUsername }}</span>
+              <span>16:20{{ msg.time }}</span>
+            </div>
+            <span>sasa{{ msg.message }}</span>
+          </li>
+        </ul> -->
+      <ul v-show="hideInbox">
+        <li class="flex justify-between" @click="goback">
+          <div class="w-12 h-12 rounded-[100%] bg-slate-300 p-1"><img src="@/assets/images/user_profile.png"
+              class="w-[38px] h-[35px]"></div>
+          <div class="flex flex-col bg-slate-300 w-[85%] pr-5 border-2">
+            <div class="flex justify-between">
+              <span class="font-bold text-lg">Mary</span>
+              <span>16:20</span>
+            </div>
+            <span>sasa</span>
+          </div>
+        </li>
+        <li class="flex justify-between">
+          <div class="w-12 h-12 rounded-[100%] bg-slate-300 p-1"><img src="@/assets/images/user_profile.png"
+              class="w-[38px] h-[35px]"></div>
+          <div class="flex flex-col bg-slate-300 w-[85%] pr-5 border-2">
+            <div class="flex justify-between">
+              <span class="font-bold text-lg">Mary</span>
+              <span>16:20</span>
+            </div>
+            <span>sasa</span>
+          </div>
+        </li>
+        <li class="flex justify-between">
+          <div class="w-12 h-12 rounded-[100%] bg-slate-300 p-1"><img src="@/assets/images/user_profile.png"
+              class="w-[38px] h-[35px]"></div>
+          <div class="flex flex-col bg-slate-300 w-[85%] pr-5 border-2">
+            <div class="flex justify-between">
+              <span class="font-bold text-lg">Mary</span>
+              <span>16:20</span>
+            </div>
+            <span>sasa</span>
+          </div>
+        </li>
+        <!-- <div><span ref="senderRefs">heloo</span></div> -->
+        inbox
+        <ul>
+          <li v-for="(msg, index) in messages1" :key="index" @click="getSender(index)" ref="senderRefs">{{ msg.time }} {{
+            msg.senderUsername }} : {{ msg.message }}</li>
+        </ul>
+      </ul>
+      <ul class="px-5 flex flex-col gap-3 mt-10" v-show="showmessenger">
+        <div class="flex gap-9"><button @click="goback">back</button>&nbsp;<span class="font-bold text-lg">Mary</span>
+        </div>
+        <li class="flex flex-col mr-5">
+          <span class="self-center">12:30</span>
+          <span class="bg-gray-200 w-fit rounded-lg px-3 py-1 self-start flex text-wrap">Niaje</span>
+        </li>
+        <li class="flex flex-col ml-5">
+          <span class="self-center mr-10">12:39</span>
+          <span class="bg-green-600 w-fit text-white rounded-lg px-3 py-1 self-end">Poa sana</span>
+        </li>
+        <li class="flex flex-col mr-5 overflow-hidden">
+          <span class="self-center">12:41</span>
+          <span class="bg-gray-200 w-fit rounded-lg px-3 py-1 self-start overflow-wrap break-words">Lorem ipsum dolor sit
+            amet consecteturadipisicingelitTempore,porromolestiasofficiisnostrum ani</span>
+        </li>
+        <div>
+          <label for="recipient">Recipient ID:</label>
+          <input v-model="recipientUsername" id="recipient" />
+        </div>
+        <div>
+          <h3>chat</h3>
+          <ul>
+            <li v-for="msg in messages" :key="msg.id">{{ msg.time }} {{ msg.senderUsername }}: {{ msg.message }}</li>
+          </ul>
+          <label for="message">Message:</label>
+          <input v-model="message" class="border-2 border-slate-500" />
+          <button @click="sendMessage" id="message">Send Message</button>
+        </div>
+      </ul>
     </div>
   </div>
 </template>
