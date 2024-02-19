@@ -325,14 +325,16 @@ onMounted(() => {
     // let userFound = false;
     // console.log('b4', userMessage1);
     const msgArray = [];
+    // console.log('1Stt', userMessage);
+    // console.log('2ntt', userMessage1);
     for (let i = 0; i < userMessage.length; i++) {
       const searchedUser = userMessage[i].senderUsername;
       for (let j = 0; j < userMessage1.length; j++) {
         const comparedUser = userMessage1[j].recipientUsername;
         if (comparedUser == searchedUser) {
           // console.log('ndiooo', comparedUser + '' + searchedUser);
-          // console.log('first',userMessage[i]);
-          // console.log('2nd',userMessage1[j]);
+          console.log('first',userMessage[i]);
+          console.log('2nd',userMessage1[j]);
           //  console.log(messagez);
           //  console.log(messagez.indexOf(userMessage[i]));
           //   console.log(messagez.indexOf(userMessage1[j]));
@@ -345,25 +347,51 @@ onMounted(() => {
             // console.log('afterr1',userMessage1);
           }
         }
-        if (comparedUser != searchedUser){
-          userMessage1.splice(j, 1);
-          j++;
-          break;  
-        } 
-        msgArray.push(userMessage1);  
+        // if (comparedUser != searchedUser){
+        //   userMessage1.splice(j, 1);
+        //   j++;
+        //   break;  
+        // } 
+        // console.log('myrray-compared-msg1',userMessage[i]); 
+        // console.log('myrray-msg',userMessage1[j]);   
         // messages1.value = userMessage;
         // messages1.value.push(userMessage1[j]);
       }
       // break;
     }
-    console.log('check ths arry', userMessage);
-    console.log('the array',userMessage1);
-    console.log('newarray', msgArray);
-    userMessage.push(msgArray);
-    console.log('pp',userMessage);
+    // console.log('check ths arry', userMessage);
+    // console.log('the array',userMessage1);
+    // console.log('newarray', msgArray);
+    // userMessage.push(msgArray);
+    // console.log('pp',userMessage);
     messages1.value = userMessage;
-    ;
-    //messages1.value.push(userMessage1);
+    console.log('1Stt', userMessage);
+    console.log('2ntt', userMessage1);
+    console.log('inbox', messages1.value);
+    // const mynewarray = [];
+    for (let i = 0;i < userMessage.length;i++){
+      const objValue = userMessage[i].senderUsername;
+      for(let j = 0;j<userMessage1.length;j++){
+        const objValue2 = userMessage1[j].recipientUsername;
+        if((objValue.includes(objValue2))){
+          userMessage1.splice(j, 1);
+          break;
+        }
+        // mynewarray = userMessage1;
+      }
+      // console.log('tazamaee',mynewarray);
+      console.log('tazamaee2',userMessage1);
+      
+    }
+    for(let i=0;i<userMessage1.length;i++){
+      const obj = userMessage1[i];
+      userMessage1[i].senderUsername = userMessage1[i].recipientUsername;
+      messages1.value.push(obj);
+    }
+    messages1.value.reverse();
+    // console.log('tazamaee3',userMessage1);
+    console.log('tazm4',messages1.value);
+    console.log(messagez);
 
   });
 
@@ -384,12 +412,15 @@ const sendMessage = () => {
   for (let i = 0; i < messages1.value.length; i++) {
     if (messages1.value[i].senderUsername == recipientUsername.value) {
       messages1.value[i].message = message.value;
+      messages1.value[i].time = currenttime();
+      const removeObj = messages1.value.splice(i, 1)[0];
+      messages1.value.unshift(removeObj);
       matchFound = true;
       break;
     }
   }
   if (!matchFound) {
-    messages1.value.push({ id: checktime(), senderUsername: recipientUsername.value, message: message.value, time: currenttime() });
+    messages1.value.unshift({ id: checktime(), senderUsername: recipientUsername.value, message: message.value, time: currenttime() });
   }
   message.value = '';
 };
@@ -409,7 +440,7 @@ socket.on('receiveMessage', ({ senderUsername, message }) => {
       break;
     }
   }
-  messages1.value.push(newmessage);
+  messages1.value.unshift(newmessage);
 });
 
 socket.on('disconnect', () => {
