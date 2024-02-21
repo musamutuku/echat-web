@@ -7,7 +7,9 @@ const socket = io('http://localhost:3001');
 const user = ref(null);
 const message = ref('');
 const messages = ref([]);
+// const messagez = ref([]);
 const messages1 = ref([]);
+const chatMessages = ref([]);
 const recipientUsername = ref('');
 
 const store = useAuthStore();
@@ -39,6 +41,7 @@ const showinbox = ref(false);
 const hideFeedback = ref(true);
 const showmessenger = ref(false);
 const hideInbox = ref(true);
+const users = ref([]);
 // const recipientname = ref('');
 const senderRefs = ref([]);
 
@@ -50,12 +53,20 @@ const populateListItemsRef = () => {
 
 // Call populateListItemsRef on component mount
 // populateListItemsRef();
-
+const checkinboxx = () =>{
+  console.log('kagua chatinbox', chatMessages.value);
+}
 const getSender = (index) => {
   // recipientUsername.value = senderRef.value;
   // const clickedItem = senderRefs.value[index].value;
   // console.log(senderRefs.value[index]);
+  messages.value = chatMessages;
   recipientUsername.value = messages1.value[index].senderUsername;
+  const userMessage2 = chatMessages.value.filter((msg) => ((msg.senderUsername == user.value.username) && (msg.recipientUsername == recipientUsername.value)) || ((msg.senderUsername == recipientUsername.value) && (msg.recipientUsername == user.value.username)));
+  messages.value = userMessage2;
+  // console.log('chec1', userMessage3);
+  // console.log('chec2', chatMessages);
+  // console.log('chec3',messages1.value);
   //  console.log(clickedItem);
 }
 
@@ -112,6 +123,15 @@ const logbtn = computed(() => {
   isdisabledLog.value = true;
 });
 
+onMounted(() => {
+  fetch('http://localhost:3001/users').then(response => response.json())
+    .then(data => localStorage.setItem('users', JSON.stringify(data)));
+});
+if(process.client){
+  const users1 = JSON.parse(localStorage.getItem('users'));
+// const users = localStorage.getItem('users');
+  users.value = users1;
+}
 
 //Registration
 const registerUser = () => {
@@ -169,7 +189,7 @@ function registerSuccess(regMsg) {
   email.value = "";
   password.value = "";
   confirm.value = "";
-  setTimeout(() => {
+  setTimeout(() => {    
     successMsg.value = '';
     showsuccess.value = false;
     showLog.value = true;
@@ -262,8 +282,27 @@ onMounted(() => {
       hideFeedback.value = false;
     }, 3000);
   });
+  socket.on('storedMessages133', (msgx) =>{
+    console.log('help', msgx);
+    chatMessages.value = msgx;
+    console.log('2',chatMessages.value);
+    messagez.value = [...msgx];
+    messagez.value.push({ id: checktime(), senderUsername: 'You', recipientUsername: 'jmm', message: 'hey', time: currenttime() });
+    console.log('1',messagez.value);
+    // console.log('2',chatMessages.value);
+    console.log('help1', msgx);
+  })
 
-  socket.on('storedMessages', (messagez) => {
+
+  socket.on('storedMessages', (messagez1) => {
+    // var messagez2 = [...messagez1];
+    const messagez = JSON.parse(JSON.stringify(messagez1));
+    // messagez.value = [...messagez1];
+    chatMessages.value = [...messagez1];
+    // messages.value = [...messagez1];
+    // chatMessages.value = newmessageArray;
+    // messages.value = [...newmessageArray];
+    // console.log('22',newmessageArray);
     const currentDate = new Date();
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     const dayOfWeek = currentDate.getDay();
@@ -278,8 +317,15 @@ onMounted(() => {
     const formattedDate = `${dayName}, ${dayOfMonth} ${monthName} ${year}, ${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
     const userMessage = messagez.filter((msg) => msg.recipientUsername === user.value.username);
     const userMessage1 = messagez.filter((msg) => msg.senderUsername === user.value.username);
+    // const userMessage2 = messagez.filter((msg) => ((msg.senderUsername === user.value.username) && (msg.recipientUsername === recipientUsername.value )) || ((msg.senderUsername === recipientUsername.value) && (msg.recipientUsername === user.value.username)));
     console.log('fisrt b4', userMessage);
-    messages.value = messagez;
+    // chatMessages.value = messagez1;
+    // messages.value = [...messagez];
+    // console.log('log11', messagez1);
+    // console.log('log113', arr);
+    console.log('log21', messages.value);
+    console.log('log31', chatMessages.value);
+    // console.log('log3',chatMessages.value);
     for (let i = 0; i < userMessage1.length; i++) {
       // Get the property value to compare
       let propValue = userMessage1[i].recipientUsername;
@@ -333,8 +379,8 @@ onMounted(() => {
         const comparedUser = userMessage1[j].recipientUsername;
         if (comparedUser == searchedUser) {
           // console.log('ndiooo', comparedUser + '' + searchedUser);
-          console.log('first',userMessage[i]);
-          console.log('2nd',userMessage1[j]);
+          console.log('first', userMessage[i]);
+          console.log('2nd', userMessage1[j]);
           //  console.log(messagez);
           //  console.log(messagez.indexOf(userMessage[i]));
           //   console.log(messagez.indexOf(userMessage1[j]));
@@ -367,31 +413,28 @@ onMounted(() => {
     messages1.value = userMessage;
     console.log('1Stt', userMessage);
     console.log('2ntt', userMessage1);
-    console.log('inbox', messages1.value);
+    console.log('allinbox', messagez.value);
     // const mynewarray = [];
-    for (let i = 0;i < userMessage.length;i++){
+    for (let i = 0; i < userMessage.length; i++) {
       const objValue = userMessage[i].senderUsername;
-      for(let j = 0;j<userMessage1.length;j++){
+      for (let j = 0; j < userMessage1.length; j++) {
         const objValue2 = userMessage1[j].recipientUsername;
-        if((objValue.includes(objValue2))){
+        if ((objValue.includes(objValue2))) {
           userMessage1.splice(j, 1);
           break;
         }
-        // mynewarray = userMessage1;
       }
-      // console.log('tazamaee',mynewarray);
-      console.log('tazamaee2',userMessage1);
-      
-    }
-    for(let i=0;i<userMessage1.length;i++){
-      const obj = userMessage1[i];
-      userMessage1[i].senderUsername = userMessage1[i].recipientUsername;
-      messages1.value.push(obj);
+      console.log('tazamaee2', userMessage1);
     }
     messages1.value.reverse();
     // console.log('tazamaee3',userMessage1);
-    console.log('tazm4',messages1.value);
-    console.log(messagez);
+    console.log('tazm4', messages1.value);
+    // console.log(messagez);
+     for (let i = 0; i < userMessage1.length; i++) {
+        const obj = userMessage1[i];
+        userMessage1[i].senderUsername = userMessage1[i].recipientUsername;
+        messages1.value.unshift(obj);
+      }
 
   });
 
@@ -474,27 +517,31 @@ const logout = () => {
   localStorage.removeItem('user');
   hide.value = true;
   hide1.value = false;
-  showinbox.value = false;
+  showinbox.value = false;                                                                                                                                                                                                                                                                                                                                                                                                
   loginMsg.value = '';
 }
-</script>
+// console.log('lll', users);
+</script>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
 
-<template>
-  <div :class="{ 'pointer-events-none': loading }">
-    <div v-show="hide">
-      <div class="absolute bg-[#00000080] h-full w-[100%] z-10 flex justify-center items-center text-sm"
-        v-show="showsuccess" @click="resetSuccess">
-        <p class="bg-[#ACEEAC] py-3 px-3 mx-3 text-center">{{ successMsg }}</p>
+<template>                                                                                                                                                                                                                                             
+  <!-- <div v-for="item in users" :key="item.id">                                                                                                                                                                                                                                                                        
+      <li>{{ item.username }}</li>                                                                                                                                      
+  </div>                                                                                                                     -->
+  <div :class="{ 'pointer-events-none': loading }">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+    <div v-show="hide">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+      <div class="absolute bg-[#00000080] h-full w-[100%] z-10 flex justify-center items-center text-sm"                                                                                                                           
+        v-show="showsuccess" @click="resetSuccess">                                                                                                                                                                           
+        <p class="bg-[#ACEEAC] py-3 px-3 mx-3 text-center">{{ successMsg }}</p>                                                                                                                                                                                                                                                                                                                              
       </div>
-      <div class="absolute bg-[#00000080] h-full w-[100%] z-10 flex justify-center items-center text-sm"
-        v-show="showerror" @click="resetError">
+      <div class="absolute bg-[#00000080] h-full w-[100%] z-10 flex justify-center items-center text-sm"                                                                                                                                                
+        v-show="showerror" @click="resetError">                                                                                                                                                                                                                                                                                                                                                                                                                         
         <p class="bg-[#742929] text-white py-3 px-5">{{ errormsg }}</p>
       </div>
-      <div v-show="showReg" class="flex flex-col justify-center">
-        <div class="bg-[#236E98] text-center py-3 mb-4 font-[quicksand] w-[99%] mx-auto font-bold">
-          <h2 class=" text-[25px] text-[#A4A716]">CREATE eCHAT ACCOUNT</h2>
+      <div v-show="showReg" class="flex flex-col justify-center">                                                                                               
+        <div class="bg-[#236E98] text-center py-3 mb-4 font-[quicksand] w-[99%] mx-auto font-bold">                                                                                                                                 
+          <h2 class=" text-[25px] text-[#A4A716]">CREATE eCHAT ACCOUNT</h2>                                                                                                                                                                                                                                                                       
         </div>
-        <span class="font-semibold text-[#970606] font-[quicksand] text-center text-[13px]">{{ userError }}</span>
+        <span class="font-semibold text-[#970606] font-[quicksand] text-center text-[13px]">{{ userError }}</span>                                                                                        
         <div class="mx-auto py-2 flex flex-col gap-8 regbox">
           <div class="flex flex-col">
             <label for="username">Username</label>
@@ -635,7 +682,7 @@ const logout = () => {
           </div>
         </li>
         <!-- <div><span ref="senderRefs">heloo</span></div> -->
-        inbox
+        <p @click="checkinboxx">check inbox</p>
         <ul>
           <li v-for="(msg, index) in messages1" :key="index" @click="getSender(index)" ref="senderRefs">{{ msg.time }} {{
             msg.senderUsername }} : {{ msg.message }}</li>
