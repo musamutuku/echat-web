@@ -7,7 +7,6 @@ const socket = io('http://localhost:3001');
 const user = ref(null);
 const message = ref('');
 const messages = ref([]);
-// const messagez = ref([]);
 const messages1 = ref([]);
 const chatMessages = ref([]);
 const recipientUsername = ref('');
@@ -36,47 +35,47 @@ const hideWaitMsg = ref("SIGN IN");
 const hideWaitMsg1 = ref("SIGN UP");
 const loading = ref(false);
 const loginMsg = ref('');
-const loginSuccess = ref('');
 const showinbox = ref(false);
 const hideFeedback = ref(true);
 const showmessenger = ref(false);
-const hideInbox = ref(true);
+const showStartChat = ref(false);
 const users = ref([]);
-// const recipientname = ref('');
 const senderRefs = ref([]);
+const recipientRefs = ref([]);
 
-const populateListItemsRef = () => {
-  senderRefs.value = Array.from({ length: messages1.length }, (_, index) => {
-    return ref(null);
-  });
-};
 
-// Call populateListItemsRef on component mount
-// populateListItemsRef();
-const checkinboxx = () =>{
-  console.log('kagua chatinbox', chatMessages.value);
-}
 const getSender = (index) => {
-  // recipientUsername.value = senderRef.value;
-  // const clickedItem = senderRefs.value[index].value;
-  // console.log(senderRefs.value[index]);
+  showmessenger.value = true;
+  showinbox.value = false;
   messages.value = chatMessages;
   recipientUsername.value = messages1.value[index].senderUsername;
   const userMessage2 = chatMessages.value.filter((msg) => ((msg.senderUsername == user.value.username) && (msg.recipientUsername == recipientUsername.value)) || ((msg.senderUsername == recipientUsername.value) && (msg.recipientUsername == user.value.username)));
   messages.value = userMessage2;
-  // console.log('chec1', userMessage3);
-  // console.log('chec2', chatMessages);
-  // console.log('chec3',messages1.value);
-  //  console.log(clickedItem);
+}
+
+
+const getRecipient = (item) => {
+  showmessenger.value = true;
+  showinbox.value = false;
+  showStartChat.value = false;
+  messages.value = chatMessages;
+  recipientUsername.value = item.username;
+  const userMessage2 = chatMessages.value.filter((msg) => ((msg.senderUsername == user.value.username) && (msg.recipientUsername == recipientUsername.value)) || ((msg.senderUsername == recipientUsername.value) && (msg.recipientUsername == user.value.username)));
+  messages.value = userMessage2;
 }
 
 const goback = () => {
   showmessenger.value = !showmessenger.value;
-  hideInbox.value = !hideInbox.value;
+  showinbox.value = !showinbox.value;
 }
 
 const toggleinbox = () => {
   showinbox.value = true;
+  hide1.value = false;
+
+}
+const togglestartChat = () => {
+  showStartChat.value = true;
   hide1.value = false;
 
 }
@@ -127,9 +126,9 @@ onMounted(() => {
   fetch('http://localhost:3001/users').then(response => response.json())
     .then(data => localStorage.setItem('users', JSON.stringify(data)));
 });
-if(process.client){
+
+if (process.client) {
   const users1 = JSON.parse(localStorage.getItem('users'));
-// const users = localStorage.getItem('users');
   users.value = users1;
 }
 
@@ -189,7 +188,7 @@ function registerSuccess(regMsg) {
   email.value = "";
   password.value = "";
   confirm.value = "";
-  setTimeout(() => {    
+  setTimeout(() => {
     successMsg.value = '';
     showsuccess.value = false;
     showLog.value = true;
@@ -261,9 +260,7 @@ onMounted(() => {
     localStorage.setItem('token', token.value);
     hide.value = false;
     hide1.value = true;
-    loginSuccess.value = 'Logged in successfully';
     setTimeout(() => {
-      loginSuccess.value = '';
       hideFeedback.value = false;
     }, 3000);
   });
@@ -282,50 +279,15 @@ onMounted(() => {
       hideFeedback.value = false;
     }, 3000);
   });
-  socket.on('storedMessages133', (msgx) =>{
-    console.log('help', msgx);
-    chatMessages.value = msgx;
-    console.log('2',chatMessages.value);
-    messagez.value = [...msgx];
-    messagez.value.push({ id: checktime(), senderUsername: 'You', recipientUsername: 'jmm', message: 'hey', time: currenttime() });
-    console.log('1',messagez.value);
-    // console.log('2',chatMessages.value);
-    console.log('help1', msgx);
-  })
-
 
   socket.on('storedMessages', (messagez1) => {
-    // var messagez2 = [...messagez1];
     const messagez = JSON.parse(JSON.stringify(messagez1));
-    // messagez.value = [...messagez1];
     chatMessages.value = [...messagez1];
-    // messages.value = [...messagez1];
-    // chatMessages.value = newmessageArray;
-    // messages.value = [...newmessageArray];
-    // console.log('22',newmessageArray);
-    const currentDate = new Date();
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const dayOfWeek = currentDate.getDay();
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const dayName = dayNames[dayOfWeek];
-    const dayOfMonth = currentDate.getDate();
-    const monthName = monthNames[currentDate.getMonth()];
-    const year = currentDate.getFullYear();
-    const hours = currentDate.getHours();
-    const minutes = currentDate.getMinutes();
-    const currenttime = `${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
-    const formattedDate = `${dayName}, ${dayOfMonth} ${monthName} ${year}, ${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
     const userMessage = messagez.filter((msg) => msg.recipientUsername === user.value.username);
     const userMessage1 = messagez.filter((msg) => msg.senderUsername === user.value.username);
-    // const userMessage2 = messagez.filter((msg) => ((msg.senderUsername === user.value.username) && (msg.recipientUsername === recipientUsername.value )) || ((msg.senderUsername === recipientUsername.value) && (msg.recipientUsername === user.value.username)));
-    console.log('fisrt b4', userMessage);
-    // chatMessages.value = messagez1;
-    // messages.value = [...messagez];
-    // console.log('log11', messagez1);
-    // console.log('log113', arr);
-    console.log('log21', messages.value);
-    console.log('log31', chatMessages.value);
-    // console.log('log3',chatMessages.value);
+
+    //Get the msgs send by the currently logged in user. First get one(loop with i), then get the next( j=i+i), then
+    //compare to get the one which was send later and remove the ones send earlier(older i.e the ones with lower indexes)
     for (let i = 0; i < userMessage1.length; i++) {
       // Get the property value to compare
       let propValue = userMessage1[i].recipientUsername;
@@ -341,80 +303,39 @@ onMounted(() => {
       }
     }
 
-    // messages.id = formattedDate;
-    // messages.time = currenttime;
-    let newArray = [];
+    //Get the msgs to the currently logged in user by other clients. First get one(loop with i), then get the next( j=i+i), then
+    //compare to get the one which was send later and remove the ones send earlier(older i.e the ones with lower indexes)
     for (let i = 0; i < userMessage.length; i++) {
-      // userMessage[i].id = formattedDate;
-      // userMessage[i].time = currenttime;
-      // if(userMessage[i].senderUsername == user.value.username){
-      //   userMessage[i].senderUsername = 'You';
-      // }
-    }
-    for (let i = 0; i < userMessage.length; i++) {
-      // Get the property value to compare
       let propValue = userMessage[i].senderUsername;
-
-      // Iterate over the subsequent objects
       for (let j = i + 1; j < userMessage.length; j++) {
-        // If the property value matches, remove the object with lower index
         if (userMessage[j].senderUsername === propValue) {
-          userMessage.splice(i, 1); // Remove object at lower index
-          i--; // Adjust index to account for removed object
-          break; // Exit inner loop 
+          userMessage.splice(i, 1); 
+          i--; 
+          break; 
         }
       }
     }
-    // messages1.value = userMessage;
-    // console.log(userMessage1);
-    // console.log(userMessage);
-    // let userFound = false;
-    // console.log('b4', userMessage1);
-    const msgArray = [];
-    // console.log('1Stt', userMessage);
-    // console.log('2ntt', userMessage1);
+
+    //Get the new arrays formed after splicing the lower indexes, 
+    //then get the msgs send by one sender(i) to logged user and replies the looged user send back (j)- [loop to all in i and j]
+    //compare the two and return the msg send latest by replacing the msg of the sender if it has lower index (using index from original array b4 spliced) 
+    //so that it can be reflected in the inbox page
     for (let i = 0; i < userMessage.length; i++) {
       const searchedUser = userMessage[i].senderUsername;
       for (let j = 0; j < userMessage1.length; j++) {
         const comparedUser = userMessage1[j].recipientUsername;
         if (comparedUser == searchedUser) {
-          // console.log('ndiooo', comparedUser + '' + searchedUser);
-          console.log('first', userMessage[i]);
-          console.log('2nd', userMessage1[j]);
-          //  console.log(messagez);
-          //  console.log(messagez.indexOf(userMessage[i]));
-          //   console.log(messagez.indexOf(userMessage1[j]));
           const index1 = messagez.indexOf(userMessage[i]);
           const index2 = messagez.indexOf(userMessage1[j]);
           if (index2 > index1) {
             userMessage[i].message = userMessage1[j].message;
-            // break;
-            // userMessage1.splice(j, 1);
-            // console.log('afterr1',userMessage1);
           }
         }
-        // if (comparedUser != searchedUser){
-        //   userMessage1.splice(j, 1);
-        //   j++;
-        //   break;  
-        // } 
-        // console.log('myrray-compared-msg1',userMessage[i]); 
-        // console.log('myrray-msg',userMessage1[j]);   
-        // messages1.value = userMessage;
-        // messages1.value.push(userMessage1[j]);
       }
-      // break;
     }
-    // console.log('check ths arry', userMessage);
-    // console.log('the array',userMessage1);
-    // console.log('newarray', msgArray);
-    // userMessage.push(msgArray);
-    // console.log('pp',userMessage);
     messages1.value = userMessage;
-    console.log('1Stt', userMessage);
-    console.log('2ntt', userMessage1);
-    console.log('allinbox', messagez.value);
-    // const mynewarray = [];
+
+  //filter and remove to avoid repeat in the inbox msgs
     for (let i = 0; i < userMessage.length; i++) {
       const objValue = userMessage[i].senderUsername;
       for (let j = 0; j < userMessage1.length; j++) {
@@ -424,21 +345,14 @@ onMounted(() => {
           break;
         }
       }
-      console.log('tazamaee2', userMessage1);
     }
     messages1.value.reverse();
-    // console.log('tazamaee3',userMessage1);
-    console.log('tazm4', messages1.value);
-    // console.log(messagez);
-     for (let i = 0; i < userMessage1.length; i++) {
-        const obj = userMessage1[i];
-        userMessage1[i].senderUsername = userMessage1[i].recipientUsername;
-        messages1.value.unshift(obj);
-      }
-
+    for (let i = 0; i < userMessage1.length; i++) {
+      const obj = userMessage1[i];
+      userMessage1[i].senderUsername = userMessage1[i].recipientUsername;
+      messages1.value.unshift(obj);
+    }
   });
-
-
 });
 
 
@@ -502,6 +416,7 @@ const checktime = () => {
   const year = currentDate.getFullYear();
   const hours = currentDate.getHours();
   const minutes = currentDate.getMinutes();
+  const currenttime = `${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
   const formattedDate = `${dayName}, ${dayOfMonth} ${monthName} ${year}, ${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
   return formattedDate;
 }
@@ -517,31 +432,27 @@ const logout = () => {
   localStorage.removeItem('user');
   hide.value = true;
   hide1.value = false;
-  showinbox.value = false;                                                                                                                                                                                                                                                                                                                                                                                                
+  showinbox.value = false;
   loginMsg.value = '';
 }
-// console.log('lll', users);
 </script>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
 
-<template>                                                                                                                                                                                                                                             
-  <!-- <div v-for="item in users" :key="item.id">                                                                                                                                                                                                                                                                        
-      <li>{{ item.username }}</li>                                                                                                                                      
-  </div>                                                                                                                     -->
-  <div :class="{ 'pointer-events-none': loading }">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
-    <div v-show="hide">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
-      <div class="absolute bg-[#00000080] h-full w-[100%] z-10 flex justify-center items-center text-sm"                                                                                                                           
-        v-show="showsuccess" @click="resetSuccess">                                                                                                                                                                           
-        <p class="bg-[#ACEEAC] py-3 px-3 mx-3 text-center">{{ successMsg }}</p>                                                                                                                                                                                                                                                                                                                              
+<template>
+  <div :class="{ 'pointer-events-none': loading }">
+    <div v-show="hide">
+      <div class="absolute bg-[#00000080] h-full w-[100%] z-10 flex justify-center items-center text-sm"
+        v-show="showsuccess" @click="resetSuccess">
+        <p class="bg-[#ACEEAC] py-3 px-3 mx-3 text-center">{{ successMsg }}</p>
       </div>
-      <div class="absolute bg-[#00000080] h-full w-[100%] z-10 flex justify-center items-center text-sm"                                                                                                                                                
-        v-show="showerror" @click="resetError">                                                                                                                                                                                                                                                                                                                                                                                                                         
+      <div class="absolute bg-[#00000080] h-full w-[100%] z-10 flex justify-center items-center text-sm"
+        v-show="showerror" @click="resetError">
         <p class="bg-[#742929] text-white py-3 px-5">{{ errormsg }}</p>
       </div>
-      <div v-show="showReg" class="flex flex-col justify-center">                                                                                               
-        <div class="bg-[#236E98] text-center py-3 mb-4 font-[quicksand] w-[99%] mx-auto font-bold">                                                                                                                                 
-          <h2 class=" text-[25px] text-[#A4A716]">CREATE eCHAT ACCOUNT</h2>                                                                                                                                                                                                                                                                       
+      <div v-show="showReg" class="flex flex-col justify-center">
+        <div class="bg-[#236E98] text-center py-3 mb-4 font-[quicksand] w-[99%] mx-auto font-bold">
+          <h2 class=" text-[25px] text-[#A4A716]">CREATE eCHAT ACCOUNT</h2>
         </div>
-        <span class="font-semibold text-[#970606] font-[quicksand] text-center text-[13px]">{{ userError }}</span>                                                                                        
+        <span class="font-semibold text-[#970606] font-[quicksand] text-center text-[13px]">{{ userError }}</span>
         <div class="mx-auto py-2 flex flex-col gap-8 regbox">
           <div class="flex flex-col">
             <label for="username">Username</label>
@@ -601,7 +512,6 @@ const logout = () => {
     </div>
     <div v-show="hide1" class="sm:hidden">
       <div class="flex flex-col gap-10 text-center">
-        <!-- <p>{{ loginSuccess }}</p> -->
         <div class="flex justify-between mx-3 mt-3">
           <span class="w-[10%]"><img src="@/assets/images/menu.svg"></span>
           <span class="w-[20%] rounded-[50%] h-[70px]"><img src="@/assets/images/profile.jpg"
@@ -610,7 +520,7 @@ const logout = () => {
         <span class="font-[quicksand] text-[30px] text-[#A4A716] my-5 leading-10 font-bold">Welcome to Fast Chat Web
           App</span>
         <div class="flex w-fit mx-auto gap-8">
-          <div class="flex flex-col">
+          <div class="flex flex-col" @click="togglestartChat">
             <span class=""><img src="@/assets/images/chat.png" class="w-[78%]"></span>
             <button class="-mt-1">start chat</button>
           </div>
@@ -621,88 +531,33 @@ const logout = () => {
         </div>
       </div>
     </div>
-    <div v-show="showinbox">
-      <!-- <button @click="logout">Logout</button>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                -->
-      <!-- <div class="hidden">
-        <label for="recipient">Recipient ID:</label>
-        <input v-model="recipientUsername" id="recipient" />
-      </div>
-      <div class="hidden">
-        <label for="message">Message:</label>
-        <input v-model="message"/>
-        <button @click="sendMessage" id="message">Send Message</button>
-      </div> -->
-      <div class="hidden">
-        <h2>Chat</h2>
-        <ul>
-          <li v-for="msg in messages" :key="msg.id">{{ msg.id }} {{ msg.senderUsername }}: {{ msg.message }}</li>
-        </ul>
-      </div>
-      <!-- <ul>
-          <li v-for="msg in messages1" :key="msg.id">
-            <div class="flex">
-              <span>Mary{{ msg.senderUsername }}</span>
-              <span>16:20{{ msg.time }}</span>
-            </div>
-            <span>sasa{{ msg.message }}</span>
-          </li>
-        </ul> -->
-      <ul v-show="hideInbox">
-        <li class="flex justify-between" @click="goback">
-          <div class="w-12 h-12 rounded-[100%] bg-slate-300 p-1"><img src="@/assets/images/user_profile.png"
-              class="w-[38px] h-[35px]"></div>
-          <div class="flex flex-col bg-slate-300 w-[85%] pr-5 border-2">
-            <div class="flex justify-between">
-              <span class="font-bold text-lg">Mary</span>
-              <span>16:20</span>
-            </div>
-            <span>sasa</span>
-          </div>
-        </li>
-        <li class="flex justify-between">
-          <div class="w-12 h-12 rounded-[100%] bg-slate-300 p-1"><img src="@/assets/images/user_profile.png"
-              class="w-[38px] h-[35px]"></div>
-          <div class="flex flex-col bg-slate-300 w-[85%] pr-5 border-2">
-            <div class="flex justify-between">
-              <span class="font-bold text-lg">Mary</span>
-              <span>16:20</span>
-            </div>
-            <span>sasa</span>
-          </div>
-        </li>
-        <li class="flex justify-between">
-          <div class="w-12 h-12 rounded-[100%] bg-slate-300 p-1"><img src="@/assets/images/user_profile.png"
-              class="w-[38px] h-[35px]"></div>
-          <div class="flex flex-col bg-slate-300 w-[85%] pr-5 border-2">
-            <div class="flex justify-between">
-              <span class="font-bold text-lg">Mary</span>
-              <span>16:20</span>
-            </div>
-            <span>sasa</span>
-          </div>
-        </li>
-        <!-- <div><span ref="senderRefs">heloo</span></div> -->
-        <p @click="checkinboxx">check inbox</p>
-        <ul>
-          <li v-for="(msg, index) in messages1" :key="index" @click="getSender(index)" ref="senderRefs">{{ msg.time }} {{
-            msg.senderUsername }} : {{ msg.message }}</li>
-        </ul>
+    <div v-show="showStartChat">
+       <ul>
+        <li v-for="item in users" :key="item.username" @click="getRecipient(item)" ref="recipientRefs">{{ item.username }}</li> 
       </ul>
-      <ul class="px-5 flex flex-col gap-3 mt-10" v-show="showmessenger">
+     </div>
+    <div v-show="showinbox">
+      <ul>
+        <li class="flex justify-between"  v-for="(msg, index) in messages1" :key="index" @click="getSender(index)" ref="senderRefs">
+          <div class="w-12 h-12 rounded-[100%] bg-slate-300 p-1"><img src="@/assets/images/user_profile.png"
+              class="w-[38px] h-[35px]"></div>
+          <div class="flex flex-col bg-slate-300 w-[85%] pr-5 border-2">
+            <div class="flex justify-between">
+              <span class="font-bold text-lg">{{ msg.senderUsername }}</span>
+              <span>{{ msg.time }}</span>
+            </div>
+            <span>{{ msg.message }}</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div v-show="showmessenger">
+       <ul class="px-5 flex flex-col gap-3 mt-10">
         <div class="flex gap-9"><button @click="goback">back</button>&nbsp;<span class="font-bold text-lg">Mary</span>
         </div>
-        <li class="flex flex-col mr-5">
-          <span class="self-center">12:30</span>
-          <span class="bg-gray-200 w-fit rounded-lg px-3 py-1 self-start flex text-wrap">Niaje</span>
-        </li>
-        <li class="flex flex-col ml-5">
-          <span class="self-center mr-10">12:39</span>
-          <span class="bg-green-600 w-fit text-white rounded-lg px-3 py-1 self-end">Poa sana</span>
-        </li>
-        <li class="flex flex-col mr-5 overflow-hidden">
-          <span class="self-center">12:41</span>
-          <span class="bg-gray-200 w-fit rounded-lg px-3 py-1 self-start overflow-wrap break-words">Lorem ipsum dolor sit
-            amet consecteturadipisicingelitTempore,porromolestiasofficiisnostrum ani</span>
+        <li v-for="msg in messages" :key="msg.id" class="flex flex-col" :class="{'mr-5': msg.senderUsername !== user.value.username, 'ml-5': msg.senderUsername === user.value.username}">
+          <span class="self-center" :class="{'mr-10': msg.senderUsername === user.value.username}">{{ msg.time }}</span>
+          <span class="w-fit rounded-lg px-3 py-1 self-start flex break-all" :class="{'bg-gray-200': msg.senderUsername !== user.value.username, 'bg-green-600': msg.senderUsername === user.value.username, 'self-start': msg.senderUsername !== user.value.username ,'self-end': msg.senderUsername === user.value.username}">{{ msg.message }}</span>
         </li>
         <div>
           <label for="recipient">Recipient ID:</label>
