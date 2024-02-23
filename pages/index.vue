@@ -73,7 +73,7 @@ const getClass2 = (name) =>{
 const getSender = (index) => {
   showmessenger.value = true;
   showinbox.value = false;
-  messages.value = chatMessages;
+  messages.value = chatMessages.value;
   recipientUsername.value = messages1.value[index].senderUsername;
   const userMessage2 = chatMessages.value.filter((msg) => ((msg.senderUsername == user.value.username) && (msg.recipientUsername == recipientUsername.value)) || ((msg.senderUsername == recipientUsername.value) && (msg.recipientUsername == user.value.username)));
   messages.value = userMessage2;
@@ -84,7 +84,7 @@ const getRecipient = (item) => {
   showmessenger.value = true;
   showinbox.value = false;
   showStartChat.value = false;
-  messages.value = chatMessages;
+  messages.value = chatMessages.value;
   recipientUsername.value = item.username;
   const userMessage2 = chatMessages.value.filter((msg) => ((msg.senderUsername == user.value.username) && (msg.recipientUsername == recipientUsername.value)) || ((msg.senderUsername == recipientUsername.value) && (msg.recipientUsername == user.value.username)));
   messages.value = userMessage2;
@@ -390,7 +390,7 @@ const sendMessage = () => {
     message: message.value,
     time: currenttime()
   });
-  messages.value.push({ id: checktime(), senderUsername: 'You', message: message.value, time: currenttime() });
+  messages.value.push({ id: checktime(), senderUsername: user.value.username, message: message.value, time: currenttime() });
   let matchFound = false;
   for (let i = 0; i < messages1.value.length; i++) {
     if (messages1.value[i].senderUsername == recipientUsername.value) {
@@ -410,15 +410,13 @@ const sendMessage = () => {
 
 
 socket.on('receiveMessage', ({ senderUsername, message }) => {
-  if (senderUsername != user.value.username) {
+  if (senderUsername != user.value.username && senderUsername == recipientUsername) {
     messages.value.push({ id: checktime(), senderUsername: senderUsername, message: message, time: currenttime() });
   }
   const newmessage = { id: checktime(), senderUsername: senderUsername, message: message, time: currenttime() };
-  // messages1.value = messages1.push(newmessage);
   const newvalue = newmessage.senderUsername;
   for (let i = 0; i < messages1.value.length; i++) {
     if (messages1.value[i].senderUsername === newvalue) {
-      // messages1.value[i] = newmessage;
       messages1.value.splice(i, 1);
       break;
     }
@@ -580,17 +578,13 @@ const logout = () => {
     </div>
     <div v-show="showmessenger">
        <ul class="px-5 flex flex-col gap-3 mt-10">
-        <div class="flex gap-9"><button @click="goback">back</button>&nbsp;<span class="font-bold text-lg">Mary</span>
+        <div class="flex gap-9"><button @click="goback">back</button>&nbsp;<span class="font-bold text-lg">{{ recipientUsername }}</span>
         </div>
         <li v-for="msg in messages" :key="msg.id" class="flex flex-col" :class="getClass(msg.senderUsername)">
-          <span class="self-center" :class="getClass(senderUsername)">{{ msg.time }}</span>
-          <span class="w-fit rounded-lg px-3 py-1 self-start flex break-all" :class="getClass2(senderUsername)">{{ msg.message }}</span>
+          <span class="self-center" :class="getClass1(msg.senderUsername)">{{ msg.time }}</span>
+          <span class="w-fit rounded-lg px-3 py-1 self-start flex break-all" :class="getClass2(msg.senderUsername)">{{ msg.message }}</span>
         </li>
-         <!-- <li v-for="msg in messages" :key="msg.id" class="flex flex-col">
-          <span class="self-center">{{ msg.time }}</span>
-          <span class="w-fit rounded-lg px-3 py-1 self-start flex break-all bg-gray-200">{{ msg.message }}</span>
-        </li> -->
-        <div>
+        <div class="hidden">
           <label for="recipient">Recipient ID:</label>
           <input v-model="recipientUsername" id="recipient" />
         </div>
