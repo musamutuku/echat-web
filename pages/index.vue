@@ -44,6 +44,32 @@ const senderRefs = ref([]);
 const recipientRefs = ref([]);
 
 
+
+const getClass = (name) =>{
+  if(name === user.value.username){
+    return 'ml-5';
+  }
+  else{
+    return 'mr-5';
+  }
+}
+
+
+const getClass1 = (name) =>{
+  if(name === user.value.username){
+    return 'mr-10';
+  }
+}
+
+const getClass2 = (name) =>{
+  if(name === user.value.username){
+    return ['bg-green-600', 'self-end'];
+  }
+  else{
+    return ['bg-gray-200', 'self-start'];
+  }
+}
+
 const getSender = (index) => {
   showmessenger.value = true;
   showinbox.value = false;
@@ -550,15 +576,20 @@ const logout = () => {
           </div>
         </li>
       </ul>
+      <div @click="togglestartChat">start chat</div>
     </div>
     <div v-show="showmessenger">
        <ul class="px-5 flex flex-col gap-3 mt-10">
         <div class="flex gap-9"><button @click="goback">back</button>&nbsp;<span class="font-bold text-lg">Mary</span>
         </div>
-        <li v-for="msg in messages" :key="msg.id" class="flex flex-col" :class="{'mr-5': msg.senderUsername !== user.value.username, 'ml-5': msg.senderUsername === user.value.username}">
-          <span class="self-center" :class="{'mr-10': msg.senderUsername === user.value.username}">{{ msg.time }}</span>
-          <span class="w-fit rounded-lg px-3 py-1 self-start flex break-all" :class="{'bg-gray-200': msg.senderUsername !== user.value.username, 'bg-green-600': msg.senderUsername === user.value.username, 'self-start': msg.senderUsername !== user.value.username ,'self-end': msg.senderUsername === user.value.username}">{{ msg.message }}</span>
+        <li v-for="msg in messages" :key="msg.id" class="flex flex-col" :class="getClass(msg.senderUsername)">
+          <span class="self-center" :class="getClass(senderUsername)">{{ msg.time }}</span>
+          <span class="w-fit rounded-lg px-3 py-1 self-start flex break-all" :class="getClass2(senderUsername)">{{ msg.message }}</span>
         </li>
+         <!-- <li v-for="msg in messages" :key="msg.id" class="flex flex-col">
+          <span class="self-center">{{ msg.time }}</span>
+          <span class="w-fit rounded-lg px-3 py-1 self-start flex break-all bg-gray-200">{{ msg.message }}</span>
+        </li> -->
         <div>
           <label for="recipient">Recipient ID:</label>
           <input v-model="recipientUsername" id="recipient" />
