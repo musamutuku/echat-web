@@ -24,7 +24,8 @@ const isdisabledReg = ref(true);
 const isFocused = ref(false);
 const isFocused1 = ref(false);
 const hide = ref(true);
-const hide1 = ref(false)
+const hide1 = ref(false);
+const hide2 = ref(false);
 const showsuccess = ref(false);
 const showerror = ref(false);
 const successMsg = ref('');
@@ -40,32 +41,56 @@ const hideFeedback = ref(true);
 const showmessenger = ref(false);
 const showStartChat = ref(false);
 const users = ref([]);
+const filteredUsers = ref([]);
 const senderRefs = ref([]);
 const recipientRefs = ref([]);
+const logoutshown = ref(false)
+const msgcontainer = ref(null);
+
+// Scroll to the bottom of the container after the component is mounted
+// onMounted(() => {
+//   if(msgcontainer.value) {
+//     msgcontainer.value.scrollTop = 10;
+//     console.log('1st',msgcontainer.value.scrollTop);
+//     console.log('2nd',msgcontainer.value.scrollHeight);
+//   }
+// })
 
 
+const toggleshown = () =>{
+  logoutshown.value = true;
+}
 
-const getClass = (name) =>{
-  if(name === user.value.username){
+
+const togglehome = () =>{
+  hide.value = false;
+  hide1.value = true;
+  showStartChat.value = false;
+  showinbox.value = false;
+  showmessenger.value = false;
+}
+
+const getClass = (name) => {
+  if (name === user.value.username) {
     return 'ml-5';
   }
-  else{
+  else {
     return 'mr-5';
   }
 }
 
 
-const getClass1 = (name) =>{
-  if(name === user.value.username){
+const getClass1 = (name) => {
+  if (name === user.value.username) {
     return 'mr-10';
   }
 }
 
-const getClass2 = (name) =>{
-  if(name === user.value.username){
+const getClass2 = (name) => {
+  if (name === user.value.username) {
     return ['bg-green-600', 'self-end'];
   }
-  else{
+  else {
     return ['bg-gray-200', 'self-start'];
   }
 }
@@ -157,6 +182,8 @@ if (process.client) {
   const users1 = JSON.parse(localStorage.getItem('users'));
   users.value = users1;
 }
+
+
 
 //Registration
 const registerUser = () => {
@@ -281,11 +308,13 @@ onMounted(() => {
     loading.value = false;
     hideWaitMsg.value = "SIGN IN";
     user.value = userData;
+    filteredUsers.value = users.value.filter(msg => msg.username !== user.value.username);
     token.value = userToken;
     localStorage.setItem('user', user);
     localStorage.setItem('token', token.value);
     hide.value = false;
     hide1.value = true;
+    hide2.value = true;
     setTimeout(() => {
       hideFeedback.value = false;
     }, 3000);
@@ -305,6 +334,7 @@ onMounted(() => {
       hideFeedback.value = false;
     }, 3000);
   });
+
 
   socket.on('storedMessages', (messagez1) => {
     const messagez = JSON.parse(JSON.stringify(messagez1));
@@ -335,9 +365,9 @@ onMounted(() => {
       let propValue = userMessage[i].senderUsername;
       for (let j = i + 1; j < userMessage.length; j++) {
         if (userMessage[j].senderUsername === propValue) {
-          userMessage.splice(i, 1); 
-          i--; 
-          break; 
+          userMessage.splice(i, 1);
+          i--;
+          break;
         }
       }
     }
@@ -361,7 +391,7 @@ onMounted(() => {
     }
     messages1.value = userMessage;
 
-  //filter and remove to avoid repeat in the inbox msgs
+    //filter and remove to avoid repeat in the inbox msgs
     for (let i = 0; i < userMessage.length; i++) {
       const objValue = userMessage[i].senderUsername;
       for (let j = 0; j < userMessage1.length; j++) {
@@ -390,7 +420,8 @@ const sendMessage = () => {
     message: message.value,
     time: currenttime()
   });
-  messages.value.push({ id: checktime(), senderUsername: user.value.username, message: message.value, time: currenttime() });
+  messages.value.push({ id: checktime(), senderUsername: user.value.username, recipientUsername: recipientUsername.value, message: message.value, time: currenttime() });
+  chatMessages.value.push({ id: checktime(), senderUsername: user.value.username, recipientUsername: recipientUsername.value, message: message.value, time: currenttime() });
   let matchFound = false;
   for (let i = 0; i < messages1.value.length; i++) {
     if (messages1.value[i].senderUsername == recipientUsername.value) {
@@ -410,10 +441,11 @@ const sendMessage = () => {
 
 
 socket.on('receiveMessage', ({ senderUsername, message }) => {
-  if (senderUsername != user.value.username && senderUsername == recipientUsername) {
+  if (senderUsername != user.value.username && senderUsername == recipientUsername.value) {
     messages.value.push({ id: checktime(), senderUsername: senderUsername, message: message, time: currenttime() });
   }
   const newmessage = { id: checktime(), senderUsername: senderUsername, message: message, time: currenttime() };
+  chatMessages.value.push({ id: checktime(), senderUsername: senderUsername, recipientUsername: user.value.username, message: message, time: currenttime() })
   const newvalue = newmessage.senderUsername;
   for (let i = 0; i < messages1.value.length; i++) {
     if (messages1.value[i].senderUsername === newvalue) {
@@ -431,7 +463,7 @@ socket.on('disconnect', () => {
 
 const checktime = () => {
   const currentDate = new Date();
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const dayOfWeek = currentDate.getDay();
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const dayName = dayNames[dayOfWeek];
@@ -455,9 +487,11 @@ const currenttime = () => {
 const logout = () => {
   localStorage.removeItem('user');
   hide.value = true;
-  hide1.value = false;
-  showinbox.value = false;
+  hide2.value = false;
   loginMsg.value = '';
+  username.value = '';
+  password.value = '';
+  logoutshown.value = false;
 }
 </script>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
 
@@ -480,19 +514,21 @@ const logout = () => {
         <div class="mx-auto py-2 flex flex-col gap-8 regbox">
           <div class="flex flex-col">
             <label for="username">Username</label>
-            <input type="text" v-model="username" maxlength="50" id="username">
+            <input type="text" class="placeholder:text-[14px]" v-model="username" maxlength="20" id="username"
+              placeholder="max. 20 characters e.g (musamutuku)">
           </div>
           <div class="flex flex-col">
             <label for="email">Email</label>
-            <input type="text" v-model="email" maxlength="50" id="email" @blur="changeCase">
+            <input type="text" class="placeholder:text-[14px]" v-model="email" maxlength="50" id="email" placeholder="e.g musa@gmail.com"
+              @blur="changeCase">
           </div>
           <div class="flex flex-col">
             <label for="password">Password</label>
-            <input type="password" v-model="password" maxlength="50" id="password">
+            <input type="password" v-model="password" maxlength="30" id="password">
           </div>
           <div class="flex flex-col">
             <label for="confirm">Confirm Password</label>
-            <input type="password" v-model="confirm" maxlength="50" id="confirm">
+            <input type="password" v-model="confirm" maxlength="30" id="confirm">
           </div>
           <button @click="registerUser"
             class="my-5 bg-[#E0DEEA] font-bold font-[quicksand] rounded-[5px] text-[18px] text-white h-[45px]"
@@ -534,6 +570,16 @@ const logout = () => {
         </div>
       </div>
     </div>
+   <div v-show="hide2">
+    <div class="hidden">
+      <li @click="togglehome">Home</li>
+      <li @click="togglestartChat">members</li>
+      <li @click="toggleshown">logout</li>
+    </div>
+    <div v-show="logoutshown">
+      <span>Logout?</span>
+      <span @click="logout">OK</span>
+    </div>
     <div v-show="hide1" class="sm:hidden">
       <div class="flex flex-col gap-10 text-center">
         <div class="flex justify-between mx-3 mt-3">
@@ -556,49 +602,62 @@ const logout = () => {
       </div>
     </div>
     <div v-show="showStartChat">
-       <ul>
-        <li v-for="item in users" :key="item.username" @click="getRecipient(item)" ref="recipientRefs">{{ item.username }}</li> 
-      </ul>
-     </div>
-    <div v-show="showinbox">
       <ul>
-        <li class="flex justify-between"  v-for="(msg, index) in messages1" :key="index" @click="getSender(index)" ref="senderRefs">
-          <div class="w-12 h-12 rounded-[100%] bg-slate-300 p-1"><img src="@/assets/images/user_profile.png"
+        <li v-for="item in filteredUsers" :key="item.username" @click="getRecipient(item)" ref="recipientRefs">{{
+          item.username }}</li>
+      </ul>
+    </div>
+    <div v-show="showinbox">
+      <div @click="togglestartChat" class="z-10 absolute bottom-40 right-5 w-16"><img src="@/assets/images/start.svg"></div>
+      <div class="mx-2 mt-5 mb-2 flex flex-col">
+        <div class="flex justify-between">
+          <span class="w-[10%]"><img src="@/assets/images/menu.svg" class="w-[36px] h-[32px]"></span>
+          <div class="flex self-end gap-2"> 
+            <span class="w-6"><img src="@/assets/images/search.png"></span>
+            <span class="w-5"><img src="@/assets/images/menu_btn.png"></span>
+          </div>
+        </div>
+        <span class="font-bold font-[quicksand] text-[20px]">Messages</span>
+      </div>
+      <ul class="mx-2">
+        <li class="flex justify-between h-[60px]" v-for="(msg, index) in messages1" :key="index" @click="getSender(index)"
+          ref="senderRefs">
+          <div class="w-12 self-center h-[50px] rounded-[100%] bg-[#D9D9D9] p-1"><img src="@/assets/images/user_profile.png"
               class="w-[38px] h-[35px]"></div>
-          <div class="flex flex-col bg-slate-300 w-[85%] pr-5 border-2">
+          <div class="flex flex-col bg-[#ffff55] w-[85%] pr-5 border-2">
             <div class="flex justify-between">
-              <span class="font-bold text-lg">{{ msg.senderUsername }}</span>
+              <span class="font-medium text-[20px]">{{ msg.senderUsername }}</span>
               <span>{{ msg.time }}</span>
             </div>
-            <span>{{ msg.message }}</span>
+            <span class="break-words whitespace-normal text-wrap text-[15px]">{{ msg.message }}</span>
           </div>
         </li>
       </ul>
-      <div @click="togglestartChat">start chat</div>
+      
     </div>
-    <div v-show="showmessenger">
-       <ul class="px-5 flex flex-col gap-3 mt-10">
-        <div class="flex gap-9"><button @click="goback">back</button>&nbsp;<span class="font-bold text-lg">{{ recipientUsername }}</span>
-        </div>
+    <div v-show="showmessenger" class="flex flex-col min-h-[600px] justify-between">
+      <div class="flex gap-9"><button @click="goback">back</button>&nbsp;<span class="font-bold text-lg">{{
+          recipientUsername }}</span>
+      </div>
+     <div class="bg-yellow-400">
+      <ul ref="msgcontainer" class="px-5 flex flex-col gap-3 mt-10 max-h-[470px] overflow-y-auto bg-red-300">
         <li v-for="msg in messages" :key="msg.id" class="flex flex-col" :class="getClass(msg.senderUsername)">
-          <span class="self-center" :class="getClass1(msg.senderUsername)">{{ msg.time }}</span>
-          <span class="w-fit rounded-lg px-3 py-1 self-start flex break-all" :class="getClass2(msg.senderUsername)">{{ msg.message }}</span>
+          <span class="self-center text-[10px]" :class="getClass1(msg.senderUsername)">{{ msg.id }}</span>
+          <span class="w-fit rounded-lg px-3 py-1 self-start flex break-all" :class="getClass2(msg.senderUsername)">{{
+            msg.message }}</span>
         </li>
-        <div class="hidden">
-          <label for="recipient">Recipient ID:</label>
-          <input v-model="recipientUsername" id="recipient" />
-        </div>
-        <div>
-          <h3>chat</h3>
-          <ul>
-            <li v-for="msg in messages" :key="msg.id">{{ msg.time }} {{ msg.senderUsername }}: {{ msg.message }}</li>
-          </ul>
+      </ul>
+     </div>
+      <div class="hidden">
+          <input v-model="recipientUsername"/>
+      </div>
+      <div class="flex-grow">
           <label for="message">Message:</label>
           <input v-model="message" class="border-2 border-slate-500" />
           <button @click="sendMessage" id="message">Send Message</button>
         </div>
-      </ul>
     </div>
+   </div>
   </div>
 </template>
 
