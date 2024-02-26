@@ -46,28 +46,49 @@ const senderRefs = ref([]);
 const recipientRefs = ref([]);
 const logoutshown = ref(false)
 const msgcontainer = ref(null);
+const isActive = ref(false);
+const isActive1 = ref(false);
+const isActive2 = ref(false);
+const displayMenu = ref(true);
+const isCollapsed = ref(true);
 
-// Scroll to the bottom of the container after the component is mounted
-// onMounted(() => {
-//   if(msgcontainer.value) {
-//     msgcontainer.value.scrollTop = 10;
-//     console.log('1st',msgcontainer.value.scrollTop);
-//     console.log('2nd',msgcontainer.value.scrollHeight);
-//   }
-// })
+
+
+const cancelLog = () =>{
+  logoutshown.value = false;
+}
+
+const showmenu = () =>{
+  isCollapsed.value = true;
+  isCollapsed.value = !isCollapsed.value;
+}
+
+const hidemenu = () =>{
+
+  isCollapsed.value = !isCollapsed.value;
+}
 
 
 const toggleshown = () =>{
   logoutshown.value = true;
+  isActive.value = false;
+  isActive1.value = false;
+  isActive2.value = true;
+  isCollapsed.value = true;
+  loading.value = true;
 }
 
 
 const togglehome = () =>{
+  isActive.value = true;
+  isActive1.value = false;
+  isActive2.value = false;
   hide.value = false;
   hide1.value = true;
   showStartChat.value = false;
   showinbox.value = false;
   showmessenger.value = false;
+  isCollapsed.value = true;
 }
 
 const getClass = (name) => {
@@ -123,11 +144,17 @@ const goback = () => {
 const toggleinbox = () => {
   showinbox.value = true;
   hide1.value = false;
+  showStartChat.value = false;
 
 }
 const togglestartChat = () => {
   showStartChat.value = true;
+  showinbox.value = false;
   hide1.value = false;
+  isActive.value = false;
+  isActive1.value = true;
+  isActive2.value = false;
+  isCollapsed.value = true;
 
 }
 
@@ -492,6 +519,9 @@ const logout = () => {
   username.value = '';
   password.value = '';
   logoutshown.value = false;
+  isActive.value = false;
+  isActive1.value = false;
+  isActive2.value = false;
 }
 </script>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
 
@@ -571,19 +601,23 @@ const logout = () => {
       </div>
     </div>
    <div v-show="hide2">
-    <div class="hidden">
-      <li @click="togglehome">Home</li>
-      <li @click="togglestartChat">members</li>
-      <li @click="toggleshown">logout</li>
+    <div v-show="displayMenu" :class="{ '-translate-x-[100%]': isCollapsed, 'translate-x-[0%]': !isCollapsed }" class="transition ease-in-out duration-[1s] absolute pl-4 list-none z-20 bg-[#888DED] text-[#031187] w-[55%] h-[100%] flex flex-col gap-6 font-semibold font-[quicksand] text-[18px]">
+      <div class="w-7 mt-4 mb-4" @click="hidemenu"><img src="@/assets/images/close.svg"></div>
+      <div class="flex flex-col gap-6 mx-3">
+        <li @click="togglehome" class="w-fit" :class="{ 'active': isActive }">Home</li>
+        <li @click="togglestartChat" class="w-fit" :class="{ 'active': isActive1 }">Members</li>
+        <li @click="toggleshown" class="w-fit" :class="{ 'active': isActive2  }">Logout</li>
+      </div>
     </div>
-    <div v-show="logoutshown">
+    <div v-show="logoutshown" class="absolute w-48 h-24 bg-green-500 top-40 left-[20%] pointer-events-all">
       <span>Logout?</span>
-      <span @click="logout">OK</span>
+      <span @click="logout">YES</span>
+      <span @click="cancelLog">NO</span>
     </div>
     <div v-show="hide1" class="sm:hidden">
       <div class="flex flex-col gap-10 text-center">
         <div class="flex justify-between mx-3 mt-3">
-          <span class="w-[10%]"><img src="@/assets/images/menu.svg"></span>
+          <span class="w-[10%]" @click="showmenu"><img src="@/assets/images/menu.svg"></span>
           <span class="w-[20%] rounded-[50%] h-[70px]"><img src="@/assets/images/profile.jpg"
               class="rounded-[100%] h-[100%] w-[100%]"></span>
         </div>
@@ -602,16 +636,9 @@ const logout = () => {
       </div>
     </div>
     <div v-show="showStartChat">
-      <ul>
-        <li v-for="item in filteredUsers" :key="item.username" @click="getRecipient(item)" ref="recipientRefs">{{
-          item.username }}</li>
-      </ul>
-    </div>
-    <div v-show="showinbox">
-      <div @click="togglestartChat" class="z-10 absolute bottom-40 right-5 w-16"><img src="@/assets/images/start.svg"></div>
-      <div class="mx-2 mt-5 mb-2 flex flex-col">
+      <div class="px-2 pt-5 mb-2 flex flex-col gap-2 bg-slate-50">
         <div class="flex justify-between">
-          <span class="w-[10%]"><img src="@/assets/images/menu.svg" class="w-[36px] h-[32px]"></span>
+          <span class="w-[10%]" @click="showmenu"><img src="@/assets/images/menu.svg" class="w-[36px] h-[32px]"></span>
           <div class="flex self-end gap-2"> 
             <span class="w-6"><img src="@/assets/images/search.png"></span>
             <span class="w-5"><img src="@/assets/images/menu_btn.png"></span>
@@ -619,12 +646,29 @@ const logout = () => {
         </div>
         <span class="font-bold font-[quicksand] text-[20px]">Messages</span>
       </div>
-      <ul class="mx-2">
-        <li class="flex justify-between h-[60px]" v-for="(msg, index) in messages1" :key="index" @click="getSender(index)"
+      <ul>
+        <li v-for="item in filteredUsers" :key="item.username" @click="getRecipient(item)" ref="recipientRefs">{{
+          item.username }}</li>
+      </ul>
+    </div>
+    <div v-show="showinbox">
+      <div @click="togglestartChat" class="z-10 absolute bottom-40 right-5 w-16"><img src="@/assets/images/start.svg"></div>
+      <div class="px-2 pt-5 flex flex-col gap-2 bg-slate-50">
+        <div class="flex justify-between">
+          <span class="w-[10%]" @click="showmenu"><img src="@/assets/images/menu.svg" class="w-[36px] h-[32px]"></span>
+          <div class="flex self-end gap-2"> 
+            <span class="w-6"><img src="@/assets/images/search.png"></span>
+            <span class="w-5"><img src="@/assets/images/menu_btn.png"></span>
+          </div>
+        </div>
+        <span class="font-bold font-[quicksand] text-[20px]">Messages</span>
+      </div>
+      <ul class="ml-2 mr-1 h-[500px] overflow-y-auto">
+        <li class="flex mt-0.5 justify-between h-[60px]" v-for="(msg, index) in messages1" :key="index" @click="getSender(index)"
           ref="senderRefs">
-          <div class="w-12 self-center h-[50px] rounded-[100%] bg-[#D9D9D9] p-1"><img src="@/assets/images/user_profile.png"
-              class="w-[38px] h-[35px]"></div>
-          <div class="flex flex-col bg-[#ffff55] w-[85%] pr-5 border-2">
+          <div class="w-[48px] self-center h-[48px] rounded-[100%] p-1"><img src="@/assets/images/user_profile.svg"
+              class="w-[100%] h-[100%]"></div>
+          <div class="flex flex-col bg-gray-100 w-[85%] pr-5">
             <div class="flex justify-between">
               <span class="font-medium text-[20px]">{{ msg.senderUsername }}</span>
               <span>{{ msg.time }}</span>
@@ -749,6 +793,10 @@ const logout = () => {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.active{
+  color: #B0188F;
 }
 </style>
   
