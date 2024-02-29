@@ -53,23 +53,35 @@ const displayMenu = ref(true);
 const isCollapsed = ref(true);
 
 
+const activebtn = computed(() => {
+  if (message.value == '') {
+    return true;
+  }
+  else {
+    return false;
+  }
+});
 
-const cancelLog = () =>{
+const cancelLog = () => {
   logoutshown.value = false;
+  loading.value = false;
+  isActive.value = false;
+  isActive1.value = false;
+  isActive2.value = false;
 }
 
-const showmenu = () =>{
+const showmenu = () => {
   isCollapsed.value = true;
   isCollapsed.value = !isCollapsed.value;
 }
 
-const hidemenu = () =>{
+const hidemenu = () => {
 
   isCollapsed.value = !isCollapsed.value;
 }
 
 
-const toggleshown = () =>{
+const toggleshown = () => {
   logoutshown.value = true;
   isActive.value = false;
   isActive1.value = false;
@@ -79,7 +91,7 @@ const toggleshown = () =>{
 }
 
 
-const togglehome = () =>{
+const togglehome = () => {
   isActive.value = true;
   isActive1.value = false;
   isActive2.value = false;
@@ -91,28 +103,13 @@ const togglehome = () =>{
   isCollapsed.value = true;
 }
 
+
 const getClass = (name) => {
   if (name === user.value.username) {
-    return 'ml-5';
+    return ['bg-[#3C60DC]', 'text-white', 'self-end', 'ml-10'];
   }
   else {
-    return 'mr-5';
-  }
-}
-
-
-const getClass1 = (name) => {
-  if (name === user.value.username) {
-    return 'mr-10';
-  }
-}
-
-const getClass2 = (name) => {
-  if (name === user.value.username) {
-    return ['bg-green-600', 'self-end'];
-  }
-  else {
-    return ['bg-gray-200', 'self-start'];
+    return ['bg-gray-200', 'self-start', 'mr-10'];
   }
 }
 
@@ -139,6 +136,7 @@ const getRecipient = (item) => {
 const goback = () => {
   showmessenger.value = !showmessenger.value;
   showinbox.value = !showinbox.value;
+  message.value = '';
 }
 
 const toggleinbox = () => {
@@ -214,6 +212,10 @@ if (process.client) {
 
 //Registration
 const registerUser = () => {
+  username.value = username.value.trim();
+  password.value = password.value.trim();
+  confirm.value = confirm.value.trim();
+  email.value = email.value.trim();
   loadingMsg.value = true;
   loading.value = true;
   hideWaitMsg1.value = "";
@@ -311,6 +313,8 @@ const login = () => {
   loading.value = true;
   hideWaitMsg.value = "";
   hideFeedback.value = true;
+  username.value = username.value.trim();
+  password.value = password.value.trim();
   setTimeout(() => {
     if (loginMsg.value == '') {
       loginMsg.value = 'Check on your connection and try again!';
@@ -440,6 +444,7 @@ onMounted(() => {
 
 
 const sendMessage = () => {
+  message.value = message.value.trim();
   socket.emit('sendMessage', {
     id: checktime(),
     senderUsername: user.value.username,
@@ -522,6 +527,10 @@ const logout = () => {
   isActive.value = false;
   isActive1.value = false;
   isActive2.value = false;
+  loading.value = false;
+  showinbox.value =false;
+  showmessenger.value = false;
+  showStartChat.value = false;
 }
 </script>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
 
@@ -549,8 +558,8 @@ const logout = () => {
           </div>
           <div class="flex flex-col">
             <label for="email">Email</label>
-            <input type="text" class="placeholder:text-[14px]" v-model="email" maxlength="50" id="email" placeholder="e.g musa@gmail.com"
-              @blur="changeCase">
+            <input type="text" class="placeholder:text-[14px]" v-model="email" maxlength="50" id="email"
+              placeholder="e.g musa@gmail.com" @blur="changeCase">
           </div>
           <div class="flex flex-col">
             <label for="password">Password</label>
@@ -566,8 +575,8 @@ const logout = () => {
                 src="@/assets/images/waiting_img.png">Please wait...</span></button>
           <div class="flex mx-auto gap-2 text-[14px] font-bold">
             <span class="text-[#236E98]">Already have an account?</span>
-            <button @click="toggleLogReg"
-              class="text-[#0912DB] underline decoration-1 hover:cursor-pointer">Signin</button>
+            <button @click="toggleLogReg" class="text-[#0912DB] underline decoration-1 hover:cursor-pointer">Sign
+              in</button>
           </div>
         </div>
       </div>
@@ -600,112 +609,147 @@ const logout = () => {
         </div>
       </div>
     </div>
-   <div v-show="hide2">
-    <div v-show="displayMenu" :class="{ '-translate-x-[100%]': isCollapsed, 'translate-x-[0%]': !isCollapsed }" class="transition ease-in-out duration-[1s] absolute pl-4 list-none z-20 bg-[#888DED] text-[#031187] w-[55%] h-[100%] flex flex-col gap-6 font-semibold font-[quicksand] text-[18px]">
-      <div class="w-7 mt-4 mb-4" @click="hidemenu"><img src="@/assets/images/close.svg"></div>
-      <div class="flex flex-col gap-6 mx-3">
-        <li @click="togglehome" class="w-fit" :class="{ 'active': isActive }">Home</li>
-        <li @click="togglestartChat" class="w-fit" :class="{ 'active': isActive1 }">Members</li>
-        <li @click="toggleshown" class="w-fit" :class="{ 'active': isActive2  }">Logout</li>
-      </div>
-    </div>
-    <div v-show="logoutshown" class="absolute w-48 h-24 bg-green-500 top-40 left-[20%] pointer-events-all">
-      <span>Logout?</span>
-      <span @click="logout">YES</span>
-      <span @click="cancelLog">NO</span>
-    </div>
-    <div v-show="hide1" class="sm:hidden">
-      <div class="flex flex-col gap-10 text-center">
-        <div class="flex justify-between mx-3 mt-3">
-          <span class="w-[10%]" @click="showmenu"><img src="@/assets/images/menu.svg"></span>
-          <span class="w-[20%] rounded-[50%] h-[70px]"><img src="@/assets/images/profile.jpg"
-              class="rounded-[100%] h-[100%] w-[100%]"></span>
-        </div>
-        <span class="font-[quicksand] text-[30px] text-[#A4A716] my-5 leading-10 font-bold">Welcome to Fast Chat Web
-          App</span>
-        <div class="flex w-fit mx-auto gap-8">
-          <div class="flex flex-col" @click="togglestartChat">
-            <span class=""><img src="@/assets/images/chat.png" class="w-[78%]"></span>
-            <button class="-mt-1">start chat</button>
-          </div>
-          <div class="flex flex-col hover:cursor-pointer" @click="toggleinbox">
-            <span class="mt-[-9px]"><img src="@/assets/images/inbox.png" class="w-[65px] h-[65px]"></span>
-            <button class="mt-[-7.5px]">inbox</button>
-          </div>
+    <div v-show="hide2">
+      <div v-show="displayMenu" :class="{ '-translate-x-[100%]': isCollapsed, 'translate-x-[0%]': !isCollapsed }"
+        class="transition ease-in-out duration-[1s] absolute pl-4 list-none z-20 bg-[#888DED] text-[#031187] w-[55%] h-screen flex flex-col gap-6 font-semibold font-[quicksand] text-[18px]">
+        <div class="w-7 mt-4 mb-4 cursor-pointer" @click="hidemenu"><img src="@/assets/images/close.svg"></div>
+        <div class="flex flex-col gap-6 mx-3">
+          <li @click="togglehome" class="w-fit hover:cursor-pointer" :class="{ 'active': isActive }">Home</li>
+          <li @click="togglestartChat" class="w-fit hover:cursor-pointer" :class="{ 'active': isActive1 }">Members</li>
+          <li @click="toggleshown" class="w-fit hover:cursor-pointer" :class="{ 'active': isActive2 }">Logout</li>
         </div>
       </div>
-    </div>
-    <div v-show="showStartChat">
-      <div class="px-2 pt-5 mb-2 flex flex-col gap-2 bg-slate-50">
-        <div class="flex justify-between">
-          <span class="w-[10%]" @click="showmenu"><img src="@/assets/images/menu.svg" class="w-[36px] h-[32px]"></span>
-          <div class="flex self-end gap-2"> 
-            <span class="w-6"><img src="@/assets/images/search.png"></span>
-            <span class="w-5"><img src="@/assets/images/menu_btn.png"></span>
-          </div>
+      <div v-show="logoutshown"
+        class="font-medium text-[16px] font-[quicksand] border-2 border-gray-200 top-52 absolute w-[80%] h-40 bg-blue-200 inset-x-0 max-w-sm mx-auto pointer-events-auto flex flex-col justify-between">
+        <span class="mx-auto mt-[5%]">Logout?</span>
+        <span class="text-[14px] mx-auto my-4">Are you sure you want to logout?</span>
+        <div class="flex gap-20 justify-between mx-5 mb-5">
+          <span @click="logout" class="px-5 text-[#0A5B09] hover:cursor-pointer hover:bg-[#d3cdcd]">YES</span>
+          <span @click="cancelLog" class="hover:bg-[#d3cdcd] hover:cursor-pointer text-[#970606] px-5">NO</span>
         </div>
-        <span class="font-bold font-[quicksand] text-[20px]">Messages</span>
       </div>
-      <ul>
-        <li v-for="item in filteredUsers" :key="item.username" @click="getRecipient(item)" ref="recipientRefs">{{
-          item.username }}</li>
-      </ul>
-    </div>
-    <div v-show="showinbox">
-      <div @click="togglestartChat" class="z-10 absolute bottom-40 right-5 w-16"><img src="@/assets/images/start.svg"></div>
-      <div class="px-2 pt-5 flex flex-col gap-2 bg-slate-50">
-        <div class="flex justify-between">
-          <span class="w-[10%]" @click="showmenu"><img src="@/assets/images/menu.svg" class="w-[36px] h-[32px]"></span>
-          <div class="flex self-end gap-2"> 
-            <span class="w-6"><img src="@/assets/images/search.png"></span>
-            <span class="w-5"><img src="@/assets/images/menu_btn.png"></span>
+      <div v-show="hide1" class="sm:hidden">
+        <div class="flex flex-col gap-10 text-center">
+          <div class="flex justify-between mx-3 mt-3">
+            <span class="w-[10%] cursor-pointer" @click="showmenu"><img src="@/assets/images/menu.svg"></span>
+            <span class="w-[20%] rounded-[50%] h-[70px] hover:cursor-pointer"><img src="@/assets/images/profile.jpg"
+                class="rounded-[100%] h-[100%] w-[100%]"></span>
           </div>
-        </div>
-        <span class="font-bold font-[quicksand] text-[20px]">Messages</span>
-      </div>
-      <ul class="ml-2 mr-1 h-[500px] overflow-y-auto">
-        <li class="flex mt-0.5 justify-between h-[60px]" v-for="(msg, index) in messages1" :key="index" @click="getSender(index)"
-          ref="senderRefs">
-          <div class="w-[48px] self-center h-[48px] rounded-[100%] p-1"><img src="@/assets/images/user_profile.svg"
-              class="w-[100%] h-[100%]"></div>
-          <div class="flex flex-col bg-gray-100 w-[85%] pr-5">
-            <div class="flex justify-between">
-              <span class="font-medium text-[20px]">{{ msg.senderUsername }}</span>
-              <span>{{ msg.time }}</span>
+          <span class="font-[quicksand] text-[30px] text-[#A4A716] my-5 leading-10 font-bold">Welcome to Fast Chat Web
+            App</span>
+          <div class="flex w-fit mx-auto gap-8">
+            <div class="flex flex-col hover:cursor-pointer" @click="togglestartChat">
+              <span class=""><img src="@/assets/images/chat.png" class="w-[78%]"></span>
+              <button class="-mt-1">start chat</button>
             </div>
-            <span class="break-words whitespace-normal text-wrap text-[15px]">{{ msg.message }}</span>
+            <div class="flex flex-col hover:cursor-pointer" @click="toggleinbox">
+              <span class="mt-[-9px]"><img src="@/assets/images/inbox.png" class="w-[65px] h-[65px]"></span>
+              <button class="mt-[-7.5px]">inbox</button>
+            </div>
           </div>
-        </li>
-      </ul>
-      
-    </div>
-    <div v-show="showmessenger" class="flex flex-col min-h-[600px] justify-between">
-      <div class="flex gap-9"><button @click="goback">back</button>&nbsp;<span class="font-bold text-lg">{{
-          recipientUsername }}</span>
-      </div>
-     <div class="bg-yellow-400">
-      <ul ref="msgcontainer" class="px-5 flex flex-col gap-3 mt-10 max-h-[470px] overflow-y-auto bg-red-300">
-        <li v-for="msg in messages" :key="msg.id" class="flex flex-col" :class="getClass(msg.senderUsername)">
-          <span class="self-center text-[10px]" :class="getClass1(msg.senderUsername)">{{ msg.id }}</span>
-          <span class="w-fit rounded-lg px-3 py-1 self-start flex break-all" :class="getClass2(msg.senderUsername)">{{
-            msg.message }}</span>
-        </li>
-      </ul>
-     </div>
-      <div class="hidden">
-          <input v-model="recipientUsername"/>
-      </div>
-      <div class="flex-grow">
-          <label for="message">Message:</label>
-          <input v-model="message" class="border-2 border-slate-500" />
-          <button @click="sendMessage" id="message">Send Message</button>
         </div>
+      </div>
+      <div v-show="showStartChat" class="h-screen flex flex-col justify-between">
+        <div class="px-2 pt-5 mb-2 flex flex-col gap-2 bg-slate-50">
+          <div class="flex justify-between">
+            <span class="w-[10%] cursor-pointer" @click="showmenu"><img src="@/assets/images/menu.svg"
+                class="w-[36px] h-[32px]"></span>
+            <div class="flex self-end gap-2">
+              <span class="w-6"><img src="@/assets/images/search.png"></span>
+              <span class="w-5"><img src="@/assets/images/menu_btn.png"></span>
+            </div>
+          </div>
+          <span class="font-[quicksand] font-medium text-[14px] self-center">SELECT A MEMBER TO START CHAT</span>
+        </div>
+        <ul class="ml-2 mr-1 overflow-y-auto mb-2 flex-1">
+          <li class="flex gap-3 hover:cursor-pointer mt-0.5 h-[60px] bg-[#f8f5f5]" v-for="item in filteredUsers"
+            :key="item.username" @click="getRecipient(item)" ref="recipientRefs">
+            <div class="w-[48px] self-center h-[48px] rounded-[100%] p-1"><img src="@/assets/images/user_profile.svg"
+                class="w-[100%] h-[100%]"></div>
+            <div class="self-center">
+              <span>{{ item.username }}</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div v-show="showinbox" class="h-screen flex flex-col justify-between">
+        <div class="h-full flex flex-col overflow-y-hidden">
+          <div class="flex flex-col">
+            <div @click="togglestartChat" class="z-10 absolute bottom-4 right-5 w-16 hover:cursor-pointer"><img
+                src="@/assets/images/start.svg">
+            </div>
+            <div class="px-2 pt-5 flex flex-col gap-2 bg-slate-50">
+              <div class="flex justify-between">
+                <span class="w-[10%] hover:cursor-pointer" @click="showmenu"><img src="@/assets/images/menu.svg"
+                    class="w-[36px] h-[32px]"></span>
+                <div class="flex self-end gap-2">
+                  <span class="w-6"><img src="@/assets/images/search.png"></span>
+                  <span class="w-5"><img src="@/assets/images/menu_btn.png"></span>
+                </div>
+              </div>
+              <span class="font-bold font-[quicksand] text-[20px]">Messages</span>
+            </div>
+          </div>
+          <ul class="ml-2 mr-1 bg-white overflow-y-auto">
+            <li class="flex mt-0.5 justify-between h-[60px] overflow-hidden bg-slate-50" v-for="(msg, index) in messages1"
+              :key="index" @click="getSender(index)" ref="senderRefs">
+              <div class="w-[48px] self-center h-[48px] rounded-[100%] p-1"><img src="@/assets/images/user_profile.svg"
+                  class="w-[100%] h-[100%]"></div>
+              <div class="flex flex-col bg-gray-100 w-[85%] pr-5">
+                <div class="flex justify-between">
+                  <span class="font-medium text-[20px]">{{ msg.senderUsername }}</span>
+                  <span>{{ msg.time }}</span>
+                </div>
+                <span class="break-words whitespace-normal text-wrap text-[15px] mt-1">{{ msg.message }}</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="text-center invisible">
+          <p>inbox messages</p>
+        </div>
+      </div>
+      <div v-show="showmessenger" class="flex flex-col justify-between h-screen">
+        <div class="h-full">
+          <div class="flex justify-between bg-gray-50 py-5">
+            <button @click="goback" class="ml-5"><img src="@/assets/images/back.png" class="w-[30px] h-[25px]"></button>
+            <span class="font-medium text-xl mr-[45%]">{{ recipientUsername }}</span>
+          </div>
+          <ul class="mx-1 bg-white px-2 flex flex-col gap-3 mt-1 max-h-[620px] rounded-sm overflow-y-auto">
+            <li v-for="msg in messages" :key="msg.id" class="flex flex-col px-2">
+              <span class="self-center text-[10px]">{{ msg.id }}</span>
+              <span class="w-fit rounded-xl text-[16px] px-3 py-2 self-start flex break-all"
+                :class="getClass(msg.senderUsername)">
+                {{ msg.message }}
+              </span>
+            </li>
+          </ul>
+        </div>
+        <div class="mb-2">
+          <input class="hidden" v-model="recipientUsername" />
+          <div class="flex-grow bg-slate-200 border-4 h-[45px] flex justify-between">
+            <input v-model="message" class="flex-1 outline-none pl-3 mr-2 rounded-sm" placeholder="+    message" />
+            <button :disabled="activebtn" :class="{ 'bg-blue-400': !activebtn, 'bg-blue-200': activebtn }"
+              class="flex font-semibold font-[quicksand] rounded-[6px] px-1 my-[3px]" @click="sendMessage">
+              <span :class="{ 'text-[#084407]': !activebtn, 'text-gray-400': activebtn }"
+                class="text-[13px] self-center">SEND</span>
+              <span class="self-center"><img src="@/assets/images/send.png" class="w-4"></span>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-   </div>
   </div>
 </template>
 
 <style scoped>
+body::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
+}
+body {
+  -ms-overflow-style: none;  /* Hide scrollbar for IE and Edge */
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
 .custom-input {
   position: relative;
   display: inline-block;
@@ -795,8 +839,7 @@ const logout = () => {
   }
 }
 
-.active{
+.active {
   color: #B0188F;
-}
-</style>
+}</style>
   
