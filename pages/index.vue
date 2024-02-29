@@ -744,7 +744,7 @@ const logout = () => {
 
 <style scoped>
 body::-webkit-scrollbar {
-  display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
+  display: none; /* Hide scrollbar for Chrome, Safari, and Opera browser*/
 }
 body {
   -ms-overflow-style: none;  /* Hide scrollbar for IE and Edge */
