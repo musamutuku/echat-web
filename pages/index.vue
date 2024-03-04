@@ -40,7 +40,6 @@ const showinbox = ref(false);
 const hideFeedback = ref(true);
 const showmessenger = ref(false);
 const showStartChat = ref(false);
-const users = ref([]);
 const filteredUsers = ref([]);
 const senderRefs = ref([]);
 const recipientRefs = ref([]);
@@ -198,14 +197,22 @@ const logbtn = computed(() => {
   isdisabledLog.value = true;
 });
 
-onMounted(() => {
-  fetch('http://localhost:3001/users').then(response => response.json())
-    .then(data => localStorage.setItem('users', JSON.stringify(data)));
-});
 
-if (process.client) {
-  const users1 = JSON.parse(localStorage.getItem('users'));
-  users.value = users1;
+// const fetchData = () => {
+//   fetch('http://localhost:3001/users').then(response => response.json())
+//     .then(data => {
+//       localStorage.setItem('users', JSON.stringify(data));
+//   });
+// }
+
+const users = ref([]);
+fetch('http://localhost:3001/users').then(response => response.json())
+    .then(data => {
+      users.value = data;
+    });
+
+const refreshUsers = () => {
+  fetchData();
 }
 
 
@@ -450,7 +457,8 @@ const sendMessage = () => {
     senderUsername: user.value.username,
     recipientUsername: recipientUsername.value,
     message: message.value,
-    time: currenttime()
+    time: currenttime(),
+    mark: 'unread'
   });
   messages.value.push({ id: checktime(), senderUsername: user.value.username, recipientUsername: recipientUsername.value, message: message.value, time: currenttime() });
   chatMessages.value.push({ id: checktime(), senderUsername: user.value.username, recipientUsername: recipientUsername.value, message: message.value, time: currenttime() });
@@ -469,10 +477,21 @@ const sendMessage = () => {
     messages1.value.unshift({ id: checktime(), senderUsername: recipientUsername.value, message: message.value, time: currenttime() });
   }
   message.value = '';
+  console.log(messages1.value);
 };
 
+// const counter = ref(0)
+// const array1 = [{ name1: 'john', msg: 'hey' }, { name1: 'joel', msg: 'hello' }, { name1: 'mary', msg: 'hello' }, { name1: 'kioko', msg: 'hello' }];
+// const newArr = array1.filter((msgz) => msgz.msg == 'hello');
 
-socket.on('receiveMessage', ({ senderUsername, message }) => {
+// onMounted(() => {
+//   for (let count = 0; count <= newArr.length; count++) {
+//     counter.value = count;
+//   }
+//   console.log(counter.value);
+// });
+
+socket.on('receiveMessage', ({ senderUsername, message, mark }) => {
   if (senderUsername != user.value.username && senderUsername == recipientUsername.value) {
     messages.value.push({ id: checktime(), senderUsername: senderUsername, message: message, time: currenttime() });
   }
@@ -528,11 +547,11 @@ const logout = () => {
   isActive1.value = false;
   isActive2.value = false;
   loading.value = false;
-  showinbox.value =false;
+  showinbox.value = false;
   showmessenger.value = false;
   showStartChat.value = false;
 }
-</script>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+</script>
 
 <template>
   <div :class="{ 'pointer-events-none': loading }">
@@ -571,8 +590,8 @@ const logout = () => {
           </div>
           <button @click="registerUser"
             class="my-5 bg-[#E0DEEA] font-bold font-[quicksand] rounded-[5px] text-[18px] text-white h-[45px]"
-            :style="regbtn" :disabled="isdisabledReg">{{ hideWaitMsg1 }}<span v-show="loadingMsg" class="loadingMsg"><img
-                src="@/assets/images/waiting_img.png">Please wait...</span></button>
+            :style="regbtn" :disabled="isdisabledReg">{{ hideWaitMsg1 }}<span v-show="loadingMsg"
+              class="loadingMsg"><img src="@/assets/images/waiting_img.png">Please wait...</span></button>
           <div class="flex mx-auto gap-2 text-[14px] font-bold">
             <span class="text-[#236E98]">Already have an account?</span>
             <button @click="toggleLogReg" class="text-[#0912DB] underline decoration-1 hover:cursor-pointer">Sign
@@ -586,7 +605,7 @@ const logout = () => {
         </div>
         <h3 class="text-[#084407] font-bold text-[20px] text-center mb-5">USER LOGIN</h3>
         <span class="font-semibold text-[#970606] font-[quicksand] text-center text-[13px]" v-show="hideFeedback">{{
-          loginMsg }}</span>
+    loginMsg }}</span>
         <div class="mx-auto py-5 flex flex-col gap-10">
           <div class="custom-input">
             <input type="text" v-model="username" maxlength="50" @input="isFocused = true" @blur="isFocused = false"
@@ -594,13 +613,13 @@ const logout = () => {
             <div class="placeholder-image" v-show="!username && !isFocused"></div>
           </div>
           <div class="custom-input">
-            <input type="password" v-model="password" maxlength="50" @input="isFocused1 = true" @blur="isFocused1 = false"
-              placeholder="Password">
+            <input type="password" v-model="password" maxlength="50" @input="isFocused1 = true"
+              @blur="isFocused1 = false" placeholder="Password">
             <div class="placeholder-image1" v-show="!password && !isFocused1"></div>
           </div>
           <button @click="login" :style="logbtn" :disabled="isdisabledLog"
             class="my-5 bg-[#E0DEEA] font-bold font-[quicksand] rounded-3xl text-[18px] text-white h-[45px]">{{
-              hideWaitMsg }}<span v-show="loadingMsg" class="loadingMsg"><img src="@/assets/images/waiting_img.png">Please
+    hideWaitMsg }}<span v-show="loadingMsg" class="loadingMsg"><img src="@/assets/images/waiting_img.png">Please
               wait...</span></button>
           <div class="flex justify-between text-[#0912DB] font-bold text-sm">
             <span class="hover:cursor-pointer">Forgot Password?</span>
@@ -662,6 +681,7 @@ const logout = () => {
           <span class="font-[quicksand] font-medium text-[14px] self-center">SELECT A MEMBER TO START CHAT</span>
         </div>
         <ul class="ml-2 mr-1 overflow-y-auto mb-2 flex-1">
+          <button @click="refreshUsers">refresh</button>
           <li class="flex gap-3 hover:cursor-pointer mt-0.5 h-[60px] bg-[#f8f5f5]" v-for="item in filteredUsers"
             :key="item.username" @click="getRecipient(item)" ref="recipientRefs">
             <div class="w-[48px] self-center h-[48px] rounded-[100%] p-1"><img src="@/assets/images/user_profile.svg"
@@ -691,8 +711,8 @@ const logout = () => {
             </div>
           </div>
           <ul class="ml-2 mr-1 bg-white overflow-y-auto">
-            <li class="flex mt-0.5 justify-between h-[60px] overflow-hidden bg-slate-50" v-for="(msg, index) in messages1"
-              :key="index" @click="getSender(index)" ref="senderRefs">
+            <li class="flex mt-0.5 justify-between h-[60px] overflow-hidden bg-slate-50"
+              v-for="(msg, index) in messages1" :key="index" @click="getSender(index)" ref="senderRefs">
               <div class="w-[48px] self-center h-[48px] rounded-[100%] p-1"><img src="@/assets/images/user_profile.svg"
                   class="w-[100%] h-[100%]"></div>
               <div class="flex flex-col bg-gray-100 w-[85%] pr-5">
@@ -744,12 +764,17 @@ const logout = () => {
 
 <style scoped>
 body::-webkit-scrollbar {
-  display: none; /* Hide scrollbar for Chrome, Safari, and Opera browser*/
+  display: none;
+  /* Hide scrollbar for Chrome, Safari, and Opera browser*/
 }
+
 body {
-  -ms-overflow-style: none;  /* Hide scrollbar for IE and Edge */
-  scrollbar-width: none; /* Hide scrollbar for Firefox */
+  -ms-overflow-style: none;
+  /* Hide scrollbar for IE and Edge */
+  scrollbar-width: none;
+  /* Hide scrollbar for Firefox */
 }
+
 .custom-input {
   position: relative;
   display: inline-block;
@@ -841,5 +866,5 @@ body {
 
 .active {
   color: #B0188F;
-}</style>
-  
+}
+</style>
