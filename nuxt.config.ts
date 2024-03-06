@@ -15,7 +15,6 @@ export default defineNuxtConfig({
       name: "eChat Beta",
       short_name: "eChat",
       description: "message app",
-      background_color: "#ffffff",
       theme_color: "#ffffff",
       icons: [
         {
@@ -56,6 +55,9 @@ export default defineNuxtConfig({
        }
       ],
     },
+    // build: {
+    //   publicPath: '//local.jy.net:9000/pwa/',
+    // },
     workbox: {
       navigateFallback: "/",
     },

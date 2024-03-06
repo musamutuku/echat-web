@@ -7,6 +7,8 @@ const socket = io('http://localhost:3001');
 const user = ref(null);
 const message = ref('');
 const messages = ref([]);
+const unreadMsg = ref(null);
+const totalMsgs = ref(0);
 const messages1 = ref([]);
 const chatMessages = ref([]);
 const recipientUsername = ref('');
@@ -41,6 +43,7 @@ const hideFeedback = ref(true);
 const showmessenger = ref(false);
 const showStartChat = ref(false);
 const filteredUsers = ref([]);
+const filteredSenders = ref([]);
 const senderRefs = ref([]);
 const recipientRefs = ref([]);
 const logoutshown = ref(false)
@@ -60,6 +63,15 @@ const activebtn = computed(() => {
     return false;
   }
 });
+
+
+const getMessageCount = (sender) => {
+  const total = filteredSenders.value.filter(msg => msg.senderUsername === sender && msg.mark === 'unread').length;
+  if (total > 0) {
+    return total;
+  }
+};
+
 
 const cancelLog = () => {
   logoutshown.value = false;
@@ -207,9 +219,9 @@ const logbtn = computed(() => {
 
 const users = ref([]);
 fetch('http://localhost:3001/users').then(response => response.json())
-    .then(data => {
-      users.value = data;
-    });
+  .then(data => {
+    users.value = data;
+  });
 
 const refreshUsers = () => {
   fetchData();
@@ -379,6 +391,7 @@ onMounted(() => {
     chatMessages.value = [...messagez1];
     const userMessage = messagez.filter((msg) => msg.recipientUsername === user.value.username);
     const userMessage1 = messagez.filter((msg) => msg.senderUsername === user.value.username);
+    filteredSenders.value = [...userMessage];
 
     //Get the msgs send by the currently logged in user. First get one(loop with i), then get the next( j=i+i), then
     //compare to get the one which was send later and remove the ones send earlier(older i.e the ones with lower indexes)
@@ -446,6 +459,17 @@ onMounted(() => {
       userMessage1[i].senderUsername = userMessage1[i].recipientUsername;
       messages1.value.unshift(obj);
     }
+
+    const newMsgArray = messages1.value.map(obj => {
+      const count = filteredSenders.value.filter(item => item.senderUsername === obj.senderUsername && item.mark === 'unread').length;
+      return {
+        ...obj,
+        totalUnreadMsgs: count
+      };
+    });
+    messages1.value = newMsgArray;
+    const totalValue = messages1.value.reduce((acc, curr) => acc + curr.totalUnreadMsgs, 0);
+    totalMsgs.value = totalValue;
   });
 });
 
@@ -477,26 +501,17 @@ const sendMessage = () => {
     messages1.value.unshift({ id: checktime(), senderUsername: recipientUsername.value, message: message.value, time: currenttime() });
   }
   message.value = '';
-  console.log(messages1.value);
 };
 
-// const counter = ref(0)
-// const array1 = [{ name1: 'john', msg: 'hey' }, { name1: 'joel', msg: 'hello' }, { name1: 'mary', msg: 'hello' }, { name1: 'kioko', msg: 'hello' }];
-// const newArr = array1.filter((msgz) => msgz.msg == 'hello');
 
-// onMounted(() => {
-//   for (let count = 0; count <= newArr.length; count++) {
-//     counter.value = count;
-//   }
-//   console.log(counter.value);
-// });
-
-socket.on('receiveMessage', ({ senderUsername, message, mark }) => {
+socket.on('receiveMessage', ({ senderUsername, message, totalUnread }) => {
   if (senderUsername != user.value.username && senderUsername == recipientUsername.value) {
     messages.value.push({ id: checktime(), senderUsername: senderUsername, message: message, time: currenttime() });
   }
-  const newmessage = { id: checktime(), senderUsername: senderUsername, message: message, time: currenttime() };
+  const newmessage = { id: checktime(), senderUsername: senderUsername, message: message, time: currenttime(), totalUnreadMsgs: totalUnread };
+  unreadMsg.value = totalUnread;
   chatMessages.value.push({ id: checktime(), senderUsername: senderUsername, recipientUsername: user.value.username, message: message, time: currenttime() })
+  //check if there is a name same as the incoming msg sendername or inshort after pushing the new message remove the old one
   const newvalue = newmessage.senderUsername;
   for (let i = 0; i < messages1.value.length; i++) {
     if (messages1.value[i].senderUsername === newvalue) {
@@ -505,6 +520,8 @@ socket.on('receiveMessage', ({ senderUsername, message, mark }) => {
     }
   }
   messages1.value.unshift(newmessage);
+  const totalValue = messages1.value.reduce((acc, curr) => acc + curr.totalUnreadMsgs, 0);
+  totalMsgs.value = totalValue;
 });
 
 socket.on('disconnect', () => {
@@ -662,6 +679,7 @@ const logout = () => {
               <button class="-mt-1">start chat</button>
             </div>
             <div class="flex flex-col hover:cursor-pointer" @click="toggleinbox">
+              <span v-if="totalMsgs != 0">{{ totalMsgs }}</span>
               <span class="mt-[-9px]"><img src="@/assets/images/inbox.png" class="w-[65px] h-[65px]"></span>
               <button class="mt-[-7.5px]">inbox</button>
             </div>
@@ -718,6 +736,9 @@ const logout = () => {
               <div class="flex flex-col bg-gray-100 w-[85%] pr-5">
                 <div class="flex justify-between">
                   <span class="font-medium text-[20px]">{{ msg.senderUsername }}</span>
+                  <span v-if="!msg.totalUnreadMsgs" class="text-blue-500">{{ getMessageCount(msg.senderUsername)
+                    }}</span>
+                  <span v-if="msg.totalUnreadMsgs != 0" class="text-red-500">{{ msg.totalUnreadMsgs }}</span>
                   <span>{{ msg.time }}</span>
                 </div>
                 <span class="break-words whitespace-normal text-wrap text-[15px] mt-1">{{ msg.message }}</span>

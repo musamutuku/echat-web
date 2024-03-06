@@ -1,0 +1,12 @@
+i have an array of objects as an example
+
+myArray = [
+    {sender: 'john', receiver: 'mary', value: 3},
+    {sender: 'joel', receiver: 'mary', value: 2},
+    {sender: 'james', receiver: 'mary', value: 5},
+    {sender: 'mercy', receiver: 'mary', value: 1},
+    {sender: 'kim', receiver: 'mary', value: 8}
+    
+]
+
+i want to loop through the values and add them then display the sum of the values in a <span> tag
