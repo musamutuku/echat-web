@@ -4,6 +4,11 @@ import { useAuthStore } from "@/stores/myStore";
 import { jwtDecode } from "jwt-decode";
 
 const socket = io("http://localhost:3001");
+onMounted(() => {
+  const newuser = "a user joined link";
+  socket.emit('connected', newuser);
+})
+
 const user = ref(null);
 const message = ref("");
 const messages = ref([]);
