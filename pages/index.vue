@@ -3,22 +3,15 @@ import io from "socket.io-client";
 import { useAuthStore } from "@/stores/myStore";
 import { jwtDecode } from "jwt-decode";
 
-const socket = io("http://192.168.0.118:3001");
+const socket = io("http://localhost:3001");
 const user = ref(null);
 const message = ref("");
 const messages = ref([]);
-// const unreadMsg = ref(null);
 const totalMsgs = ref(0);
 const messages1 = ref([]);
 const chatMessages = ref([]);
 const recipientUsername = ref("");
 const msgSender = ref();
-
-// const getuser = () =>{
-//   const val = msgSender.value.innerText;
-//   console.log(val);
-//   console.log(msgSender.value);
-// }
 
 const store = useAuthStore();
 const token = ref("");
@@ -54,7 +47,6 @@ const filteredSenders = ref([]);
 const senderRefs = ref([]);
 const recipientRefs = ref([]);
 const logoutshown = ref(false);
-// const msgcontainer = ref(null);
 const isActive = ref(false);
 const isActive1 = ref(false);
 const isActive2 = ref(false);
@@ -73,7 +65,6 @@ const computedRows = computed(() => {
 });;
 
 onMounted(() => {
-  // scrollToBottom();
   scrollToTop();
 });
 
@@ -85,14 +76,13 @@ const scrollToBottom = () => {
   if (messageContainer.value) {
     messageContainer.value.scrollTop = messageContainer.value.scrollHeight;
   }
-  // window.scrollTo(0, document.body.scrollHeight);
 };
 
 const scrollToBottom1 = () => {
   window.scrollTo(0, document.body.scrollHeight); // Scroll the entire screen to bottom
 };
 const scrollToTop = () => {
-  window.scrollTo(0, 0);// Scroll the entire screen to bottom
+  window.scrollTo(0, 0); // Scroll the entire screen to bottom
 };
 
 // Listen to the scroll event and scroll to bottom if user scrolls up
@@ -117,14 +107,6 @@ const activebtn = computed(() => {
   }
 });
 
-// const getMessageCount = (sender) => {
-//   const total = filteredSenders.value.filter(
-//     (msg) => msg.senderUsername === sender && msg.mark === "unread"
-//   ).length;
-//   if (total > 0) {
-//     return total;
-//   }
-// };
 
 watch(showmessenger, (value) => {
   if (value) {
@@ -181,9 +163,12 @@ const getClass = (name) => {
 const getSender = (index, totalmsgs) => {
   scrollToBottom();
   scrollToBottom1();
+
+  //after clicking the unread msg(s) delete the in inbox page or reduce the number in the inbox button
   messages1.value[index].totalUnreadMsgs = 0;
   totalMsgs.value = totalMsgs.value - totalmsgs;
   socket.emit("markAsRead", (user.value.username), (messages1.value[index].senderUsername));
+
   showmessenger.value = true;
   showinbox.value = false;
   messages.value = chatMessages.value;
@@ -199,13 +184,33 @@ const getSender = (index, totalmsgs) => {
   messages.value = userMessage2;
   return messages1.value;
 };
-
+const getTotalInbox = (totalmsgs) => {
+  totalMsgs.value = totalMsgs.value - totalmsgs;
+}
 const getRecipient = (item) => {
   scrollToBottom();
   scrollToBottom1();
-  // messages1.value[index].totalUnreadMsgs = 0;
-  // totalMsgs.value = totalMsgs.value - totalmsgs;
-  // socket.emit("markAsRead", (user.value.username), (messages1.value[index].senderUsername));
+
+  //after click start chat or a user to send msg you head to show messager page hence viewing all the unread msgs for that sender 
+  // so reduce the number of messages in the inbox button
+  const newsenderarray = [...messages1.value];
+  for (let i = 0; i < newsenderarray.length; i++) {
+    if (newsenderarray[i].senderUsername == item.username) {
+      const unread = newsenderarray[i].totalUnreadMsgs;
+      getTotalInbox(unread);
+
+    }
+  }
+
+  //after click start chat or a user to send msg you head to show messager page hence viewing all the unread msgs for that sender 
+  // so delete the unread msgs for that sender in inbox page 
+  for (let i = 0; i < messages1.value.length; i++) {
+    if (messages1.value[i].senderUsername == item.username) {
+      messages1.value[i].totalUnreadMsgs = 0;
+      socket.emit("markAsRead", (user.value.username), (messages1.value[i].senderUsername));
+    }
+  }
+
   showmessenger.value = true;
   showinbox.value = false;
   showStartChat.value = false;
@@ -219,6 +224,7 @@ const getRecipient = (item) => {
         msg.recipientUsername == user.value.username)
   );
   messages.value = userMessage2;
+  return messages1.value;
 };
 
 const goback = () => {
@@ -291,19 +297,29 @@ const logbtn = computed(() => {
   isdisabledLog.value = true;
 });
 
-// const fetchData = () => {
-//   fetch('http://localhost:3001/users').then(response => response.json())
-//     .then(data => {
-//       localStorage.setItem('users', JSON.stringify(data));
-//   });
-// }
+
+onMounted(() => {
+  fetchData();
+});
 
 const users = ref([]);
-fetch("http://192.168.0.118:3001/users")
-  .then((response) => response.json())
-  .then((data) => {
-    users.value = data;
-  });
+const fetchData = () => {
+  if (process.client) {
+    fetch("http://localhost:3001/users")                                                                                                                                                  
+      .then((response) => response.json())
+      .then((data) => {
+        localStorage.setItem('users', JSON.stringify(data));
+        const allUsers = JSON.parse(localStorage.getItem('users'));                                                                                                                                                                                                                                                                                                             
+        users.value = allUsers;
+        //referesh data if user s logged in
+        const oneuserlog = localStorage.getItem('user');
+        if(oneuserlog){
+          filteredUsers.value = users.value.filter(
+          (msg) => msg.username != oneuserlog);
+        }                                                   
+      });
+  }
+}
 
 const refreshUsers = () => {
   fetchData();
@@ -320,7 +336,7 @@ const registerUser = () => {
   hideWaitMsg1.value = "";
   if (email.value.includes("@")) {
     if (password.value == confirm.value) {
-      fetch("http://192.168.0.118:3001/register", {
+      fetch("http://localhost:3001/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -347,8 +363,8 @@ const registerUser = () => {
         .then((data) => {
           if (data.regMsg) {
             return registerSuccess(data.regMsg);
-          } else if (data.regUserMsg) {
             return registerError1(data.regUserMsg);
+          } else if (data.regUserMsg) {
           }
         })
         .catch((error) => registerError(error.error));
@@ -442,7 +458,7 @@ onMounted(() => {
       (msg) => msg.username !== user.value.username
     );
     token.value = userToken;
-    localStorage.setItem("user", user);
+    localStorage.setItem("user", user.value.username);
     localStorage.setItem("token", token.value);
     hide.value = false;
     hide1.value = true;
@@ -621,6 +637,10 @@ socket.on("receiveMessage", ({ senderUsername, message, totalUnread }) => {
       time: currenttime(),
     });
   }
+
+  //check if the receiver is already in the show messager page 
+  // just to view the msgs and don't add the unread to the inbox page(set it to zero)
+  // else add them to inbox page and inbox button
   var newmessage = [];
   if (msgSender.value.innerText == senderUsername) {
     socket.emit("markAsRead", (user.value.username), (senderUsername));
@@ -641,7 +661,8 @@ socket.on("receiveMessage", ({ senderUsername, message, totalUnread }) => {
       totalUnreadMsgs: totalUnread
     };
   }
-  // unreadMsg.value = totalUnread;
+
+
   chatMessages.value.push({
     id: checktime(),
     senderUsername: senderUsername,
@@ -649,6 +670,7 @@ socket.on("receiveMessage", ({ senderUsername, message, totalUnread }) => {
     message: message,
     time: currenttime(),
   });
+
   //check if there is a name same as the incoming msg sendername or inshort after pushing the new message remove the old one
   const newvalue = newmessage.senderUsername;
   for (let i = 0; i < messages1.value.length; i++) {
@@ -850,8 +872,11 @@ const logout = () => {
               <span class=""><img src="@/assets/images/chat.png" class="w-[78%]" /></span>
               <button class="-mt-1">start chat</button>
             </div>
-            <div class="flex flex-col hover:cursor-pointer" @click="toggleinbox">
-              <span v-if="totalMsgs != 0">{{ totalMsgs }}</span>
+            <div class="flex flex-col hover:cursor-pointer relative" @click="toggleinbox">
+              <div v-if="totalMsgs != 0"
+                class="bg-[#f32d37] absolute right-0 text-white text-[10px] flex items-center justify-center h-5 w-auto rounded-full px-2">
+                <span>{{ totalMsgs }}</span>
+              </div>
               <span class="mt-[-9px]"><img src="@/assets/images/inbox.png" class="w-[65px] h-[65px]" /></span>
               <button class="mt-[-7.5px]">inbox</button>
             </div>
@@ -910,18 +935,16 @@ const logout = () => {
               </div>
               <div class="flex flex-col bg-gray-100 w-[85%] pr-5">
                 <div class="flex justify-between">
-                  <span class="font-medium text-[20px]">{{
-    msg.senderUsername
-  }}</span>
-                  <!-- <span v-if="!msg.totalUnreadMsgs" class="text-blue-500">{{
-    getMessageCount(msg.senderUsername)
-  }}</span> -->
-                  <span v-if="msg.totalUnreadMsgs != 0" class="text-red-500">{{
-    msg.totalUnreadMsgs
-  }}</span>
+                  <span class="font-medium text-[20px]">{{ msg.senderUsername }}</span>
                   <span>{{ msg.time }}</span>
                 </div>
-                <span class="break-words whitespace-normal text-wrap text-[15px] mt-1">{{ msg.message }}</span>
+                <div class="flex justify-between items-end">
+                  <span class="break-words whitespace-normal text-wrap text-[15px] mt-1">{{ msg.message }}</span>
+                  <div v-if="msg.totalUnreadMsgs != 0"
+                    class="bg-[#f32d37] text-white text-[10px] flex items-center justify-center h-4 w-auto rounded-full px-1.5">
+                    <span>{{ msg.totalUnreadMsgs }}</span>
+                  </div>
+                </div>
               </div>
             </li>
           </ul>
@@ -974,18 +997,6 @@ const logout = () => {
 </template>
 
 <style scoped>
-body::-webkit-scrollbar {
-  display: none;
-  /* Hide scrollbar for Chrome, Safari, and Opera browser*/
-}
-
-body {
-  -ms-overflow-style: none;
-  /* Hide scrollbar for IE and Edge */
-  scrollbar-width: none;
-  /* Hide scrollbar for Firefox */
-}
-
 .custom-input {
   position: relative;
   display: inline-block;
