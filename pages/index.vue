@@ -3,7 +3,7 @@ import io from "socket.io-client";
 import { useAuthStore } from "@/stores/myStore";
 import { jwtDecode } from "jwt-decode";
 
-const socket = io("http://localhost:3001");
+const socket = io("http://192.168.0.118:3001");
 onMounted(() => {
   const newuser = "a user joined link";
   socket.emit('connected', newuser);
@@ -58,6 +58,7 @@ const isActive2 = ref(false);
 const displayMenu = ref(true);
 const isCollapsed = ref(true);
 const messageContainer = ref(null);
+const pauseRefresh = ref(false);
 
 const minRows = 1;
 const maxRows = 5;
@@ -70,7 +71,7 @@ const computedRows = computed(() => {
 });;
 
 onMounted(() => {
-  scrollToTop();
+  scrollToTop1();
 });
 
 onUpdated(() => {
@@ -86,20 +87,17 @@ const scrollToBottom = () => {
 const scrollToBottom1 = () => {
   window.scrollTo(0, document.body.scrollHeight); // Scroll the entire screen to bottom
 };
+
 const scrollToTop = () => {
-  window.scrollTo(0, 0); // Scroll the entire screen to bottom
+  if (messageContainer.value) {
+    messageContainer.value.scrollTop = 0;
+  }
 };
 
-// Listen to the scroll event and scroll to bottom if user scrolls up
-const handleScroll = () => {
-  const container = messageContainer.value;
-  if (container.scrollTop + container.clientHeight >= container.scrollHeight) {
-    // Scrolled to the bottom
-    return;
-  }
-  scrollToBottom();
-  scrollToBottom1();
-};
+const scrollToTop1 = () => {
+  window.scrollTo(0, 0); // Scroll the entire screen to top
+}
+
 
 // Attach the scroll event listener to the message container
 messageContainer.value?.addEventListener('scroll', handleScroll);
@@ -165,10 +163,7 @@ const getClass = (name) => {
   }
 };
 
-const getSender = (index, totalmsgs) => {
-  scrollToBottom();
-  scrollToBottom1();
-
+const getSender = (index, totalmsgs) => {;
   //after clicking the unread msg(s) delete the in inbox page or reduce the number in the inbox button
   messages1.value[index].totalUnreadMsgs = 0;
   totalMsgs.value = totalMsgs.value - totalmsgs;
@@ -187,15 +182,19 @@ const getSender = (index, totalmsgs) => {
         msg.recipientUsername == user.value.username)
   );
   messages.value = userMessage2;
+  if(messages.value.length > 3){
+    scrollToBottom();
+    scrollToBottom1();
+  }
   return messages1.value;
 };
+
 const getTotalInbox = (totalmsgs) => {
   totalMsgs.value = totalMsgs.value - totalmsgs;
 }
-const getRecipient = (item) => {
-  scrollToBottom();
-  scrollToBottom1();
 
+
+const getRecipient = (item) => {
   //after click start chat or a user to send msg you head to show messager page hence viewing all the unread msgs for that sender 
   // so reduce the number of messages in the inbox button
   const newsenderarray = [...messages1.value];
@@ -229,11 +228,15 @@ const getRecipient = (item) => {
         msg.recipientUsername == user.value.username)
   );
   messages.value = userMessage2;
+  if(messages.value.length > 3){
+    scrollToBottom();
+    scrollToBottom1();
+  }
   return messages1.value;
 };
 
 const goback = () => {
-  scrollToTop();
+  scrollToTop1();
   showmessenger.value = !showmessenger.value;
   showinbox.value = !showinbox.value;
   message.value = "";
@@ -310,23 +313,27 @@ onMounted(() => {
 const users = ref([]);
 const fetchData = () => {
   if (process.client) {
-    fetch("http://localhost:3001/users")                                                                                                                                                  
+    fetch("http://192.168.0.118:3001/users")
       .then((response) => response.json())
       .then((data) => {
         localStorage.setItem('users', JSON.stringify(data));
-        const allUsers = JSON.parse(localStorage.getItem('users'));                                                                                                                                                                                                                                                                                                             
+        const allUsers = JSON.parse(localStorage.getItem('users'));
         users.value = allUsers;
         //referesh data if user s logged in
         const oneuserlog = localStorage.getItem('user');
-        if(oneuserlog){
+        if (oneuserlog) {
           filteredUsers.value = users.value.filter(
-          (msg) => msg.username != oneuserlog);
-        }                                                   
+            (msg) => msg.username != oneuserlog);
+        }
       });
   }
 }
 
 const refreshUsers = () => {
+  pauseRefresh.value = true;
+  setTimeout(() => {
+    pauseRefresh.value = false;
+  }, 2000);
   fetchData();
 };
 
@@ -341,7 +348,7 @@ const registerUser = () => {
   hideWaitMsg1.value = "";
   if (email.value.includes("@")) {
     if (password.value == confirm.value) {
-      fetch("http://localhost:3001/register", {
+      fetch("http://192.168.0.118:3001/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -585,6 +592,10 @@ onMounted(() => {
 });
 
 const sendMessage = () => {
+  if(messages.value.length > 3){
+    scrollToBottom();
+    scrollToBottom1();
+  }
   message.value = message.value.trim();
   socket.emit("sendMessage", {
     id: checktime(),
@@ -625,6 +636,7 @@ const sendMessage = () => {
       senderUsername: recipientUsername.value,
       message: message.value,
       time: currenttime(),
+      totalUnreadMsgs: 0
     });
   }
   message.value = "";
@@ -855,7 +867,7 @@ const logout = () => {
         </div>
       </div>
       <div v-show="logoutshown"
-        class="font-medium text-[16px] font-[quicksand] border-2 border-gray-200 top-52 absolute w-[80%] h-40 bg-blue-200 inset-x-0 max-w-sm mx-auto pointer-events-auto flex flex-col justify-between">
+        class="z-20 font-medium text-[16px] font-[quicksand] border-2 border-gray-200 top-52 absolute w-[80%] h-40 bg-blue-200 inset-x-0 max-w-sm mx-auto pointer-events-auto flex flex-col justify-between">
         <span class="mx-auto mt-[5%]">Logout?</span>
         <span class="text-[14px] mx-auto my-4">Are you sure you want to logout?</span>
         <div class="flex gap-20 justify-between mx-5 mb-5">
@@ -889,7 +901,7 @@ const logout = () => {
         </div>
       </div>
       <div v-show="showStartChat" class="h-screen flex flex-col justify-between">
-        <div class="px-2 pt-5 mb-2 flex flex-col gap-2 bg-slate-50">
+        <div class="px-2 pt-5 flex flex-col gap-2 bg-slate-50">
           <div class="flex justify-between">
             <span class="w-[10%] cursor-pointer" @click="showmenu"><img src="@/assets/images/menu.svg"
                 class="w-[36px] h-[32px]" /></span>
@@ -900,8 +912,11 @@ const logout = () => {
           </div>
           <span class="font-[quicksand] font-medium text-[14px] self-center">SELECT A MEMBER TO START CHAT</span>
         </div>
+        <div class="w-fit flex z-20">
+          <button @click="refreshUsers" class="absolute right-4"><img src=" @/assets/images/refresh.png"
+              class="w-7" :class="{ 'loadingrefresh' : pauseRefresh }" /></button>
+        </div>
         <ul class="ml-2 mr-1 overflow-y-auto mb-2 flex-1">
-          <button @click="refreshUsers">refresh</button>
           <li class="flex gap-3 hover:cursor-pointer mt-0.5 h-[60px] bg-[#f8f5f5]" v-for="item in filteredUsers"
             :key="item.username" @click="getRecipient(item)" ref="recipientRefs">
             <div class="w-[48px] self-center h-[48px] rounded-[100%] p-1">
@@ -941,7 +956,7 @@ const logout = () => {
               <div class="flex flex-col bg-gray-100 w-[85%] pr-5">
                 <div class="flex justify-between">
                   <span class="font-medium text-[20px]">{{ msg.senderUsername }}</span>
-                  <span>{{ msg.time }}</span>
+                  <span class="text-[14px]">{{ msg.time }}</span>
                 </div>
                 <div class="flex justify-between items-end">
                   <span class="break-words whitespace-normal text-wrap text-[15px] mt-1">{{ msg.message }}</span>
@@ -1078,10 +1093,24 @@ const logout = () => {
 .loadingMsg img {
   width: 9%;
   height: 11%;
-  animation: rotate 2s linear infinite;
+  animation: rotate1 2s linear infinite;
 }
 
 @keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingrefresh {
+  animation: rotate1 2s linear infinite;
+}
+
+@keyframes rotate1 {
   0% {
     transform: rotate(0deg);
   }
