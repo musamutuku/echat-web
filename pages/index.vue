@@ -75,7 +75,10 @@ onMounted(() => {
 });
 
 onUpdated(() => {
-  scrollToBottom();
+  // scrollToBottom();
+  if (messages.value.length > 3) {
+    scrollToBottom();
+  }
 });
 
 const scrollToBottom = () => {
@@ -163,7 +166,8 @@ const getClass = (name) => {
   }
 };
 
-const getSender = (index, totalmsgs) => {;
+const getSender = (index, totalmsgs) => {
+  ;
   //after clicking the unread msg(s) delete the in inbox page or reduce the number in the inbox button
   messages1.value[index].totalUnreadMsgs = 0;
   totalMsgs.value = totalMsgs.value - totalmsgs;
@@ -182,7 +186,7 @@ const getSender = (index, totalmsgs) => {;
         msg.recipientUsername == user.value.username)
   );
   messages.value = userMessage2;
-  if(messages.value.length > 3){
+  if (messages.value.length > 3) {
     scrollToBottom();
     scrollToBottom1();
   }
@@ -228,7 +232,7 @@ const getRecipient = (item) => {
         msg.recipientUsername == user.value.username)
   );
   messages.value = userMessage2;
-  if(messages.value.length > 3){
+  if (messages.value.length > 3) {
     scrollToBottom();
     scrollToBottom1();
   }
@@ -592,11 +596,8 @@ onMounted(() => {
 });
 
 const sendMessage = () => {
-  if(messages.value.length > 3){
-    scrollToBottom();
-    scrollToBottom1();
-  }
   message.value = message.value.trim();
+
   socket.emit("sendMessage", {
     id: checktime(),
     senderUsername: user.value.username,
@@ -638,6 +639,10 @@ const sendMessage = () => {
       time: currenttime(),
       totalUnreadMsgs: 0
     });
+  }
+  if (messages.value.length < 3) {
+    scrollToTop();
+    scrollToTop1();
   }
   message.value = "";
 };
@@ -913,8 +918,8 @@ const logout = () => {
           <span class="font-[quicksand] font-medium text-[14px] self-center">SELECT A MEMBER TO START CHAT</span>
         </div>
         <div class="w-fit flex z-20">
-          <button @click="refreshUsers" class="absolute right-4"><img src=" @/assets/images/refresh.png"
-              class="w-7" :class="{ 'loadingrefresh' : pauseRefresh }" /></button>
+          <button @click="refreshUsers" class="absolute right-4 p-1"><img src=" @/assets/images/refresh.png" class="w-7"
+              :class="{ 'loadingrefresh': pauseRefresh }" /></button>
         </div>
         <ul class="ml-2 mr-1 overflow-y-auto mb-2 flex-1">
           <li class="flex gap-3 hover:cursor-pointer mt-0.5 h-[60px] bg-[#f8f5f5]" v-for="item in filteredUsers"
@@ -1107,7 +1112,7 @@ const logout = () => {
 }
 
 .loadingrefresh {
-  animation: rotate1 2s linear infinite;
+  animation: rotate1 1s linear infinite;
 }
 
 @keyframes rotate1 {
