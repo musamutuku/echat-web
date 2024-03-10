@@ -1,5 +1,15 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  app: {
+    head: {
+      link: [
+        {
+          rel: "stylesheet",
+          href: "https://fonts.googleapis.com/css2?family=Quicksand",
+        },
+      ],
+    }
+  },
   devtools: { enabled: false },
   modules: ["@pinia/nuxt", "@vueuse/nuxt", "@vite-pwa/nuxt"],
   css: ["~/assets/css/main.css"],
@@ -12,7 +22,7 @@ export default defineNuxtConfig({
   pwa: {
     registerType: "autoUpdate",
     manifest: {
-      name: "eChat Beta",
+      name: "eChat",
       short_name: "eChat",
       description: "message app",
       theme_color: "#ffffff",
@@ -40,30 +50,36 @@ export default defineNuxtConfig({
       ],
       screenshots: [
         {
-        src: "icons/mobile-screenshot.png",
-        sizes: "720x1600",
-        type: "image/png",
-        form_factor: "narrow",
-        label: "Application",
-      },
+          src: "icons/mobile-screenshot.png",
+          sizes: "720x1600",
+          type: "image/png",
+          form_factor: "narrow",
+          label: "Application",
+        },
         {
           src: "icons/desktop-screenshot.png",
           sizes: "1600x900",
           type: "image/png",
           form_factor: "wide",
           label: "Application",
-       }
+        },
       ],
     },
     // build: {
     //   publicPath: '//local.jy.net:9000/pwa/',
     // },
+    // workbox: {
+    //   navigateFallback: "/",
+    // },
     workbox: {
       navigateFallback: "/",
+      globDirectory: ".nuxt/dist/client",
+      globPatterns: ["**/*.{js,json}", "**/node_modules/**/*"],
+      globIgnores: ["**/node_modules/**/*"],
     },
-    // client: {
-    //   installPrompt: true,
-    // },
+    client: {
+      installPrompt: true,
+    },
     devOptions: {
       enabled: true,
       type: "module",
