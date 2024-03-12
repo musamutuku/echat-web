@@ -22,7 +22,7 @@ export default defineNuxtConfig({
   pwa: {
     registerType: "autoUpdate",
     manifest: {
-      name: "eChat",
+      name: "eChat Beta",
       short_name: "eChat",
       description: "message app",
       theme_color: "#ffffff",
@@ -46,7 +46,7 @@ export default defineNuxtConfig({
           src: "icons/icon512x512.png",
           sizes: "512x512",
           type: "image/png",
-        },
+        }
       ],
       screenshots: [
         {
@@ -65,9 +65,6 @@ export default defineNuxtConfig({
         },
       ],
     },
-    // build: {
-    //   publicPath: '//local.jy.net:9000/pwa/',
-    // },
     workbox: {
       navigateFallback: "/",
     },

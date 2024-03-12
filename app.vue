@@ -21,7 +21,7 @@
       </p>
       <div class="flex justify-between mt-4">
         <button
-          class="px-6 text-xs bg-orange-500 rounded-md text-white font-semibold"
+          class="px-6 text-xs bg-[#031187] rounded-md text-white font-semibold"
           @click="installPwa()"
         >
           Install Now
