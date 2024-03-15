@@ -887,7 +887,7 @@ const logout = () => {
             <span class="w-[20%] rounded-[50%] h-[70px] hover:cursor-pointer"><img src="@/assets/images/profile.jpg"
                 class="rounded-[100%] h-[100%] w-[100%]" /></span>
           </div>
-          <span class="font-[quicksand] text-[30px] text-[#A4A716] my-5 leading-10 font-bold">Welcome to Fast Chat Web
+          <span class="font-[quicksand] text-[30px] text-[#A4A716] my-5 leading-10 font-bold">Welcome to Fast Chat Mobile
             App</span>
           <div class="flex w-fit mx-auto gap-8">
             <div class="flex flex-col hover:cursor-pointer" @click="togglestartChat">
@@ -896,7 +896,7 @@ const logout = () => {
             </div>
             <div class="flex flex-col hover:cursor-pointer relative" @click="toggleinbox">
               <div v-if="totalMsgs != 0"
-                class="bg-[#f32d37] absolute right-0 text-white text-[10px] flex items-center justify-center h-5 w-auto rounded-full px-2">
+                class="bg-[#CE0909] absolute right-0 text-white text-[10px] flex items-center justify-center h-5 w-auto rounded-full px-2">
                 <span>{{ totalMsgs }}</span>
               </div>
               <span class="mt-[-9px]"><img src="@/assets/images/inbox.png" class="w-[65px] h-[65px]" /></span>
@@ -966,7 +966,7 @@ const logout = () => {
                 <div class="flex justify-between items-end">
                   <span class="break-words whitespace-normal text-wrap text-[15px] mt-1">{{ msg.message }}</span>
                   <div v-if="msg.totalUnreadMsgs != 0"
-                    class="bg-[#f32d37] text-white text-[10px] flex items-center justify-center h-4 w-auto rounded-full px-1.5">
+                    class="bg-[#CE0909] text-white text-[10px] flex items-center justify-center h-4 w-auto rounded-full px-1.5">
                     <span>{{ msg.totalUnreadMsgs }}</span>
                   </div>
                 </div>
