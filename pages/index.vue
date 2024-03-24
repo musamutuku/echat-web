@@ -97,7 +97,7 @@ const showDel = (index) => {
   showDelete.value = true;
   msgindex.value = index;
 }
-
+//longpress
 let isLongPress = false;
 let pressTimer
 const selectedMessage1 = ref(null);
