@@ -22,7 +22,7 @@
       <div class="flex justify-between mt-4">
         <button
           class="px-6 text-xs bg-[#031187] rounded-md text-white font-semibold"
-          @click="installPwa()"
+          @click="installPwa"
         >
           Install Now
         </button>
