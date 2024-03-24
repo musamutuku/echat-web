@@ -3,7 +3,7 @@ import io from "socket.io-client";
 import { useAuthStore } from "@/stores/myStore";
 import { jwtDecode } from "jwt-decode";
 
-const socket = io("http://localhost:3001");
+const socket = io("https://echat-api.onrender.com");
 onMounted(() => {
   const newuser = "a user joined link";
   socket.emit('connected', newuser);
@@ -476,7 +476,7 @@ onMounted(() => {
 const users = ref([]);
 const fetchData = () => {
   if (process.client) {
-    fetch("http://localhost:3001/users")
+    fetch("https://echat-api.onrender.com/users")
       .then((response) => response.json())
       .then((data) => {
         localStorage.setItem('users', JSON.stringify(data));
@@ -511,7 +511,7 @@ const registerUser = () => {
   hideWaitMsg1.value = "";
   if (email.value.includes("@")) {
     if (password.value == confirm.value) {
-      fetch("http://localhost:3001/register", {
+      fetch("https://echat-api.onrender.com/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
