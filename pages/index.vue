@@ -3,7 +3,7 @@ import io from "socket.io-client";
 import { useAuthStore } from "@/stores/myStore";
 import { jwtDecode } from "jwt-decode";
 
-const socket = io("http://192.168.0.118:3001");
+const socket = io("http://localhost:3001");
 onMounted(() => {
   const newuser = "a user joined link";
   socket.emit('connected', newuser);
@@ -60,15 +60,154 @@ const isCollapsed = ref(true);
 const messageContainer = ref(null);
 const pauseRefresh = ref(false);
 
-const minRows = 1;
-const maxRows = 5;
+const delMessage = ref(false);
+const showmsgDel = () => {
+  delMessage.value = true;
+  showDelete1.value = false;
+}
+
+const CancelDel2 = () => {
+  delMessage.value = false;
+}
+
+
+
+//Delete a conversation in the inbox page
+const showDelete = ref(false);
+const msgindex = ref();
+const DelMsg = () => {
+  const senderToDelMsg = messages1.value[msgindex.value].senderUsername;
+  // loop through the array backwards to avoid index shifting when splicing
+  for (let i = chatMessages.value.length - 1; i >= 0; i--) {
+    if ((chatMessages.value[i].senderUsername == senderToDelMsg && chatMessages.value[i].recipientUsername == user.value.username) ||
+      (chatMessages.value[i].recipientUsername == senderToDelMsg && chatMessages.value[i].senderUsername == user.value.username)) {
+      chatMessages.value.splice(i, 1);
+      socket.emit('deleteMsg', (user.value.username), (senderToDelMsg))
+    }
+  }
+  messages1.value.splice(msgindex.value, 1);
+  showDelete.value = false;
+  isLongPress = false;
+}
+const CancelDel = () => {
+  showDelete.value = false;
+  isLongPress = false;
+}
+const showDel = (index) => {
+  showDelete.value = true;
+  msgindex.value = index;
+}
+
+let isLongPress = false;
+let pressTimer
+const selectedMessage1 = ref(null);
+const startPress = (msg, event) => {
+  selectedMessage1.value = msg;
+  showDelete.value = false;
+  isLongPress = false;
+  if (event.button === 0) {
+    pressTimer = setTimeout(() => {
+      // Long press detected, delete the message
+      const index = messages1.value.indexOf(msg)
+      if (index !== -1) {
+        showDel(index);
+      }
+      isLongPress = true
+    }, 1000)
+  }
+}
+const cancelPress = () => {
+  clearTimeout(pressTimer)
+}
+
+
+//Delete a message in the messenger page
+const showDelete1 = ref(false);
+const msgindex1 = ref();
+const msgToDel = ref(null);
+const msgToCopy = ref();
+const DelMsg1 = () => {
+  messages.value.splice(msgindex1.value, 1);
+  delMessage.value = false;
+  for (let i = 0; i < chatMessages.value.length; i++) {
+    if (chatMessages.value[i].date === msgToDel.value) {
+      chatMessages.value.splice(i, 1);
+      socket.emit('deleteMsg1', (msgToDel.value));
+    }
+  }
+  for (let i = 0; i < messages1.value.length; i++) {
+    if (messages1.value[i].date === msgToDel.value) {
+      const prevMsgindex = messages.value.length - 1;
+      const prevMsg = messages.value[prevMsgindex];
+      if (prevMsg) {
+        messages1.value[i].message = prevMsg.message;
+        messages1.value[i].date = prevMsg.date;
+      }
+      else {
+        messages1.value.splice(i, 1);
+      }
+    }
+  }
+}
+const CancelDel1 = () => {
+  showDelete1.value = false;
+}
+const showDel1 = (index) => {
+  showDelete1.value = true;
+  msgindex1.value = index;
+}
+
+const selectedMessage = ref(null);
+let isLongPress1 = false;
+let pressTimer1
+const startPress1 = (msg) => {
+  selectedMessage.value = msg;
+  showDelete1.value = false;
+  delMessage.value = false;
+  isLongPress1 = false;
+  pressTimer1 = setTimeout(() => {
+    // Long press detected, delete the message
+    const index = messages.value.indexOf(msg)
+    if (index !== -1) {
+      showDel1(index);
+      msgToDel.value = msg.date;
+      msgToCopy.value = msg.message;
+      isLongPress1 = true;
+    }
+  }, 1000)
+}
+const cancelPress1 = () => {
+  clearTimeout(pressTimer1)
+}
+
+//copy text message to clipboard
+const copiedMsg = ref('');
+const copyToClipboard = () => {
+  navigator.clipboard.writeText(msgToCopy.value)
+    .then(() => {
+      copiedMsg.value = 'copied!';
+      setTimeout(() => {
+        copiedMsg.value = '';
+        showDelete1.value = false;
+      }, 1000);
+    })
+    .catch((error) => {
+      csetTimeout(() => {
+        copiedMsg.value = 'error!';
+      }, 1000);
+    })
+}
+
 
 // Calculate the number of rows based on the message length
+const minRows = 1;
+const maxRows = 5;
 const computedRows = computed(() => {
   const lineHeight = 20; // Adjust this value based on your font size and line height
   const lines = Math.min(Math.max(message.value.split('\n').length, minRows), maxRows);
   return Math.max(lines, minRows) * lineHeight;
-});;
+});
+
 
 onMounted(() => {
   scrollToTop1();
@@ -76,7 +215,7 @@ onMounted(() => {
 
 onUpdated(() => {
   // scrollToBottom();
-  if (messages.value.length > 3) {
+  if (messages.value.length > 3 && isLongPress1 == false) {
     scrollToBottom();
   }
 });
@@ -131,6 +270,8 @@ const cancelLog = () => {
 const showmenu = () => {
   isCollapsed.value = true;
   isCollapsed.value = !isCollapsed.value;
+  showDelete.value = false;
+  isLongPress = false;
 };
 
 const hidemenu = () => {
@@ -166,32 +307,41 @@ const getClass = (name) => {
   }
 };
 
-const getSender = (index, totalmsgs) => {
-  ;
-  //after clicking the unread msg(s) delete the in inbox page or reduce the number in the inbox button
-  messages1.value[index].totalUnreadMsgs = 0;
-  totalMsgs.value = totalMsgs.value - totalmsgs;
-  socket.emit("markAsRead", (user.value.username), (messages1.value[index].senderUsername));
-
-  showmessenger.value = true;
-  showinbox.value = false;
-  messages.value = chatMessages.value;
-  msgSender.value.innerText = messages1.value[index].senderUsername;
-  recipientUsername.value = messages1.value[index].senderUsername;
-  const userMessage2 = chatMessages.value.filter(
-    (msg) =>
-      (msg.senderUsername == user.value.username &&
-        msg.recipientUsername == recipientUsername.value) ||
-      (msg.senderUsername == recipientUsername.value &&
-        msg.recipientUsername == user.value.username)
-  );
-  messages.value = userMessage2;
-  if (messages.value.length > 3) {
-    scrollToBottom();
-    scrollToBottom1();
+const getStyle = (name) => {
+  if (name === user.value.username) {
+    return "right-[90%]";
+  } else {
+    return "left-[90%]";
   }
-  return messages1.value;
 };
+
+const getSender = (index, totalmsgs) => {
+  if (!isLongPress) {
+    //after clicking the unread msg(s) delete the in inbox page or reduce the number in the inbox button
+    messages1.value[index].totalUnreadMsgs = 0;
+    totalMsgs.value = totalMsgs.value - totalmsgs;
+    socket.emit("markAsRead", (user.value.username), (messages1.value[index].senderUsername));
+
+    showmessenger.value = true;
+    showinbox.value = false;
+    messages.value = chatMessages.value;
+    msgSender.value.innerText = messages1.value[index].senderUsername;
+    recipientUsername.value = messages1.value[index].senderUsername;
+    const userMessage2 = chatMessages.value.filter(
+      (msg) =>
+        (msg.senderUsername == user.value.username &&
+          msg.recipientUsername == recipientUsername.value) ||
+        (msg.senderUsername == recipientUsername.value &&
+          msg.recipientUsername == user.value.username)
+    );
+    messages.value = userMessage2;
+    if (messages.value.length > 3) {
+      scrollToBottom();
+      scrollToBottom1();
+    }
+    return messages1.value;
+  };
+}
 
 const getTotalInbox = (totalmsgs) => {
   totalMsgs.value = totalMsgs.value - totalmsgs;
@@ -239,7 +389,14 @@ const getRecipient = (item) => {
   return messages1.value;
 };
 
+const cancelPopup = () => {
+  showDelete1.value = false;
+  delMessage.value = false;
+}
+
 const goback = () => {
+  showDelete1.value = false;
+  delMessage.value = false;
   scrollToTop1();
   showmessenger.value = !showmessenger.value;
   showinbox.value = !showinbox.value;
@@ -260,6 +417,8 @@ const togglestartChat = () => {
   isActive1.value = true;
   isActive2.value = false;
   isCollapsed.value = true;
+  showDelete.value = false;
+  isLongPress = false;
 };
 
 const resetSuccess = () => {
@@ -317,7 +476,7 @@ onMounted(() => {
 const users = ref([]);
 const fetchData = () => {
   if (process.client) {
-    fetch("http://192.168.0.118:3001/users")
+    fetch("http://localhost:3001/users")
       .then((response) => response.json())
       .then((data) => {
         localStorage.setItem('users', JSON.stringify(data));
@@ -352,7 +511,7 @@ const registerUser = () => {
   hideWaitMsg1.value = "";
   if (email.value.includes("@")) {
     if (password.value == confirm.value) {
-      fetch("http://192.168.0.118:3001/register", {
+      fetch("http://localhost:3001/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -379,8 +538,8 @@ const registerUser = () => {
         .then((data) => {
           if (data.regMsg) {
             return registerSuccess(data.regMsg);
-            return registerError1(data.regUserMsg);
           } else if (data.regUserMsg) {
+            return registerError1(data.regUserMsg);
           }
         })
         .catch((error) => registerError(error.error));
@@ -605,6 +764,7 @@ const sendMessage = () => {
     message: message.value,
     time: currenttime(),
     mark: "unread",
+    date: Date.now()
   });
   messages.value.push({
     id: checktime(),
@@ -647,7 +807,7 @@ const sendMessage = () => {
   message.value = "";
 };
 
-socket.on("receiveMessage", ({ senderUsername, message, totalUnread }) => {
+socket.on("receiveMessage", ({ senderUsername, message, totalUnread, date }) => {
   if (
     senderUsername != user.value.username &&
     senderUsername == recipientUsername.value
@@ -657,6 +817,7 @@ socket.on("receiveMessage", ({ senderUsername, message, totalUnread }) => {
       senderUsername: senderUsername,
       message: message,
       time: currenttime(),
+      date: date
     });
   }
 
@@ -887,7 +1048,8 @@ const logout = () => {
             <span class="w-[20%] rounded-[50%] h-[70px] hover:cursor-pointer"><img src="@/assets/images/profile.jpg"
                 class="rounded-[100%] h-[100%] w-[100%]" /></span>
           </div>
-          <span class="font-[quicksand] text-[30px] text-[#A4A716] my-5 leading-10 font-bold">Welcome to Fast Chat Mobile
+          <span class="font-[quicksand] text-[30px] text-[#A4A716] my-5 leading-10 font-bold">Welcome to Fast Chat
+            Mobile
             App</span>
           <div class="flex w-fit mx-auto gap-8">
             <div class="flex flex-col hover:cursor-pointer" @click="togglestartChat">
@@ -896,7 +1058,7 @@ const logout = () => {
             </div>
             <div class="flex flex-col hover:cursor-pointer relative" @click="toggleinbox">
               <div v-if="totalMsgs != 0"
-                class="bg-[#CE0909] absolute right-0 text-white text-[10px] flex items-center justify-center h-5 w-auto rounded-full px-2">
+                class="bg-[#CE0909] absolute right-0 text-white text-[10px] font-semibold flex items-center justify-center h-5 w-auto rounded-full px-2">
                 <span>{{ totalMsgs }}</span>
               </div>
               <span class="mt-[-9px]"><img src="@/assets/images/inbox.png" class="w-[65px] h-[65px]" /></span>
@@ -936,7 +1098,7 @@ const logout = () => {
       <div v-show="showinbox" class="h-screen flex flex-col justify-between">
         <div class="h-full flex flex-col overflow-y-hidden">
           <div class="flex flex-col">
-            <div @click="togglestartChat" class="z-10 absolute bottom-4 right-5 w-16 hover:cursor-pointer">
+            <div @click="togglestartChat" class="z-10 absolute bottom-5 right-5 w-16 hover:cursor-pointer">
               <img src="@/assets/images/start.svg" />
             </div>
             <div class="px-2 pt-5 flex flex-col gap-2 bg-slate-50">
@@ -951,23 +1113,34 @@ const logout = () => {
               <span class="font-bold font-[quicksand] text-[20px]">Messages</span>
             </div>
           </div>
-          <ul class="ml-2 mr-1 bg-white overflow-y-auto">
-            <li class="flex mt-0.5 justify-between h-[60px] hover:cursor-pointer overflow-hidden bg-slate-50"
-              v-for="(msg, index) in messages1" :key="index" @click="getSender(index, msg.totalUnreadMsgs)"
-              ref="senderRefs">
-              <div class="w-[48px] self-center h-[48px] rounded-[100%] p-1">
-                <img src="@/assets/images/user_profile.svg" class="w-[100%] h-[100%]" />
-              </div>
-              <div class="flex flex-col bg-gray-100 w-[85%] pr-5">
-                <div class="flex justify-between">
-                  <span class="font-medium text-[20px]">{{ msg.senderUsername }}</span>
-                  <span class="text-[14px]">{{ msg.time }}</span>
+          <ul class="ml-2 mr-1 bg-white overflow-y-auto h-[100%]">
+            <li v-for="(msg, index) in messages1" :key="index" class="relative">
+              <div v-if="selectedMessage1 === msg" v-show="showDelete"
+                class="bg-white text-sm border-[1px] gap-6 py-2 flex flex-col  border-[#dfd1d155] px-2 absolute top-10 right-3 z-20">
+                <span>Delete conversation?</span>
+                <div class="flex justify-between mx-2">
+                  <span @click="DelMsg" class="pr-2 hover:cursor-pointer">OK</span>
+                  <span @click="CancelDel" class="hover:cursor-pointer">Cancel</span>
                 </div>
-                <div class="flex justify-between items-end">
-                  <span class="break-words whitespace-normal text-wrap text-[15px] mt-1">{{ msg.message }}</span>
-                  <div v-if="msg.totalUnreadMsgs != 0"
-                    class="bg-[#CE0909] text-white text-[10px] flex items-center justify-center h-4 w-auto rounded-full px-1.5">
-                    <span>{{ msg.totalUnreadMsgs }}</span>
+              </div>
+              <div
+                class="relative flex mt-0.5 justify-between h-[60px] hover:cursor-pointer overflow-hidden bg-slate-50"
+                @mousedown="startPress(msg, $event)" @mouseup="cancelPress" @mouseleave="cancelPress"
+                @click="getSender(index, msg.totalUnreadMsgs)" ref="senderRefs">
+                <div class="w-[48px] self-center h-[48px] rounded-[100%] p-1">
+                  <img src="@/assets/images/user_profile.svg" class="w-[100%] h-[100%]" />
+                </div>
+                <div class="flex flex-col bg-gray-100 w-[85%] pr-5">
+                  <div class="flex justify-between">
+                    <span class="font-medium text-[20px]">{{ msg.senderUsername }}</span>
+                    <span class="text-[14px]">{{ msg.time }}</span>
+                  </div>
+                  <div class="flex justify-between items-end">
+                    <span class="break-words whitespace-normal text-wrap text-[15px] mt-1">{{ msg.message }}</span>
+                    <div v-if="msg.totalUnreadMsgs != 0"
+                      class="bg-[#CE0909] text-white text-[10px] font-semibold flex items-center justify-center h-4 w-auto rounded-full px-1.5">
+                      <span>{{ msg.totalUnreadMsgs }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -988,13 +1161,32 @@ const logout = () => {
     recipientUsername
   }}</span>
           </div>
-          <ul class="mx-1 bg-white px-2 flex flex-col gap-3 mt-1 max-h-[620px] rounded-sm overflow-y-auto"
+          <ul class="mx-1 bg-white px-2 flex flex-col gap-3 mt-1 min-h-[500px] max-h-[620px] rounded-sm overflow-y-auto"
             ref="messageContainer">
-            <li v-for="msg in messages" :key="msg.id" class="flex flex-col px-2">
+            <li v-for="(msg, index) in messages" :key="index" class="flex flex-col px-2">
               <span class="self-center text-[10px]">{{ msg.id }}</span>
-              <span class="w-fit rounded-xl text-[16px] px-3 py-2 self-start flex break-all"
+              <span class="relative w-fit rounded-xl text-[16px] self-start flex break-all"
                 :class="getClass(msg.senderUsername)">
-                {{ msg.message }}
+                <span @mousedown="startPress1(msg)" @mouseup="cancelPress1" @mouseleave="cancelPress1"
+                  class="px-3 py-2">
+                  {{ msg.message }}</span>
+                <div class="absolute bg-white text-black z-10" :class="getStyle(msg.senderUsername)">
+                  <div v-show="showDelete1" v-if="selectedMessage === msg"
+                    class="flex flex-col z-20 gap-2 min-w-[95px] pl-3 text-sm py-1 border-[1px] border-[#dfbfbf55]">
+                    <span @click="showmsgDel" class="w-fit hover:cursor-pointer">Delete</span>
+                    <span @click="copyToClipboard" class="w-fit pr-2 hover:cursor-pointer">Copy&nbsp;<span
+                        class="text-[10px] text-green-700">{{ copiedMsg }}</span></span>
+                    <span @click="CancelDel1" class="w-fit hover:cursor-pointer">Cancel</span>
+                  </div>
+                  <div v-show="delMessage" v-if="selectedMessage === msg"
+                    class="flex flex-col z-20 gap-6 min-w-[130px] pl-3 text-sm py-1 border-[1px] border-[#dfbfbf55]">
+                    <span>Delete message?</span>
+                    <div class="flex justify-between mr-2">
+                      <span @click="DelMsg1" class="pr-2 hover:cursor-pointer">OK</span>
+                      <span @click="CancelDel2" class="hover:cursor-pointer">Cancel</span>
+                    </div>
+                  </div>
+                </div>
               </span>
             </li>
             <p class="text-center invisible">messenger app</p>
@@ -1003,7 +1195,7 @@ const logout = () => {
         <div class="mb-2 sticky bottom-0">
           <input class="hidden" v-model="recipientUsername" />
           <div class="flex-grow bg-slate-200 border-4 flex justify-between px-3">
-            <textarea rows="1" v-model="message" :rows="computedRows"
+            <textarea rows="1" v-model="message" :rows="computedRows" @input="cancelPopup"
               class="w-full py-2 flex-1 text-sm outline-none resize-none pl-3 mr-2 rounded-sm"
               placeholder="Type message..." scrolling-touch></textarea>
             <button :disabled="activebtn" :class="{ 'bg-blue-400': !activebtn, 'bg-blue-200': activebtn }"

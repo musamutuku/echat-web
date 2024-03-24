@@ -8,8 +8,8 @@ export default defineNuxtConfig({
           href: "https://fonts.googleapis.com/css2?family=Quicksand",
         },
       ],
-      title: "eChat"
-    }
+      title: "eChat- App",
+    },
   },
   devtools: { enabled: false },
   modules: ["@pinia/nuxt", "@vueuse/nuxt", "@vite-pwa/nuxt"],
@@ -47,7 +47,7 @@ export default defineNuxtConfig({
           src: "icons/icon512x512.png",
           sizes: "512x512",
           type: "image/png",
-        }
+        },
       ],
       screenshots: [
         {
