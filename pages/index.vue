@@ -4,6 +4,7 @@ import { useAuthStore } from "@/stores/myStore";
 import { jwtDecode } from "jwt-decode";
 
 const socket = io("https://echat-api.onrender.com");
+
 onMounted(() => {
   const newuser = "a user joined link";
   socket.emit('connected', newuser);

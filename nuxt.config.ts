@@ -66,20 +66,20 @@ export default defineNuxtConfig({
         },
       ],
     },
-    // workbox: {
-    //   navigateFallback: "/",
-    // },
     workbox: {
       navigateFallback: "/",
-      globDirectory: ".nuxt/dist/client",
-      globPatterns: ["**/*.{js,json}", "**/node_modules/**/*"],
-      globIgnores: ["**/node_modules/**/*"],
     },
+    // workbox: {
+    //   navigateFallback: "/",
+    //   globDirectory: ".nuxt/dist/client",
+    //   globPatterns: ["**/*.{js,json}", "**/node_modules/**/*"],
+    //   globIgnores: ["**/node_modules/**/*"],
+    // },
     client: {
       installPrompt: true,
     },
     devOptions: {
-      // enabled: true,
+      enabled: true,
       type: "module",
     },
   },
