@@ -1126,7 +1126,7 @@ const logout = () => {
               </div>
               <div
                 class="relative flex mt-0.5 justify-between h-[60px] hover:cursor-pointer overflow-hidden bg-slate-50"
-                @mousedown="startPress(msg, $event)" @mouseup="cancelPress" @mouseleave="cancelPress"
+                @touchstart.prevent="startPress(msg, $event)" @touchend.prevent="cancelPress" @touchcancel.prevent="cancelPress"
                 @click="getSender(index, msg.totalUnreadMsgs)" ref="senderRefs">
                 <div class="w-[48px] self-center h-[48px] rounded-[100%] p-1">
                   <img src="@/assets/images/user_profile.svg" class="w-[100%] h-[100%]" />
@@ -1168,7 +1168,7 @@ const logout = () => {
               <span class="self-center text-[10px]">{{ msg.id }}</span>
               <span class="relative w-fit rounded-xl text-[16px] self-start flex break-all"
                 :class="getClass(msg.senderUsername)">
-                <span @mousedown="startPress1(msg)" @mouseup="cancelPress1" @mouseleave="cancelPress1"
+                <span @touchstart.prevent="startPress1(msg)" @touchend.prevent="cancelPress1" @touchcancel.prevent="cancelPress1"
                   class="px-3 py-2">
                   {{ msg.message }}</span>
                 <div class="absolute bg-white text-black z-10" :class="getStyle(msg.senderUsername)">
