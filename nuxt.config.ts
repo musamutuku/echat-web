@@ -8,7 +8,6 @@ export default defineNuxtConfig({
           href: "https://fonts.googleapis.com/css2?family=Quicksand",
         },
       ],
-      title: "eChat- App",
     },
   },
   devtools: { enabled: false },
