@@ -1034,10 +1034,10 @@ const logout = () => {
         </div>
       </div>
       <div v-show="logoutshown"
-        class="z-20 font-medium text-[16px] font-[quicksand] border-2 border-gray-200 top-52 absolute w-[80%] h-40 bg-blue-200 inset-x-0 max-w-sm mx-auto pointer-events-auto flex flex-col justify-between">
+        class="z-20 font-medium text-[15px] font-[quicksand] border-2 border-gray-200 top-52 absolute w-[80%] h-40 bg-blue-200 inset-x-0 max-w-sm mx-auto pointer-events-auto flex flex-col justify-between">
         <span class="mx-auto mt-[5%]">Logout?</span>
         <span class="text-[14px] mx-auto my-4">Are you sure you want to logout?</span>
-        <div class="flex gap-20 justify-between mx-5 mb-5">
+        <div class="flex gap-20 justify-between mx-5 mb-5 font-semibold">
           <span @click="logout" class="px-5 text-[#0A5B09] hover:cursor-pointer hover:bg-[#d3cdcd]">YES</span>
           <span @click="cancelLog" class="hover:bg-[#d3cdcd] hover:cursor-pointer text-[#970606] px-5">NO</span>
         </div>
@@ -1126,7 +1126,7 @@ const logout = () => {
               </div>
               <div
                 class="relative flex mt-0.5 justify-between h-[60px] hover:cursor-pointer overflow-hidden bg-slate-50"
-                @touchstart.prevent="startPress(msg, $event)" @touchend.prevent="cancelPress" @touchcancel.prevent="cancelPress"
+                @touchstart="startPress(msg, $event)" @touchend="cancelPress" @touchcancel="cancelPress"
                 @click="getSender(index, msg.totalUnreadMsgs)" ref="senderRefs">
                 <div class="w-[48px] self-center h-[48px] rounded-[100%] p-1">
                   <img src="@/assets/images/user_profile.svg" class="w-[100%] h-[100%]" />
@@ -1168,7 +1168,7 @@ const logout = () => {
               <span class="self-center text-[10px]">{{ msg.id }}</span>
               <span class="relative w-fit rounded-xl text-[16px] self-start flex break-all"
                 :class="getClass(msg.senderUsername)">
-                <span @touchstart.prevent="startPress1(msg)" @touchend.prevent="cancelPress1" @touchcancel.prevent="cancelPress1"
+                <span @touchstart="startPress1(msg)" @touchend="cancelPress1" @touchcancel="cancelPress1"
                   class="px-3 py-2">
                   {{ msg.message }}</span>
                 <div class="absolute bg-white text-black z-10" :class="getStyle(msg.senderUsername)">
