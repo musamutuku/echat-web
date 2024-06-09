@@ -11,7 +11,7 @@
 <template>
   <NuxtPwaManifest/>
   <div>
-    <div
+    <!-- <div
       class="max-w-screen-sm z-20 absolute bottom-4 bg-white/20 backdrop-blur-md mx-6 p-4 rounded-2xl border-2 border-gray-100"
       v-if="installationPromptIsShown"
     >
@@ -33,7 +33,7 @@
           Some other time
         </button>
       </div>
-    </div>
+    </div> -->
     <NuxtPage />
   </div>
 </template>

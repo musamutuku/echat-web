@@ -2,8 +2,11 @@
 import io from "socket.io-client";
 import { useAuthStore } from "@/stores/myStore";
 import { jwtDecode } from "jwt-decode";
+const config = useRuntimeConfig();
+const host_server = config.public.apiHOST;
 
-const socket = io("https://echat-api.onrender.com");
+const socket = io(`${host_server}`);
+
 
 onMounted(() => {
   const newuser = "a user joined link";
@@ -21,14 +24,31 @@ const msgSender = ref();
 
 const store = useAuthStore();
 const token = ref("");
+const otp = ref("");
+const otp1 = ref("");
+const otp2 = ref("");
+const otp3 = ref("");
+const otp4 = ref("");
+const otp11 = ref("");
+const otp22 = ref("");
+const otp33 = ref("");
+const otp44 = ref("");
 const username = ref("");
 const password = ref("");
 const email = ref("");
 const confirm = ref("");
 const showLog = ref(true);
+const showForgot = ref(false);
+const showForgotSuccess = ref(false);
 const showReg = ref(false);
 const isdisabledLog = ref(true);
 const isdisabledReg = ref(true);
+const isdisabledForgot = ref(true);
+const isdisabledOtp = ref(true);
+const isdisabledOtpInput1 = ref(false);
+const isdisabledOtpInput2 = ref(true);
+const isdisabledOtpInput3 = ref(true);
+const isdisabledOtpInput4 = ref(true);
 const isFocused = ref(false);
 const isFocused1 = ref(false);
 const hide = ref(true);
@@ -39,9 +59,20 @@ const showerror = ref(false);
 const successMsg = ref("");
 const errormsg = ref("");
 const userError = ref("");
+const userError01 = ref("");
+const userError02 = ref("");
+const userError03 = ref("");
+const userError04 = ref("");
+const resendLink = ref("");
+const showresend = ref(false)
+const userError02Timer = ref("");
 const loadingMsg = ref(false);
+const loadingMsg1 = ref(false);
+const loadingMsg2 = ref(false);
 const hideWaitMsg = ref("SIGN IN");
 const hideWaitMsg1 = ref("SIGN UP");
+const hideWaitMsg2 = ref("VERIFY");
+const hideWaitMsg3 = ref("RESET");
 const loading = ref(false);
 const loginMsg = ref("");
 const showinbox = ref(false);
@@ -60,6 +91,52 @@ const displayMenu = ref(true);
 const isCollapsed = ref(true);
 const messageContainer = ref(null);
 const pauseRefresh = ref(false);
+const showVerify = ref(false);
+const unclickable = ref(false);
+const showpopupMessage = ref(false);
+const popupText = ref("");
+const showpopupMessage1 = ref(false);
+const popupText1 = ref("");
+const forgotError = ref("");
+const forgotSuccess = ref("");
+
+
+const toggleForgot = () => {
+  showForgot.value = true;
+  showLog.value = false;
+  showReg.value = false;
+  showForgotSuccess.value = false;
+}
+
+const toggleForgot1 = () => {
+  showForgot.value = false;
+  showLog.value = true;
+  showForgotSuccess.value = false;
+  showReg.value = false;
+
+}
+
+const nextOtp1 = () => {
+  isdisabledOtpInput2.value = false;
+  setTimeout(() => {
+    otp22.value.focus();
+  }, 500);
+}
+
+const nextOtp2 = () => {
+  isdisabledOtpInput3.value = false;
+  setTimeout(() => {
+    otp33.value.focus();
+  }, 500);
+}
+
+const nextOtp3 = () => {
+  isdisabledOtpInput4.value = false;
+  setTimeout(() => {
+    otp44.value.focus();
+  }, 500);
+}
+
 
 const delMessage = ref(false);
 const showmsgDel = () => {
@@ -437,11 +514,50 @@ const resetError = () => {
 const toggleLogReg = () => {
   showLog.value = !showLog.value;
   showReg.value = !showReg.value;
+  showForgot.value = false;
+  showForgotSuccess.value = false;
   username.value = "";
   email.value = "";
   password.value = "";
   confirm.value = "";
   loginMsg.value = "";
+  otp1.value = "";
+  otp2.value = "";
+  otp3.value = "";
+  otp4.value = "";
+};
+
+const toggleLogReg2 = () => {
+  showLog.value = true;
+  showReg.value = false;
+  showForgot.value = false;
+  username.value = "";
+  email.value = "";
+  password.value = "";
+  confirm.value = "";
+  loginMsg.value = "";
+  otp1.value = "";
+  otp2.value = "";
+  otp3.value = "";
+  otp4.value = "";
+};
+
+const toggleLogReg1 = () => {
+  showLog.value = true;
+  showReg.value = false;
+  username.value = "";
+  email.value = "";
+  password.value = "";
+  otp1.value = "";
+  otp2.value = "";
+  otp3.value = "";
+  otp4.value = "";
+  confirm.value = "";
+  loginMsg.value = "";
+  showVerify.value = false;
+  isdisabledOtpInput2.value = true;
+  isdisabledOtpInput3.value = true;
+  isdisabledOtpInput4.value = true;
 };
 
 const changeCase = computed(() => (email.value = email.value.toLowerCase()));
@@ -460,6 +576,20 @@ const regbtn = computed(() => {
   isdisabledReg.value = true;
 });
 
+const otpbtn = computed(() => {
+  if (
+    otp1.value != "" &&
+    otp2.value != "" &&
+    otp3.value != "" &&
+    otp4.value != ""
+  ) {
+    isdisabledOtp.value = false;
+    const color = { backgroundColor: "#6246CE" };
+    return color;
+  }
+  isdisabledOtp.value = true;
+});
+
 const logbtn = computed(() => {
   if (username.value != "" && password.value != "") {
     isdisabledLog.value = false;
@@ -467,6 +597,15 @@ const logbtn = computed(() => {
     return color;
   }
   isdisabledLog.value = true;
+});
+
+const forgotbtn = computed(() => {
+  if (username.value != "" && email.value != "") {
+    isdisabledForgot.value = false;
+    const color = { backgroundColor: "#6246CE" };
+    return color;
+  }
+  isdisabledForgot.value = true;
 });
 
 
@@ -477,7 +616,7 @@ onMounted(() => {
 const users = ref([]);
 const fetchData = () => {
   if (process.client) {
-    fetch("https://echat-api.onrender.com/users")
+    fetch(`${host_server}/users`)
       .then((response) => response.json())
       .then((data) => {
         localStorage.setItem('users', JSON.stringify(data));
@@ -512,7 +651,7 @@ const registerUser = () => {
   hideWaitMsg1.value = "";
   if (email.value.includes("@")) {
     if (password.value == confirm.value) {
-      fetch("https://echat-api.onrender.com/register", {
+      fetch(`${host_server}/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -530,6 +669,8 @@ const registerUser = () => {
               return response.json();
             } else if (response.status === 400) {
               return response.json();
+            } else if (response.status === 500) {
+              return response.json();
             }
           } else {
             errormsg.value = "Internal Server Error";
@@ -537,10 +678,17 @@ const registerUser = () => {
           }
         })
         .then((data) => {
-          if (data.regMsg) {
-            return registerSuccess(data.regMsg);
-          } else if (data.regUserMsg) {
+          if (data.regUserMsg) {
             return registerError1(data.regUserMsg);
+          }
+          if (data.regUserMsg01) {
+            return registerVerify(data.regUserMsg01);
+          }
+          else if (data.OTPmessage) {
+            return popupMessage(data.OTPmessage);
+          }
+          else if (data.OTPmessage1) {
+            return popupMessage1(data.OTPmessage1);
           }
         })
         .catch((error) => registerError(error.error));
@@ -553,21 +701,77 @@ const registerUser = () => {
     return registerError1(msg);
   }
 };
-function registerSuccess(regMsg) {
-  loading.value = false;
-  loadingMsg.value = false;
-  hideWaitMsg1.value = "SIGN UP";
-  showsuccess.value = true;
-  successMsg.value = regMsg;
-  username.value = "";
-  email.value = "";
-  password.value = "";
-  confirm.value = "";
+
+function popupMessage(OTPmessage) {
   setTimeout(() => {
-    successMsg.value = "";
-    showsuccess.value = false;
+    hideWaitMsg3.value = "RESET";
+    loading.value = false;
+    loadingMsg2.value = false;
+    popupText.value = OTPmessage;
+    showpopupMessage.value = true;
+    loading.value = false;
+    loadingMsg.value = false;
+    hideWaitMsg.value = "SIGN IN";
+    hideWaitMsg1.value = "SIGN UP";
+    username.value = "";
+    email.value = "";
+    password.value = "";
+    confirm.value = "";
+    setTimeout(() => {
+      popupText.value = "";
+      showpopupMessage.value = false;
+    }, 8000);
+  }, 2000);
+}
+
+function popupMessage1(OTPmessage1) {
+  setTimeout(() => {
+    hideWaitMsg3.value = "RESET";
+    loading.value = false;
+    loadingMsg2.value = false;
+    popupText1.value = OTPmessage1;
+    showpopupMessage1.value = true;
+    loading.value = false;
+    loadingMsg.value = false;
+    hideWaitMsg.value = "SIGN IN";
+    hideWaitMsg1.value = "SIGN UP";
+    username.value = "";
+    email.value = "";
+    password.value = "";
+    confirm.value = "";
+    setTimeout(() => {
+      popupText1.value = "";
+      showpopupMessage1.value = false;
+    }, 8000);
+  }, 2000);
+}
+
+
+function registerSuccess(regMsg) {
+  setTimeout(() => {
+    showVerify.value = false;
     showLog.value = true;
     showReg.value = false;
+    loading.value = false;
+    loadingMsg.value = false;
+    hideWaitMsg1.value = "SIGN UP";
+    loadingMsg1.value = false;
+    hideWaitMsg2.value = "VERIFY"
+    showsuccess.value = true;
+    successMsg.value = regMsg;
+    username.value = "";
+    email.value = "";
+    password.value = "";
+    confirm.value = "";
+    userError01.value = "";
+    otp1.value = "";
+    otp2.value = "";
+    otp3.value = "";
+    otp4.value = "";
+    setTimeout(() => {
+      successMsg.value = "";
+      showsuccess.value = false;
+    }, 3000);
   }, 3000);
 }
 
@@ -576,10 +780,18 @@ function registerError(error) {
     loading.value = false;
     loadingMsg.value = false;
     hideWaitMsg1.value = "SIGN UP";
+    loadingMsg1.value = false;
+    hideWaitMsg2.value = "VERIFY";
+    loadingMsg2.value = false;
+    hideWaitMsg3.value = "RESET";
     username.value = "";
     email.value = "";
     password.value = "";
     confirm.value = "";
+    otp1.value = "";
+    otp2.value = "";
+    otp3.value = "";
+    otp4.value = "";
     showerror.value = true;
     errormsg.value = "Server Error or connection failure!";
     setTimeout(() => {
@@ -598,6 +810,209 @@ function registerError1(regUserMsg) {
     userError.value = "";
   }, 3000);
 }
+
+function verifyError(regUserMsg02) {
+  if (resendLink.value != "") {
+    setTimeout(() => {
+      verifyOtp(regUserMsg02);
+    }, 10000);
+  }
+  else {
+    setTimeout(() => {
+      verifyOtp(regUserMsg02);
+    }, 1000);
+  }
+}
+
+function verifyOtp(regUserMsg02) {
+  let num = 10;
+  otp1.value = "";
+  otp2.value = "";
+  otp3.value = "";
+  otp4.value = "";
+  loading.value = false;
+  loadingMsg1.value = false;
+  hideWaitMsg2.value = "VERIFY";
+  userError02.value = regUserMsg02;
+  resendLink.value = "RESEND"
+  userError02Timer.value = 'in ' + num + 's';
+  unclickable.value = true;
+  if (num == 10) {
+    setInterval(() => {
+      if (num > 0) {
+        num = num - 1;
+        userError02Timer.value = 'in ' + num + 's';
+      }
+    }, 1000);
+  }
+  setTimeout(() => {
+    unclickable.value = false;
+    userError02.value = "";
+    userError02Timer.value = "";
+    resendLink.value = "";
+  }, 11000);
+}
+
+
+function registerVerify1(regUserMsg01) {
+  showVerify.value = true;
+  setTimeout(() => {
+    otp11.value.focus();
+  }, 500);
+  showLog.value = false;
+  showReg.value = false;
+  loading.value = false;
+  loadingMsg.value = false;
+  hideWaitMsg.value = "SIGN IN";
+  hideWaitMsg1.value = "SIGN UP";
+  userError01.value = regUserMsg01;
+  userError02.value = "";
+  userError02Timer.value = "";
+  userError03.value = "";
+  userError04.value = "";
+  resendLink.value = "";
+}
+function registerVerify(regUserMsg01) {
+  if (regUserMsg01.includes("New OTP has been resend to your Email")) {
+    loading.value = true;
+    showresend.value = true;
+    userError01.value = "";
+    userError03.value = "";
+    userError04.value = "";
+    setTimeout(() => {
+      loading.value = false;
+      showresend.value = false;
+      registerVerify1(regUserMsg01)
+    }, 11000);
+  }
+  else {
+    registerVerify1(regUserMsg01)
+    userError03.value = "CLICK HERE";
+    userError04.value = "to get a new OTP";
+  }
+}
+
+//Verification
+const verifyUser = () => {
+  otp.value = otp1.value.concat(otp2.value, otp3.value, otp4.value).trim();
+  loadingMsg1.value = true;
+  loading.value = true;
+  hideWaitMsg2.value = "";
+  // fetch("https://echat-api.onrender.com/verify", {
+  if (username.value == "") {
+    verifyUser001(user.value.username);
+  }
+  else {
+    verifyUser001(username.value);
+  }
+};
+
+const verifyUser001 = (userName) => {
+  fetch(`${host_server}/verify`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      username: userName,
+      otp: otp.value,
+    }),
+  })
+    .then((response) => {
+      if (response) {
+        if (response.status === 200) {
+          return response.json();
+        } else if (response.status === 400) {
+          return response.json();
+        }
+      } else {
+        errormsg.value = "Internal Server Error";
+        throw new Error("Server Error");
+      }
+    })
+    .then((data) => {
+      if (data.regMsg) {
+        return registerSuccess(data.regMsg);
+      } else if (data.regUserMsg02) {
+        return verifyError(data.regUserMsg02);
+      }
+    })
+    .catch((error) => registerError(error.error));
+}
+
+
+const registerOtpResend1 = (userName) => {
+  // fetch("https://echat-api.onrender.com/resend-otp", {
+  fetch(`${host_server}/resend-otp`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      username: userName
+    }),
+  })
+    .then((response) => {
+      if (response) {
+        if (response.status === 200) {
+          return response.json();
+        } else if (response.status === 400) {
+          return response.json();
+        } else if (response.status === 500) {
+          return response.json();
+        }
+      } else {
+        errormsg.value = "Internal Server Error";
+        throw new Error("Server Error");
+      }
+    })
+    .then((data) => {
+      if (data.regUserMsg01) {
+        return registerVerify(data.regUserMsg01);
+      }
+      if (data.OTPmessage) {
+        return popupMessage(data.OTPmessage);
+      }
+      else if (data.OTPmessage1) {
+        return popupMessage1(data.OTPmessage1);
+      }
+    })
+    .catch((error) => registerError(error.error));
+};
+
+const registerOtpResend = () => {
+  if (username.value == "") {
+    registerOtpResend1(user.value.username);
+  }
+  else {
+    registerOtpResend1(username.value);
+  }
+};
+
+const resetPswdError = (resetError) => {
+  hideWaitMsg3.value = "RESET";
+  loadingMsg2.value = false;
+  loading.value = false;
+  username.value = "";
+  email.value = "";
+  forgotError.value = resetError;
+  setTimeout(() => {
+    forgotError.value = "";
+  }, 5000);
+};
+
+const resetPswdSuccess = (resetSuccess) => {
+  hideWaitMsg3.value = "RESET";
+  loadingMsg2.value = false;
+  loading.value = false;
+  showLog.value = false;
+  showReg.value = false;
+  showForgot.value = false;
+  showForgotSuccess.value = true;
+  username.value = "";
+  email.value = "";
+  forgotSuccess.value = resetSuccess;
+};
 
 //Login
 const login = () => {
@@ -622,6 +1037,57 @@ const login = () => {
   }, 20000);
   socket.emit("login", { username: username.value, password: password.value });
 };
+
+
+
+//Reset password
+const resetPassword = () => {
+  username.value = username.value.trim();
+  email.value = email.value.trim();
+  loadingMsg2.value = true;
+  loading.value = true;
+  hideWaitMsg3.value = "";
+  fetch(`${host_server}/reset`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      username: username.value,
+      email: email.value,
+    }),
+  })
+    .then((response) => {
+      if (response) {
+        if (response.status === 200) {
+          return response.json();
+        } else if (response.status === 400) {
+          return response.json();
+        } else if (response.status === 500) {
+          return response.json();
+        }
+      } else {
+        errormsg.value = "Internal Server Error";
+        throw new Error("Server Error");
+      }
+    })
+    .then((data) => {
+      if (data.resetSuccess) {
+        return resetPswdSuccess(data.resetSuccess);
+      }
+      else if (data.resetError) {
+        return resetPswdError(data.resetError);
+      }
+      else if (data.OTPmessage) {
+        return popupMessage(data.OTPmessage);
+      }
+      else if (data.OTPmessage1) {
+        return popupMessage1(data.OTPmessage1);
+      }
+    })
+    .catch((error) => console.log(error));
+};
+
 
 onMounted(() => {
   // Listen for login success or failure events
@@ -656,6 +1122,12 @@ onMounted(() => {
       loginMsg.value = "";
       hideFeedback.value = false;
     }, 3000);
+  });
+
+  socket.on("loginUnverified", (user1, error) => {
+    const regUserMsg01 = error.regUserMsg01;
+    registerVerify(regUserMsg01);
+    user.value = user1;
   });
 
   socket.on("storedMessages", (messagez1) => {
@@ -931,6 +1403,16 @@ const logout = () => {
 </script>
 
 <template>
+  <div v-show="showpopupMessage"
+    class="flex items-center absolute left-1/2 transform -translate-x-1/2  top-2 text-center z-20 bg-[#b5cab8] px-2.5 py-1.5 text-sm rounded-sm font-medium font-[quicksand] text-green-800">
+    <img src="@/assets/images/success_img.png" class="h-4 w-4">&nbsp;
+    <span>{{ popupText }}</span>
+  </div>
+  <div v-show="showpopupMessage1"
+    class="flex items-center absolute left-1/2 transform -translate-x-1/2  top-2 text-center z-20 bg-[#b5cab8] px-2.5 py-1.5 text-sm rounded-sm font-medium font-[quicksand] text-[#ca4f4a]">
+    <img src="@/assets/images/error_img.png" class="h-4 w-4">&nbsp;
+    <span>{{ popupText1 }}</span>
+  </div>
   <div :class="{ 'pointer-events-none': loading }">
     <div v-show="hide">
       <div class="absolute bg-[#00000080] h-full w-[100%] z-10 flex justify-center items-center text-sm"
@@ -950,7 +1432,7 @@ const logout = () => {
           <div class="flex flex-col">
             <label for="username">Username</label>
             <input type="text" class="placeholder:text-[14px]" v-model="username" maxlength="20" id="username"
-              placeholder="max. 20 characters e.g (musamutuku)" />
+              placeholder="max. 20 characters e.g musamutuku" />
           </div>
           <div class="flex flex-col">
             <label for="email">Email</label>
@@ -972,7 +1454,7 @@ const logout = () => {
             }}<span v-show="loadingMsg" class="loadingMsg"><img src="@/assets/images/waiting_img.png" />Please
               wait...</span>
           </button>
-          <div class="flex mx-auto gap-2 text-[14px] font-bold">
+          <div class="flex mx-auto gap-2 text-[15px] font-bold">
             <span class="text-[#236E98]">Already have an account?</span>
             <button @click="toggleLogReg" class="text-[#0912DB] underline decoration-1 hover:cursor-pointer">
               Sign in
@@ -980,6 +1462,98 @@ const logout = () => {
           </div>
         </div>
       </div>
+      <div v-show="showVerify" class="flex flex-col justify-center">
+        <div class="bg-[#236E98] text-center py-3 mb-4 font-[quicksand] w-[99%] mx-auto font-bold">
+          <h2 class="text-[25px] text-[#A4A716]">CREATE eCHAT ACCOUNT</h2>
+        </div>
+        <div class="text-center text-[13px] font-medium font-[quicksand]"><span class="text-[rgb(151,6,6)]">{{
+    userError02
+  }}&nbsp;&nbsp;</span>
+          <span @click="registerOtpResend" class="cursor-pointer text-[#0912DB] underline"> {{ resendLink }}
+          </span>&nbsp;<span class="text-[#0912DB]"> {{
+    userError02Timer }}</span>
+        </div>
+        <div :class="{ 'pointer-events-none': unclickable }"
+          class="text-center font-[quicksand] mx-10 text-[14px] font-medium mb-5"><span class="text-[#084407]">{{
+    userError01
+  }}</span>&nbsp;<span class="text-[#1d1f4b] underline cursor-pointer" @click="registerOtpResend">{{
+    userError03 }}</span>&nbsp;<span class="text-[#084407]">{{ userError04
+            }}</span></div>
+        <div class="justify-center text-[14px] font-[quicksand] flex items-center" v-show="showresend">
+          <img src="@/assets/images/loader.gif" class="h-5">&nbsp;<span>resending OTP...</span>
+        </div>
+        <div class="mx-auto py-2 flex flex-col gap-8 regbox mt-6">
+          <div class="flex gap-8 mx-5">
+            <input type="text" ref="otp11" @input="nextOtp1" :disabled="isdisabledOtpInput1" v-model="otp1"
+              maxlength="1" style="width: 45px;height: 55px;font-size: 30px;font-weight: 400;text-align: center" />
+            <input type="text" ref="otp22" @input="nextOtp2" :disabled="isdisabledOtpInput2" v-model="otp2"
+              maxlength="1" style="width: 45px;height: 55px;font-size: 30px;font-weight: 400;text-align: center" />
+            <input type="text" ref="otp33" @input="nextOtp3" :disabled="isdisabledOtpInput3" v-model="otp3"
+              maxlength="1" style="width: 45px;height: 55px;font-size: 30px;font-weight: 400;text-align: center" />
+            <input type="text" ref="otp44" :disabled="isdisabledOtpInput4" v-model="otp4" maxlength="1"
+              style="width: 45px;height: 55px;font-size: 30px;font-weight: 400;text-align: center" />
+          </div>
+          <button @click="verifyUser"
+            class="my-5 bg-[#E0DEEA] font-bold font-[quicksand] rounded-[5px] text-[18px] text-white h-[45px]"
+            :style="otpbtn" :disabled="isdisabledOtp">
+            {{ hideWaitMsg2
+            }}<span v-show="loadingMsg1" class="loadingMsg"><img
+                src="@/assets/images/waiting_img.png" />Verifying...</span>
+          </button>
+          <div class="flex mx-auto gap-2 text-[14px] font-bold">
+            <span class="text-[#236E98] cursor-pointer" @click="toggleLogReg1">Back to Login</span>
+          </div>
+        </div>
+      </div>
+
+      <div v-show="showForgot" class="flex flex-col justify-center">
+        <div class="bg-[#236E98] text-center py-3 mb-4 font-[quicksand] w-[99%] mx-auto font-bold">
+          <h2 class="text-[25px] text-[#A4A716]">RESET ACCOUNT PASSWORD</h2>
+        </div>
+        <div class="text-center text-[13px] font-medium font-[quicksand]"><span class="text-[rgb(151,6,6)]">{{
+    forgotError
+  }}</span>
+        </div>
+        <div class="mx-auto py-2 flex flex-col gap-8 regbox mt-6">
+          <div class="flex flex-col">
+            <label for="username">Username</label>
+            <input type="text" v-model="username" maxlength="20" id="username" />
+          </div>
+          <div class="flex flex-col">
+            <label for="email">Email</label>
+            <input type="text" v-model="email" maxlength="50" id="email" @blur="changeCase" />
+          </div>
+          <button @click="resetPassword"
+            class="my-5 bg-[#E0DEEA] font-bold font-[quicksand] rounded-[5px] text-[18px] text-white h-[45px]"
+            :style="forgotbtn" :disabled="isdisabledForgot">
+            {{ hideWaitMsg3
+            }}<span v-show="loadingMsg2" class="loadingMsg"><img src="@/assets/images/waiting_img.png" />Please
+              wait...</span>
+          </button>
+          <div class="flex mx-auto gap-2 text-[14px] font-bold">
+            <span class="text-[#236E98] cursor-pointer" @click="toggleLogReg2">Back to Login</span>
+          </div>
+        </div>
+      </div>
+
+      <div v-show="showForgotSuccess" class="flex flex-col justify-center">
+        <div class="bg-[#236E98] text-center py-3 mb-4 font-[quicksand] w-[99%] mx-auto font-bold">
+          <h2 class="text-[25px] text-[#A4A716]">RESET ACCOUNT PASSWORD</h2>
+        </div>
+        <div class="text-center text-[15px] mx-5 mt-10 font-semibold font-[quicksand]"><span class="text-[#084407]">{{
+    forgotSuccess
+  }}</span>
+        </div>
+        <div class="mx-auto py-2 flex flex-col regbox mt-6">
+          <div class="flex mx-auto gap-2 text-[15px] font-bold font-[quicksand]">
+            <span class="text-[#0912DB] cursor-pointer underline" @click="toggleForgot1">LOGIN NOW</span>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- more code to added here -->
+
       <div v-show="showLog" class="flex flex-col justify-center">
         <div class="bg-[#236E98] text-center pt-3 pb-6 mb-8 font-[quicksand] font-bold w-[99%] mx-auto">
           <h2 class="text-[32px] text-[#A4A716]">eCHAT</h2>
@@ -1007,7 +1581,7 @@ const logout = () => {
               wait...</span>
           </button>
           <div class="flex justify-between text-[#0912DB] font-bold text-sm">
-            <span class="hover:cursor-pointer">Forgot Password?</span>
+            <span class="hover:cursor-pointer" @click="toggleForgot">Forgot Password?</span>
             <span @click="toggleLogReg" class="hover:cursor-pointer">Create an Account?</span>
           </div>
         </div>
@@ -1038,8 +1612,8 @@ const logout = () => {
         <span class="mx-auto mt-[5%]">Logout?</span>
         <span class="text-[14px] mx-auto my-4">Are you sure you want to logout?</span>
         <div class="flex gap-20 justify-between mx-5 mb-5 font-semibold">
-          <span @click="logout" class="px-5 text-[#0A5B09] hover:cursor-pointer hover:bg-[#d3cdcd]">YES</span>
-          <span @click="cancelLog" class="hover:bg-[#d3cdcd] hover:cursor-pointer text-[#970606] px-5">NO</span>
+          <span @click="logout" class="px-5 py-1 text-[#0A5B09] hover:cursor-pointer hover:bg-[#d3cdcd]">YES</span>
+          <span @click="cancelLog" class="hover:bg-[#d3cdcd] hover:cursor-pointer text-[#970606] py-1 px-5">NO</span>
         </div>
       </div>
       <div v-show="hide1" class="sm:hidden">

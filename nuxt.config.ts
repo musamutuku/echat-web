@@ -19,6 +19,11 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
+  runtimeConfig: {
+    public: {
+      apiHOST: process.env.API_URL,
+    },
+  },
   pwa: {
     registerType: "autoUpdate",
     manifest: {
