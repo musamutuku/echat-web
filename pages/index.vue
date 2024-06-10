@@ -4,7 +4,10 @@ import { useAuthStore } from "@/stores/myStore";
 import { jwtDecode } from "jwt-decode";
 const config = useRuntimeConfig();
 const host_server = config.public.apiHOST;
-
+const apiTest = ref(null);
+const apiType = ref(null);
+apiTest.value = `${host_server}`;
+apiType.value = typeof (`${host_server}`);
 const socket = io(`${host_server}`);
 
 
@@ -1559,7 +1562,7 @@ const logout = () => {
           <h2 class="text-[32px] text-[#A4A716]">eCHAT</h2>
         </div>
         <h3 class="text-[#084407] font-bold text-[20px] text-center mb-5">
-          USER LOGIN
+          USER LOGIN {{ apiTest }} {{ apiType }}
         </h3>
         <span class="font-semibold text-[#970606] font-[quicksand] text-center text-[13px]" v-show="hideFeedback">{{
     loginMsg }}</span>

@@ -21,7 +21,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      apiHOST: process.env.API_URL,
+      apiHOST: `${process.env.API_URL}`,
     },
   },
   pwa: {
