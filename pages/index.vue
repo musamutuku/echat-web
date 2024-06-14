@@ -10,7 +10,17 @@ const socket = io(`${host_server}`);
 onMounted(() => {
   const newuser = "a user joined link";
   socket.emit('connected', newuser);
-})
+});
+
+const isConnected = ref(false);
+socket.on('connect', () => {
+  isConnected.value = true;
+});
+
+socket.on('disconnect', () => {
+  isConnected.value = false;
+});
+
 
 const user = ref(null);
 const message = ref("");
@@ -43,6 +53,8 @@ const showReg = ref(false);
 const isdisabledLog = ref(true);
 const isdisabledReg = ref(true);
 const isdisabledForgot = ref(true);
+const isdisabledChange = ref(true);
+const isdisabledDelete = ref(true);
 const isdisabledOtp = ref(true);
 const isdisabledOtpInput1 = ref(false);
 const isdisabledOtpInput2 = ref(true);
@@ -86,6 +98,7 @@ const logoutshown = ref(false);
 const isActive = ref(false);
 const isActive1 = ref(false);
 const isActive2 = ref(false);
+const isActive3 = ref(false);
 const displayMenu = ref(true);
 const isCollapsed = ref(true);
 const messageContainer = ref(null);
@@ -96,8 +109,37 @@ const showpopupMessage = ref(false);
 const popupText = ref("");
 const showpopupMessage1 = ref(false);
 const popupText1 = ref("");
+const showpopupMessage2 = ref(false);
+const popupText2 = ref("");
 const forgotError = ref("");
 const forgotSuccess = ref("");
+const showprofile = ref(false);
+const hideProfile = ref(true);
+const showpasswordChange = ref(false);
+const showaccountDelete = ref(false);
+
+const togglepassword = () => {
+  hideProfile.value = false;
+  showpasswordChange.value = true;
+  showaccountDelete.value = false;
+}
+
+const toggledelete = () => {
+  hideProfile.value = false;
+  showpasswordChange.value = false;
+  showaccountDelete.value = true;
+}
+
+const passwordCancel = () => {
+  hideProfile.value = true;
+  showpasswordChange.value = false;
+  showaccountDelete.value = false;
+  pswd.value = "";
+  pswd1.value = "";
+  newPswd.value = "";
+  confirmNew.value = "";
+  accountDel.value = "";
+}
 
 
 const toggleForgot = () => {
@@ -115,25 +157,52 @@ const toggleForgot1 = () => {
 
 }
 
-const nextOtp1 = () => {
-  isdisabledOtpInput2.value = false;
-  setTimeout(() => {
+const nextOtp1 = (event) => {
+  const key = event.key;
+  if (/^[a-zA-Z0-9]$/.test(key)) {
+    isdisabledOtpInput2.value = false;
+    setTimeout(() => {
+      otp22.value.focus();
+    }, 500);
+  }
+  else if ((key === 'Backspace' || key === 'Delete')) {
+    otp11.value.focus();
+  }
+  else {
+    event.preventDefault();
+  }
+}
+
+const nextOtp2 = (event) => {
+  const key = event.key;
+  if (/^[a-zA-Z0-9]$/.test(key)) {
+    isdisabledOtpInput3.value = false;
+    setTimeout(() => {
+      otp33.value.focus();
+    }, 500);
+  }
+  else if ((key === 'Backspace' || key === 'Delete')) {
     otp22.value.focus();
-  }, 500);
+  }
+  else {
+    event.preventDefault();
+  }
 }
 
-const nextOtp2 = () => {
-  isdisabledOtpInput3.value = false;
-  setTimeout(() => {
+const nextOtp3 = (event) => {
+  const key = event.key;
+  if (/^[a-zA-Z0-9]$/.test(key)) {
+    isdisabledOtpInput4.value = false;
+    setTimeout(() => {
+      otp44.value.focus();
+    }, 500);
+  }
+  else if ((key === 'Backspace' || key === 'Delete')) {
     otp33.value.focus();
-  }, 500);
-}
-
-const nextOtp3 = () => {
-  isdisabledOtpInput4.value = false;
-  setTimeout(() => {
-    otp44.value.focus();
-  }, 500);
+  }
+  else {
+    event.preventDefault();
+  }
 }
 
 
@@ -159,7 +228,12 @@ const DelMsg = () => {
     if ((chatMessages.value[i].senderUsername == senderToDelMsg && chatMessages.value[i].recipientUsername == user.value.username) ||
       (chatMessages.value[i].recipientUsername == senderToDelMsg && chatMessages.value[i].senderUsername == user.value.username)) {
       chatMessages.value.splice(i, 1);
-      socket.emit('deleteMsg', (user.value.username), (senderToDelMsg))
+      if (isConnected.value == true) {
+        socket.emit('deleteMsg', (user.value.username), (senderToDelMsg))
+      }
+      else {
+        popupMessage2();
+      }
     }
   }
   messages1.value.splice(msgindex.value, 1);
@@ -209,7 +283,12 @@ const DelMsg1 = () => {
   for (let i = 0; i < chatMessages.value.length; i++) {
     if (chatMessages.value[i].date === msgToDel.value) {
       chatMessages.value.splice(i, 1);
-      socket.emit('deleteMsg1', (msgToDel.value));
+      if (isConnected.value == true) {
+        socket.emit('deleteMsg1', (msgToDel.value));
+      }
+      else {
+        popupMessage2();
+      }
     }
   }
   for (let i = 0; i < messages1.value.length; i++) {
@@ -339,9 +418,10 @@ watch(showmessenger, (value) => {
 const cancelLog = () => {
   logoutshown.value = false;
   loading.value = false;
-  isActive.value = false;
-  isActive1.value = false;
-  isActive2.value = false;
+  // isActive.value = false;
+  // isActive1.value = false;
+  // isActive2.value = false;
+  // isActive3.value = false;
 };
 
 const showmenu = () => {
@@ -357,9 +437,10 @@ const hidemenu = () => {
 
 const toggleshown = () => {
   logoutshown.value = true;
-  isActive.value = false;
-  isActive1.value = false;
-  isActive2.value = true;
+  // isActive.value = false;
+  // isActive1.value = false;
+  // isActive2.value = true;
+  // isActive3.value = false;
   isCollapsed.value = true;
   loading.value = true;
 };
@@ -368,13 +449,28 @@ const togglehome = () => {
   isActive.value = true;
   isActive1.value = false;
   isActive2.value = false;
+  isActive3.value = false;
   hide.value = false;
   hide1.value = true;
   showStartChat.value = false;
   showinbox.value = false;
   showmessenger.value = false;
+  showprofile.value = false;
   isCollapsed.value = true;
 };
+
+const toggleprofile = () => {
+  isActive3.value = true;
+  isActive.value = false;
+  isActive1.value = false;
+  isActive2.value = false;
+  hide.value = false;
+  hide1.value = false;
+  showStartChat.value = false;
+  showprofile.value = true;
+  isCollapsed.value = true;
+};
+
 
 const getClass = (name) => {
   if (name === user.value.username) {
@@ -397,7 +493,12 @@ const getSender = (index, totalmsgs) => {
     //after clicking the unread msg(s) delete the in inbox page or reduce the number in the inbox button
     messages1.value[index].totalUnreadMsgs = 0;
     totalMsgs.value = totalMsgs.value - totalmsgs;
-    socket.emit("markAsRead", (user.value.username), (messages1.value[index].senderUsername));
+    if (isConnected.value == true) {
+      socket.emit("markAsRead", (user.value.username), (messages1.value[index].senderUsername));
+    }
+    else {
+      popupMessage2();
+    }
 
     showmessenger.value = true;
     showinbox.value = false;
@@ -442,7 +543,12 @@ const getRecipient = (item) => {
   for (let i = 0; i < messages1.value.length; i++) {
     if (messages1.value[i].senderUsername == item.username) {
       messages1.value[i].totalUnreadMsgs = 0;
-      socket.emit("markAsRead", (user.value.username), (messages1.value[i].senderUsername));
+      if (isConnected.value == true) {
+        socket.emit("markAsRead", (user.value.username), (messages1.value[index].senderUsername));
+      }
+      else {
+        popupMessage2();
+      }
     }
   }
 
@@ -493,8 +599,10 @@ const togglestartChat = () => {
   isActive.value = false;
   isActive1.value = true;
   isActive2.value = false;
+  isActive3.value = false;
   isCollapsed.value = true;
   showDelete.value = false;
+  showprofile.value = false;
   isLongPress = false;
 };
 
@@ -605,6 +713,24 @@ const forgotbtn = computed(() => {
     return color;
   }
   isdisabledForgot.value = true;
+});
+
+const changepswdbtn = computed(() => {
+  if (pswd.value != "" && newPswd.value != "" && confirmNew.value != "") {
+    isdisabledChange.value = false;
+    const color = { backgroundColor: "#246b29" };
+    return color;
+  }
+  isdisabledChange.value = true;
+});
+
+const deleteaccountbtn = computed(() => {
+  if (accountDel.value != "" && pswd1.value != "") {
+    isdisabledDelete.value = false;
+    const color = { backgroundColor: "#b6442f" };
+    return color;
+  }
+  isdisabledDelete.value = true;
 });
 
 
@@ -745,6 +871,65 @@ function popupMessage1(OTPmessage1) {
   }, 2000);
 }
 
+function popupMessage2() {
+  if (showpopupMessage.value != true && showpopupMessage1.value != true) {
+    setTimeout(() => {
+      popupText2.value = "Sever or internet connection failure!";
+      showpopupMessage2.value = true;
+      setTimeout(() => {
+        popupText2.value = "";
+        showpopupMessage2.value = false;
+      }, 8000);
+    }, 2000);
+  }
+}
+
+const popupText3 = ref("");
+const popupText4 = ref("");
+const showpopupMessage3 = ref(false);
+const showpopupMessage4 = ref(false);
+function popupMessage3(pswdSuccess) {
+  if (showpopupMessage.value != true && showpopupMessage1.value != true && showpopupMessage2.value != true) {
+    setTimeout(() => {
+      hideWaitMsg3Pswd.value = "CHANGE";
+      hideWaitMsg3Pswd1.value = "DELETE";
+      loading.value = false;
+      popupText3.value = pswdSuccess;
+      showpopupMessage3.value = true;
+      hideProfile.value = true;
+      showpasswordChange.value = false;
+      showaccountDelete.value = false;
+      pswd.value = "";
+      pswd1.value = "";
+      newPswd.value = "";
+      confirmNew.value = "";
+      accountDel.value = "";
+      if (pswdSuccess == "Account has been deleted successfully") {
+        logout();
+      }
+      setTimeout(() => {
+        popupText3.value = "";
+        showpopupMessage3.value = false;
+      }, 8000);
+    }, 2000);
+  }
+}
+
+function popupMessage4(pswdError) {
+  if (showpopupMessage.value != true && showpopupMessage1.value != true && showpopupMessage2.value != true) {
+    setTimeout(() => {
+      hideWaitMsg3Pswd.value = "CHANGE";
+      hideWaitMsg3Pswd1.value = "DELETE";
+      loading.value = false;
+      popupText4.value = pswdError;
+      showpopupMessage4.value = true;
+      setTimeout(() => {
+        popupText4.value = "";
+        showpopupMessage4.value = false;
+      }, 8000);
+    }, 2000);
+  }
+}
 
 function registerSuccess(regMsg) {
   setTimeout(() => {
@@ -886,7 +1071,7 @@ function registerVerify(regUserMsg01) {
   }
   else {
     registerVerify1(regUserMsg01)
-    userError03.value = "CLICK HERE";
+    userError03.value = "Click Here";
     userError04.value = "to get a new OTP";
   }
 }
@@ -1033,8 +1218,10 @@ const login = () => {
         loginMsg.value = "";
       }, 4000);
     }
-  }, 20000);
-  socket.emit("login", { username: username.value, password: password.value });
+  }, 30000);
+  if (isConnected.value == true) {
+    socket.emit("login", { username: username.value, password: password.value });
+  }
 };
 
 
@@ -1088,6 +1275,119 @@ const resetPassword = () => {
 };
 
 
+//Change password
+const pswd = ref("");
+const newPswd = ref("");
+const confirmNew = ref("");
+const hideWaitMsg3Pswd = ref("CHANGE")
+const changePassword = () => {
+  pswd.value = pswd.value.trim();
+  newPswd.value = newPswd.value.trim();
+  confirmNew.value = confirmNew.value.trim();
+  hideWaitMsg3Pswd.value = "Changing...";
+  if (newPswd.value === confirmNew.value) {
+    loading.value = true;
+    fetch(`${host_server}/changepassword`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: user.value.username,
+        pswd: pswd.value,
+        newPassword: newPswd.value,
+      }),
+    })
+      .then((response) => {
+        if (response) {
+          if (response.status === 200) {
+            return response.json();
+          } else if (response.status === 400) {
+            return response.json();
+          } else if (response.status === 500) {
+            return response.json();
+          }
+        } else {
+          errormsg.value = "Internal Server Error";
+          throw new Error("Server Error");
+        }
+      })
+      .then((data) => {
+        if (data.pswdMessage) {
+          return popupMessage3(data.pswdMessage);
+        }
+        else if (data.pswdMessage1) {
+          return popupMessage4(data.pswdMessage1);
+        }
+      })
+      .catch((error) => console.log(error));
+  }
+  else {
+    const pswdmatch = "New password does not match. Confirm again"
+    return popupMessage4(pswdmatch);
+  }
+};
+
+
+//delete account
+const pswd1 = ref("");
+const accountDel = ref("");
+const hideWaitMsg3Pswd1 = ref("DELETE");
+const deleteAccount = () => {
+  pswd1.value = pswd1.value.trim();
+  accountDel.value = accountDel.value.trim();
+  hideWaitMsg3Pswd1.value = "Deleting...";
+  loading.value = true;
+  if (user.value !== null) {
+    const userToDel = user.value.username;
+    if (accountDel.value === `I want to delete ${userToDel} account`) {
+      fetch(`${host_server}/deleteAccount`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: user.value.username,
+          pswd1: pswd1.value,
+          accountDel: accountDel.value,
+        }),
+      })
+        .then((response) => {
+          if (response) {
+            if (response.status === 200) {
+              return response.json();
+            } else if (response.status === 400) {
+              return response.json();
+            } else if (response.status === 500) {
+              return response.json();
+            }
+          } else {
+            errormsg.value = "Internal Server Error";
+            throw new Error("Server Error");
+          }
+        })
+        .then((data) => {
+          if (data.pswdMessage) {
+            return popupMessage3(data.pswdMessage);
+          }
+          else if (data.pswdMessage1) {
+            return popupMessage4(data.pswdMessage1);
+          }
+        })
+        .catch((error) => console.log(error));
+    }
+    else {
+      const typingError = "You typed wrongly. Type the extact words!"
+      return popupMessage4(typingError);
+    }
+  }
+  else {
+    const logError = "Login session has expired. Refresh to login again!"
+    return popupMessage4(logError);
+  }
+};
+
+
 onMounted(() => {
   // Listen for login success or failure events
   socket.on("loginSuccess", (userData, userToken) => {
@@ -1103,7 +1403,14 @@ onMounted(() => {
     localStorage.setItem("token", token.value);
     hide.value = false;
     hide1.value = true;
+    isActive.value = true;
     hide2.value = true;
+    if (user.value.profile_image) {
+      imageUrl.value = `${host_server}/uploads/${user.value.profile_image}`
+    }
+    else {
+      imageUrl.value = profileImage;
+    }
     setTimeout(() => {
       hideFeedback.value = false;
     }, 3000);
@@ -1229,15 +1536,20 @@ onMounted(() => {
 const sendMessage = () => {
   message.value = message.value.trim();
 
-  socket.emit("sendMessage", {
-    id: checktime(),
-    senderUsername: user.value.username,
-    recipientUsername: recipientUsername.value,
-    message: message.value,
-    time: currenttime(),
-    mark: "unread",
-    date: Date.now()
-  });
+  if (isConnected.value == true) {
+    socket.emit("sendMessage", {
+      id: checktime(),
+      senderUsername: user.value.username,
+      recipientUsername: recipientUsername.value,
+      message: message.value,
+      time: currenttime(),
+      mark: "unread",
+      date: Date.now()
+    });
+  }
+  else {
+    popupMessage2();
+  }
   messages.value.push({
     id: checktime(),
     senderUsername: user.value.username,
@@ -1298,7 +1610,12 @@ socket.on("receiveMessage", ({ senderUsername, message, totalUnread, date }) => 
   // else add them to inbox page and inbox button
   var newmessage = [];
   if (msgSender.value.innerText == senderUsername) {
-    socket.emit("markAsRead", (user.value.username), (senderUsername));
+    if (isConnected.value == true) {
+      socket.emit("markAsRead", (user.value.username), (senderUsername));
+    }
+    else {
+      popupMessage2();
+    }
     newmessage = {
       id: checktime(),
       senderUsername: senderUsername,
@@ -1394,26 +1711,86 @@ const logout = () => {
   isActive.value = false;
   isActive1.value = false;
   isActive2.value = false;
+  isActive3.value = false;
   loading.value = false;
   showinbox.value = false;
   showmessenger.value = false;
   showStartChat.value = false;
+  showprofile.value = false;
 };
+
+//upload or edit profile photo
+import profileImage from '~/assets/images/user_profile.svg'
+import { Account } from "@aptos-labs/ts-sdk";
+
+const imageUrl = ref(profileImage);
+const imageFile = ref(null);
+const imageInput = ref(null);
+const uploadImage = async () => {
+  const username = user.value.username;
+  const formData = new FormData();
+  formData.append('image', imageFile.value)
+  formData.append('username', username)
+  try {
+    const response = await fetch(`${host_server}/upload`,
+      {
+        method: 'POST',
+        body: formData,
+      })
+    const data = await response.json()
+    imageUrl.value = `${host_server}/uploads/${data.filename}`
+  } catch (error) {
+    console.error("Error in uploading image:", error);
+  }
+}
+
+const chooseImage = (event) => {
+  imageInput.value.click();
+}
+
+const onFileChange = (event) => {
+  imageFile.value = event.target.files[0];
+  uploadImage();
+}
+
 </script>
 
 <template>
+
+  <!-- message popup at the top div either error or success -->
   <div v-show="showpopupMessage"
-    class="flex items-center absolute left-1/2 transform -translate-x-1/2  top-2 text-center z-20 bg-[#b5cab8] px-2.5 py-1.5 text-sm rounded-sm font-medium font-[quicksand] text-green-800">
+    class="flex items-center absolute left-1 right-1 mx-auto w-fit top-2 justify-center z-20 bg-[#b5cab8] px-2.5 py-2 text-[13px] rounded-sm font-medium font-[quicksand] text-green-800">
     <img src="@/assets/images/success_img.png" class="h-4 w-4">&nbsp;
     <span>{{ popupText }}</span>
   </div>
   <div v-show="showpopupMessage1"
-    class="flex items-center absolute left-1/2 transform -translate-x-1/2  top-2 text-center z-20 bg-[#b5cab8] px-2.5 py-1.5 text-sm rounded-sm font-medium font-[quicksand] text-[#ca4f4a]">
+    class="flex items-center absolute w-fit left-1 right-1 mx-auto  top-2 text-center z-20 bg-[#b5cab8] px-2.5 py-1.5 text-[13px] rounded-sm font-medium font-[quicksand] text-[#ca4f4a]">
     <img src="@/assets/images/error_img.png" class="h-4 w-4">&nbsp;
     <span>{{ popupText1 }}</span>
   </div>
+  <div v-show="showpopupMessage2"
+    class="flex items-center absolute w-fit left-1 right-1 mx-auto  top-2 text-center z-20 bg-[#b5cab8] px-2.5 py-1.5 text-[13px] rounded-sm font-medium font-[quicksand] text-[#ca4f4a]">
+    <img src="@/assets/images/error_img.png" class="h-4 w-4">&nbsp;
+    <span>{{ popupText2 }}</span>
+  </div>
+  <div v-show="showpopupMessage3"
+    class="flex items-center absolute w-fit left-1 right-1 mx-auto  top-2 text-center z-20 bg-[#b5cab8] px-2.5 py-1.5 text-[13px] rounded-sm font-medium font-[quicksand] text-green-800">
+    <img src="@/assets/images/success_img.png" class="h-4 w-4">&nbsp;
+    <span>{{ popupText3 }}</span>
+  </div>
+  <div v-show="showpopupMessage4"
+    class="flex items-center absolute w-fit left-1 right-1 mx-auto  top-2 text-center z-20 bg-[#b5cab8] px-2.5 py-1.5 text-[13px] rounded-sm font-medium font-[quicksand] text-[#ca4f4a]">
+    <img src="@/assets/images/error_img.png" class="h-4 w-4">&nbsp;
+    <span>{{ popupText4 }}</span>
+  </div>
+
+  <!-- outer div to be shown when loading or sending data to server -->
   <div :class="{ 'pointer-events-none': loading }">
+
+    <!-- div for registration, verification, forgot password & login forms -->
     <div v-show="hide">
+
+      <!-- error/sucess messages -->
       <div class="absolute bg-[#00000080] h-full w-[100%] z-10 flex justify-center items-center text-sm"
         v-show="showsuccess" @click="resetSuccess">
         <p class="bg-[#ACEEAC] py-3 px-3 mx-3 text-center">{{ successMsg }}</p>
@@ -1422,6 +1799,8 @@ const logout = () => {
         v-show="showerror" @click="resetError">
         <p class="bg-[#742929] text-white py-3 px-5">{{ errormsg }}</p>
       </div>
+
+      <!-- registration form -->
       <div v-show="showReg" class="flex flex-col justify-center">
         <div class="bg-[#236E98] text-center py-3 mb-4 font-[quicksand] w-[99%] mx-auto font-bold">
           <h2 class="text-[25px] text-[#A4A716]">CREATE eCHAT ACCOUNT</h2>
@@ -1461,6 +1840,8 @@ const logout = () => {
           </div>
         </div>
       </div>
+
+      <!-- verification form -->
       <div v-show="showVerify" class="flex flex-col justify-center">
         <div class="bg-[#236E98] text-center py-3 mb-4 font-[quicksand] w-[99%] mx-auto font-bold">
           <h2 class="text-[25px] text-[#A4A716]">CREATE eCHAT ACCOUNT</h2>
@@ -1472,25 +1853,26 @@ const logout = () => {
           </span>&nbsp;<span class="text-[#0912DB]"> {{
     userError02Timer }}</span>
         </div>
-        <div :class="{ 'pointer-events-none': unclickable }"
-          class="text-center font-[quicksand] mx-10 text-[14px] font-medium mb-5"><span class="text-[#084407]">{{
+        <div :class="{ 'pointer-events-none': unclickable }" class="mx-auto px-5 w-fit font-light text-[14px] mb-5">
+          <span class="text-[#084407]">{{
     userError01
   }}</span>&nbsp;<span class="text-[#1d1f4b] underline cursor-pointer" @click="registerOtpResend">{{
     userError03 }}</span>&nbsp;<span class="text-[#084407]">{{ userError04
-            }}</span></div>
+            }}</span>
+        </div>
         <div class="justify-center text-[14px] font-[quicksand] flex items-center" v-show="showresend">
           <img src="@/assets/images/loader.gif" class="h-5">&nbsp;<span>resending OTP...</span>
         </div>
         <div class="mx-auto py-2 flex flex-col gap-8 regbox mt-6">
           <div class="flex gap-8 mx-5">
-            <input type="text" ref="otp11" @input="nextOtp1" :disabled="isdisabledOtpInput1" v-model="otp1"
-              maxlength="1" style="width: 45px;height: 55px;font-size: 30px;font-weight: 400;text-align: center" />
-            <input type="text" ref="otp22" @input="nextOtp2" :disabled="isdisabledOtpInput2" v-model="otp2"
-              maxlength="1" style="width: 45px;height: 55px;font-size: 30px;font-weight: 400;text-align: center" />
-            <input type="text" ref="otp33" @input="nextOtp3" :disabled="isdisabledOtpInput3" v-model="otp3"
-              maxlength="1" style="width: 45px;height: 55px;font-size: 30px;font-weight: 400;text-align: center" />
+            <input type="text" ref="otp11" @keydown="nextOtp1" :disabled="isdisabledOtpInput1" v-model="otp1"
+              maxlength="1" style="width: 45px;height: 55px;font-size: 28px;font-weight: 400;text-align: center" />
+            <input type="text" ref="otp22" @keydown="nextOtp2" :disabled="isdisabledOtpInput2" v-model="otp2"
+              maxlength="1" style="width: 45px;height: 55px;font-size: 28px;font-weight: 400;text-align: center" />
+            <input type="text" ref="otp33" @keydown="nextOtp3" :disabled="isdisabledOtpInput3" v-model="otp3"
+              maxlength="1" style="width: 45px;height: 55px;font-size: 28px;font-weight: 400;text-align: center" />
             <input type="text" ref="otp44" :disabled="isdisabledOtpInput4" v-model="otp4" maxlength="1"
-              style="width: 45px;height: 55px;font-size: 30px;font-weight: 400;text-align: center" />
+              style="width: 45px;height: 55px;font-size: 28px;font-weight: 400;text-align: center" />
           </div>
           <button @click="verifyUser"
             class="my-5 bg-[#E0DEEA] font-bold font-[quicksand] rounded-[5px] text-[18px] text-white h-[45px]"
@@ -1505,6 +1887,7 @@ const logout = () => {
         </div>
       </div>
 
+      <!-- forgot password form -->
       <div v-show="showForgot" class="flex flex-col justify-center">
         <div class="bg-[#236E98] text-center py-3 mb-4 font-[quicksand] w-[99%] mx-auto font-bold">
           <h2 class="text-[25px] text-[#A4A716]">RESET ACCOUNT PASSWORD</h2>
@@ -1535,6 +1918,7 @@ const logout = () => {
         </div>
       </div>
 
+      <!-- reset password success div -->
       <div v-show="showForgotSuccess" class="flex flex-col justify-center">
         <div class="bg-[#236E98] text-center py-3 mb-4 font-[quicksand] w-[99%] mx-auto font-bold">
           <h2 class="text-[25px] text-[#A4A716]">RESET ACCOUNT PASSWORD</h2>
@@ -1551,8 +1935,7 @@ const logout = () => {
       </div>
 
 
-      <!-- more code to added here -->
-
+      <!-- login form -->
       <div v-show="showLog" class="flex flex-col justify-center">
         <div class="bg-[#236E98] text-center pt-3 pb-6 mb-8 font-[quicksand] font-bold w-[99%] mx-auto">
           <h2 class="text-[32px] text-[#A4A716]">eCHAT</h2>
@@ -1560,7 +1943,7 @@ const logout = () => {
         <h3 class="text-[#084407] font-bold text-[20px] text-center mb-5">
           USER LOGIN
         </h3>
-        <span class="font-semibold text-[#970606] font-[quicksand] text-center text-[13px]" v-show="hideFeedback">{{
+        <span class="font-light text-[#970606] text-center text-[13.5px]" v-show="hideFeedback">{{
     loginMsg }}</span>
         <div class="mx-auto py-5 flex flex-col gap-10">
           <div class="custom-input">
@@ -1586,7 +1969,11 @@ const logout = () => {
         </div>
       </div>
     </div>
-    <div v-show="hide2">
+
+
+    <!-- main div with navigation menu div, home page div, members div, profile div & logout div -->
+    <div v-show="hide2 = true">
+      <!-- navigation menu div -->
       <div v-show="displayMenu" :class="{
     '-translate-x-[100%]': isCollapsed,
     'translate-x-[0%]': !isCollapsed,
@@ -1595,6 +1982,9 @@ const logout = () => {
           <img src="@/assets/images/close.svg" />
         </div>
         <div class="flex flex-col gap-6 mx-3">
+          <li @click="toggleprofile" class="w-fit hover:cursor-pointer" :class="{ active: isActive3 }">
+            Profile
+          </li>
           <li @click="togglehome" class="w-fit hover:cursor-pointer" :class="{ active: isActive }">
             Home
           </li>
@@ -1606,6 +1996,106 @@ const logout = () => {
           </li>
         </div>
       </div>
+
+      <!-- profile div -->
+      <div v-show="showprofile" class="sm:hidden font-[quicksand]">
+        <div class="flex flex-col gap-10 text-center" v-show="hideProfile">
+          <div class="flex mx-3 mt-3">
+            <span class="w-[10%] cursor-pointer" @click="showmenu"><img src="@/assets/images/menu.svg" /></span>
+          </div>
+          <div class="flex flex-col items-center">
+            <div class="w-[20%] rounded-[50%] h-[75px] flex flex-col">
+              <img :src="imageUrl" class="rounded-[100%] w-[100%] h-[100%]" /><br>
+            </div>
+            <div class="bg-gray-300 text-blue-900 px-1 rounded-sm w-fit">
+              <button @click="chooseImage">Edit photo</button>
+              <input type="file" accept="image/*" @change="onFileChange" class="hidden" ref="imageInput">
+            </div>
+            <div class="mt-5 flex flex-col gap-10 items-start mx-auto">
+              <div class="inputdivs">
+                <label for="username1">Username:</label>
+                <input type="text" :value="user.username" class="profileinput" v-if="user" disabled>
+              </div>
+              <div class="inputdivs">
+                <label for="email1">Email Address:</label>
+                <input type="text" :value="user.email" class="profileinput" v-if="user" disabled>
+              </div>
+              <div class="inputdivs">
+                <label for="password1">Password:</label>
+                <input type="text" value="********" class="profileinput" style="width:150px;" disabled><button
+                  @click="togglepassword" class="profileinput" style="color: brown;">Change</button>
+              </div>
+              <div class="inputdivs">
+                <label for="account">Account:</label>
+                <input type="text" value="Active" class="profileinput" style="width:150px;" disabled><button
+                  @click="toggledelete" class="profileinput px-1 rounded-sm" style="color: brown;">DELETE</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-show="showpasswordChange" class="flex flex-col justify-center">
+          <div class="bg-[#236E98] text-center py-3 mb-4 font-[quicksand] w-[99%] mx-auto font-bold">
+            <h2 class="text-[25px] text-[#A4A716]">CHANGE ACCOUNT PASSWORD</h2>
+          </div>
+          <div class="mx-auto py-2 flex flex-col gap-8 regbox mt-6">
+            <div class="flex flex-col">
+              <label for="paswd1">Enter Old Password</label>
+              <input type="password" v-model="pswd" maxlength="20">
+            </div>
+            <div class="flex flex-col">
+              <label for="paswd2">Enter New Password</label>
+              <input type="password" v-model="newPswd" maxlength="20">
+            </div>
+            <div class="flex flex-col">
+              <label for="paswd3">Confirm New Password</label>
+              <input type="password" v-model="confirmNew" maxlength="20">
+            </div>
+            <div class="flex justify-between">
+              <button @click="changePassword"
+                class="my-5 px-2 bg-[#E0DEEA] font-bold font-[quicksand] w-[40%] rounded-[5px] text-[16px] text-white h-[40px]"
+                :style="changepswdbtn" :disabled="isdisabledChange">
+                {{ hideWaitMsg3Pswd }}
+              </button>
+              &nbsp;&nbsp;
+              <button @click="passwordCancel"
+                class="my-5 px-2 bg-[#d35656] font-bold font-[quicksand] w-[40%] rounded-[5px] text-[16px] text-white h-[40px]">
+                CANCEL
+              </button>
+            </div>
+          </div>
+        </div>
+        <div v-show="showaccountDelete" class="flex flex-col justify-center">
+          <div class="bg-[#236E98] text-center py-3 mb-4 font-[quicksand] w-[99%] mx-auto font-bold">
+            <h2 class="text-[25px] text-[#A4A716]">DELETE YOUR ACCOUNT</h2>
+          </div>
+          <div class="mx-auto py-2 flex flex-col gap-8 regbox mt-6">
+            <div class="flex flex-col">
+              <label for="account1" v-if="user">Type:&nbsp;&nbsp; <span class="text-[brown]">I want to delete {{
+    user.username }}
+                  account</span></label>
+              <label for="account1" v-else>Type: <span class="text-[brown]">I want to delete account</span></label>
+              <input type="text" v-model="accountDel" maxlength="20">
+            </div>
+            <div class="flex flex-col">
+              <label for="account2">Enter your password</label>
+              <input type="password" v-model="pswd1" maxlength="20">
+            </div>
+            <div class="flex justify-between">
+              <button @click="deleteAccount"
+                class="my-5 px-2 bg-[#E0DEEA] font-bold font-[quicksand] w-[40%] rounded-[5px] text-[16px] text-white h-[40px]"
+                :style="deleteaccountbtn" :disabled="isdisabledDelete">
+                {{ hideWaitMsg3Pswd1 }}
+              </button>
+              &nbsp;&nbsp;
+              <button @click="passwordCancel"
+                class="my-5 px-2 bg-[#44a9b1] font-bold font-[quicksand] w-[40%] rounded-[5px] text-[16px] text-white h-[40px]">
+                CANCEL
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- logout div -->
       <div v-show="logoutshown"
         class="z-20 font-medium text-[15px] font-[quicksand] border-2 border-gray-200 top-52 absolute w-[80%] h-40 bg-blue-200 inset-x-0 max-w-sm mx-auto pointer-events-auto flex flex-col justify-between">
         <span class="mx-auto mt-[5%]">Logout?</span>
@@ -1615,11 +2105,13 @@ const logout = () => {
           <span @click="cancelLog" class="hover:bg-[#d3cdcd] hover:cursor-pointer text-[#970606] py-1 px-5">NO</span>
         </div>
       </div>
+
+      <!-- home page div containing start chat/members and inbox divs-->
       <div v-show="hide1" class="sm:hidden">
         <div class="flex flex-col gap-10 text-center">
           <div class="flex justify-between mx-3 mt-3">
             <span class="w-[10%] cursor-pointer" @click="showmenu"><img src="@/assets/images/menu.svg" /></span>
-            <span class="w-[20%] rounded-[50%] h-[70px] hover:cursor-pointer"><img src="@/assets/images/profile.jpg"
+            <span class="w-[18%] rounded-[50%] h-[70px] hover:cursor-pointer"><img :src="imageUrl"
                 class="rounded-[100%] h-[100%] w-[100%]" /></span>
           </div>
           <span class="font-[quicksand] text-[30px] text-[#A4A716] my-5 leading-10 font-bold">Welcome to Fast Chat
@@ -1641,6 +2133,8 @@ const logout = () => {
           </div>
         </div>
       </div>
+
+      <!-- members div (start chat) -->
       <div v-show="showStartChat" class="h-screen flex flex-col justify-between">
         <div class="px-2 pt-5 flex flex-col gap-2 bg-slate-50">
           <div class="flex justify-between">
@@ -1669,6 +2163,8 @@ const logout = () => {
           </li>
         </ul>
       </div>
+
+      <!-- inbox messages div -->
       <div v-show="showinbox" class="h-screen flex flex-col justify-between">
         <div class="h-full flex flex-col overflow-y-hidden">
           <div class="flex flex-col">
@@ -1725,6 +2221,8 @@ const logout = () => {
           <p>inbox messages</p>
         </div>
       </div>
+
+      <!-- messages conversation div -->
       <div v-show="showmessenger" class="flex flex-col justify-between h-screen" ref="messengeContainler">
         <div class="h-full">
           <div class="flex justify-between bg-gray-50 py-5 sticky top-0">
@@ -1893,5 +2391,25 @@ const logout = () => {
 
 .active {
   color: #b0188f;
+}
+
+.profileinput {
+  background-color: rgb(209 213 219);
+  color: rgb(30 58 138);
+  border-radius: 0.125rem;
+  max-width: 280px;
+  padding: 5px;
+}
+
+.inputdivs {
+  display: flex;
+  font-size: 16px;
+  font-weight: 500;
+  gap: 10px;
+}
+
+.inputdivs label {
+  font-weight: bold;
+  color: rgb(9, 9, 65);
 }
 </style>
