@@ -1941,7 +1941,7 @@ const onFileChange = (event) => {
           <h2 class="text-[32px] text-[#A4A716]">eCHAT</h2>
         </div>
         <h3 class="text-[#084407] font-bold text-[20px] text-center mb-5">
-          USER LOGINN
+          USER LOGIN
         </h3>
         <span class="font-light text-[#970606] text-center text-[13.5px]" v-show="hideFeedback">{{
     loginMsg }}</span>
