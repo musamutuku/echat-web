@@ -1935,7 +1935,7 @@ const onFileChange = (event) => {
       </div>
 
 
-      <!-- login form -->
+      <!--- login form -->
       <div v-show="showLog" class="flex flex-col justify-center">
         <div class="bg-[#236E98] text-center pt-3 pb-6 mb-8 font-[quicksand] font-bold w-[99%] mx-auto">
           <h2 class="text-[32px] text-[#A4A716]">eCHAT</h2>
