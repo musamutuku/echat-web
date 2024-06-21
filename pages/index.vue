@@ -6,7 +6,6 @@ const config = useRuntimeConfig();
 const host_server = config.public.apiHOST;
 const socket = io(`${host_server}`);
 
-
 onMounted(() => {
   const newuser = "a user joined link";
   socket.emit('connected', newuser);
@@ -1721,7 +1720,6 @@ const logout = () => {
 
 //upload or edit profile photo
 import profileImage from '~/assets/images/user_profile.svg'
-import { Account } from "@aptos-labs/ts-sdk";
 
 const imageUrl = ref(profileImage);
 const imageFile = ref(null);
