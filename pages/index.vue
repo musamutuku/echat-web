@@ -1079,20 +1079,15 @@ function registerVerify(regUserMsg01) {
 
 //Verification
 const verifyUser = () => {
-  if (isConnected.value == true) {
-    otp.value = otp1.value.concat(otp2.value, otp3.value, otp4.value).trim();
-    loadingMsg1.value = true;
-    loading.value = true;
-    hideWaitMsg2.value = "";
-    if (username.value == "") {
-      verifyUser001(user.value.username);
-    }
-    else {
-      verifyUser001(username.value);
-    }
+  otp.value = otp1.value.concat(otp2.value, otp3.value, otp4.value).trim();
+  loadingMsg1.value = true;
+  loading.value = true;
+  hideWaitMsg2.value = "";
+  if (username.value == "") {
+    verifyUser001(user.value.username);
   }
   else {
-    popupMessage2();
+    verifyUser001(username.value);
   }
 };
 
@@ -1210,21 +1205,25 @@ const login = () => {
   hideFeedback.value = true;
   username.value = username.value.toLowerCase().trim();
   password.value = password.value.trim();
-  setTimeout(() => {
-    if (loginMsg.value == "") {
-      loginMsg.value = "Check on your connection and try again!";
+  if (isConnected.value == true) {
+    socket.emit("login", { username: username.value, password: password.value });
+    setTimeout(() => {
       loadingMsg.value = false;
       loading.value = false;
       hideWaitMsg.value = "SIGN IN";
       username.value = "";
       password.value = "";
-      setTimeout(() => {
-        loginMsg.value = "";
-      }, 4000);
-    }
-  }, 30000);
-  if (isConnected.value == true) {
-    socket.emit("login", { username: username.value, password: password.value });
+    }, 2000)
+  }
+  else {
+    popupMessage2();
+    setTimeout(() => {
+      loadingMsg.value = false;
+      loading.value = false;
+      hideWaitMsg.value = "SIGN IN";
+      username.value = "";
+      password.value = "";
+    }, 2000);
   }
 };
 
@@ -1236,45 +1235,57 @@ const resetPassword = () => {
   loadingMsg2.value = true;
   loading.value = true;
   hideWaitMsg3.value = "";
-  fetch(`${host_server}/reset`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      username: username.value,
-      email: email.value,
-    }),
-  })
-    .then((response) => {
-      if (response) {
-        if (response.status === 200) {
-          return response.json();
-        } else if (response.status === 400) {
-          return response.json();
-        } else if (response.status === 500) {
-          return response.json();
+  if (isConnected.value == true) {
+    fetch(`${host_server}/reset`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: username.value,
+        email: email.value,
+      }),
+    })
+      .then((response) => {
+        if (response) {
+          if (response.status === 200) {
+            return response.json();
+          } else if (response.status === 400) {
+            return response.json();
+          } else if (response.status === 500) {
+            return response.json();
+          }
+        } else {
+          errormsg.value = "Internal Server Error";
+          throw new Error("Server Error");
         }
-      } else {
-        errormsg.value = "Internal Server Error";
-        throw new Error("Server Error");
-      }
-    })
-    .then((data) => {
-      if (data.resetSuccess) {
-        return resetPswdSuccess(data.resetSuccess);
-      }
-      else if (data.resetError) {
-        return resetPswdError(data.resetError);
-      }
-      else if (data.OTPmessage) {
-        return popupMessage(data.OTPmessage);
-      }
-      else if (data.OTPmessage1) {
-        return popupMessage1(data.OTPmessage1);
-      }
-    })
-    .catch((error) => console.log(error));
+      })
+      .then((data) => {
+        if (data.resetSuccess) {
+          return resetPswdSuccess(data.resetSuccess);
+        }
+        else if (data.resetError) {
+          return resetPswdError(data.resetError);
+        }
+        else if (data.OTPmessage) {
+          return popupMessage(data.OTPmessage);
+        }
+        else if (data.OTPmessage1) {
+          return popupMessage1(data.OTPmessage1);
+        }
+      })
+      .catch((error) => console.log(error));
+  }
+  else{
+    popupMessage2();
+    setTimeout(() => {
+      loadingMsg2.value = false;
+      loading.value = false;
+      hideWaitMsg3.value = "RESET";
+      username.value = "";
+      email.value = "";
+    }, 2000);
+  }
 };
 
 
