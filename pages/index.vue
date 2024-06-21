@@ -1,7 +1,7 @@
 <script setup>
 import io from "socket.io-client";
 import { useAuthStore } from "@/stores/myStore";
-import { jwtDecode } from "jwt-decode";
+// import { jwtDecode } from "jwt-decode";
 const config = useRuntimeConfig();
 const host_server = config.public.apiHOST;
 const socket = io(`${host_server}`);
@@ -767,10 +767,10 @@ const refreshUsers = () => {
 
 //Registration
 const registerUser = () => {
-  username.value = username.value.trim();
+  username.value = username.value.toLowerCase().trim();
   password.value = password.value.trim();
   confirm.value = confirm.value.trim();
-  email.value = email.value.trim();
+  email.value = email.value.toLowerCase().trim();
   loadingMsg.value = true;
   loading.value = true;
   hideWaitMsg1.value = "";
@@ -873,6 +873,7 @@ function popupMessage1(OTPmessage1) {
 
 function popupMessage2() {
   if (showpopupMessage.value != true && showpopupMessage1.value != true) {
+    loading.value = false;
     setTimeout(() => {
       popupText2.value = "Sever or internet connection failure!";
       showpopupMessage2.value = true;
@@ -1078,16 +1079,20 @@ function registerVerify(regUserMsg01) {
 
 //Verification
 const verifyUser = () => {
-  otp.value = otp1.value.concat(otp2.value, otp3.value, otp4.value).trim();
-  loadingMsg1.value = true;
-  loading.value = true;
-  hideWaitMsg2.value = "";
-  // fetch("https://echat-api.onrender.com/verify", {
-  if (username.value == "") {
-    verifyUser001(user.value.username);
+  if (isConnected.value == true) {
+    otp.value = otp1.value.concat(otp2.value, otp3.value, otp4.value).trim();
+    loadingMsg1.value = true;
+    loading.value = true;
+    hideWaitMsg2.value = "";
+    if (username.value == "") {
+      verifyUser001(user.value.username);
+    }
+    else {
+      verifyUser001(username.value);
+    }
   }
   else {
-    verifyUser001(username.value);
+    popupMessage2();
   }
 };
 
@@ -1126,7 +1131,6 @@ const verifyUser001 = (userName) => {
 
 
 const registerOtpResend1 = (userName) => {
-  // fetch("https://echat-api.onrender.com/resend-otp", {
   fetch(`${host_server}/resend-otp`, {
     method: "POST",
     headers: {
@@ -1204,7 +1208,7 @@ const login = () => {
   loading.value = true;
   hideWaitMsg.value = "";
   hideFeedback.value = true;
-  username.value = username.value.trim();
+  username.value = username.value.toLowerCase().trim();
   password.value = password.value.trim();
   setTimeout(() => {
     if (loginMsg.value == "") {
@@ -1225,11 +1229,10 @@ const login = () => {
 };
 
 
-
 //Reset password
 const resetPassword = () => {
-  username.value = username.value.trim();
-  email.value = email.value.trim();
+  username.value = username.value.toLowerCase().trim();
+  email.value = email.value.toLowerCase().trim();
   loadingMsg2.value = true;
   loading.value = true;
   hideWaitMsg3.value = "";
