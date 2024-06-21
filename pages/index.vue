@@ -1864,11 +1864,11 @@ const onFileChange = (event) => {
         </div>
         <div class="mx-auto py-2 flex flex-col gap-8 regbox mt-6">
           <div class="flex gap-8 mx-5">
-            <input type="text" ref="otp11" @keydown="nextOtp1" :disabled="isdisabledOtpInput1" v-model="otp1"
+            <input type="text" ref="otp11" @input="nextOtp1" :disabled="isdisabledOtpInput1" v-model="otp1"
               maxlength="1" style="width: 45px;height: 55px;font-size: 28px;font-weight: 400;text-align: center" />
-            <input type="text" ref="otp22" @keydown="nextOtp2" :disabled="isdisabledOtpInput2" v-model="otp2"
+            <input type="text" ref="otp22" @input="nextOtp2" :disabled="isdisabledOtpInput2" v-model="otp2"
               maxlength="1" style="width: 45px;height: 55px;font-size: 28px;font-weight: 400;text-align: center" />
-            <input type="text" ref="otp33" @keydown="nextOtp3" :disabled="isdisabledOtpInput3" v-model="otp3"
+            <input type="text" ref="otp33" @input="nextOtp3" :disabled="isdisabledOtpInput3" v-model="otp3"
               maxlength="1" style="width: 45px;height: 55px;font-size: 28px;font-weight: 400;text-align: center" />
             <input type="text" ref="otp44" :disabled="isdisabledOtpInput4" v-model="otp4" maxlength="1"
               style="width: 45px;height: 55px;font-size: 28px;font-weight: 400;text-align: center" />
