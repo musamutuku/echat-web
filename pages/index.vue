@@ -157,50 +157,51 @@ const toggleForgot1 = () => {
 }
 
 const nextOtp1 = (event) => {
-  const key = event.key;
-  if (/^[a-zA-Z0-9]$/.test(key)) {
+  // const key = event.key;
+  const value = event.target.value;
+  if (/^[a-zA-Z0-9]$/.test(value)) {
     isdisabledOtpInput2.value = false;
     setTimeout(() => {
       otp22.value.focus();
     }, 500);
   }
-  else if ((key === 'Backspace' || key === 'Delete')) {
+  else if ((value === '' || value === ' ')) {
     otp11.value.focus();
   }
   else {
-    event.preventDefault();
+    event.target.value = '';
   }
 }
 
 const nextOtp2 = (event) => {
-  const key = event.key;
-  if (/^[a-zA-Z0-9]$/.test(key)) {
+  const value = event.target.value;
+  if (/^[a-zA-Z0-9]$/.test(value)) {
     isdisabledOtpInput3.value = false;
     setTimeout(() => {
       otp33.value.focus();
     }, 500);
   }
-  else if ((key === 'Backspace' || key === 'Delete')) {
+  else if ((value === '' || value === ' ')) {
     otp22.value.focus();
   }
   else {
-    event.preventDefault();
+    event.target.value = '';
   }
 }
 
 const nextOtp3 = (event) => {
-  const key = event.key;
-  if (/^[a-zA-Z0-9]$/.test(key)) {
+  const value = event.target.value;
+  if (/^[a-zA-Z0-9]$/.test(value)) {
     isdisabledOtpInput4.value = false;
     setTimeout(() => {
       otp44.value.focus();
     }, 500);
   }
-  else if ((key === 'Backspace' || key === 'Delete')) {
+  else if ((value === '' || value === ' ')) {
     otp33.value.focus();
   }
   else {
-    event.preventDefault();
+    event.target.value = '';
   }
 }
 
