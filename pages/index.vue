@@ -1216,14 +1216,16 @@ const login = () => {
     }, 2000)
   }
   else {
-    popupMessage2();
     setTimeout(() => {
-      loadingMsg.value = false;
-      loading.value = false;
-      hideWaitMsg.value = "SIGN IN";
-      username.value = "";
-      password.value = "";
-    }, 2000);
+      popupMessage2();
+      setTimeout(() => {
+        loadingMsg.value = false;
+        loading.value = false;
+        hideWaitMsg.value = "SIGN IN";
+        username.value = "";
+        password.value = "";
+      }, 2000);
+    }, 10000);
   }
 };
 
@@ -1276,7 +1278,7 @@ const resetPassword = () => {
       })
       .catch((error) => console.log(error));
   }
-  else{
+  else {
     popupMessage2();
     setTimeout(() => {
       loadingMsg2.value = false;
@@ -1985,7 +1987,7 @@ const onFileChange = (event) => {
 
 
     <!-- main div with navigation menu div, home page div, members div, profile div & logout div -->
-    <div v-show="hide2 = true">
+    <div v-show="hide2">
       <!-- navigation menu div -->
       <div v-show="displayMenu" :class="{
     '-translate-x-[100%]': isCollapsed,
@@ -2020,8 +2022,8 @@ const onFileChange = (event) => {
             <div class="w-[20%] rounded-[50%] h-[75px] flex flex-col">
               <img :src="imageUrl" class="rounded-[100%] w-[100%] h-[100%]" /><br>
             </div>
-            <div class="bg-gray-300 text-blue-900 px-1 rounded-sm w-fit">
-              <button @click="chooseImage">Edit photo</button>
+            <div class="px-1 rounded-sm w-fit">
+              <button @click="chooseImage" class="profileinput text-[14px]">Edit photo</button>
               <input type="file" accept="image/*" @change="onFileChange" class="hidden" ref="imageInput">
             </div>
             <div class="mt-5 flex flex-col gap-10 items-start mx-auto">
@@ -2036,12 +2038,14 @@ const onFileChange = (event) => {
               <div class="inputdivs">
                 <label for="password1">Password:</label>
                 <input type="text" value="********" class="profileinput" style="width:150px;" disabled><button
-                  @click="togglepassword" class="profileinput" style="color: brown;">Change</button>
+                  @click="togglepassword" class="profileinput1 px-1 rounded-sm"
+                  style="color:brown;background-color: #bbb1ff;">Change</button>
               </div>
               <div class="inputdivs">
                 <label for="account">Account:</label>
-                <input type="text" value="Active" class="profileinput" style="width:150px;" disabled><button
-                  @click="toggledelete" class="profileinput px-1 rounded-sm" style="color: brown;">DELETE</button>
+                <input type="text" value="active" class="profileinput" style="width:150px;" disabled><button
+                  @click="toggledelete" class="profileinput1 px-1 rounded-sm"
+                  style="color:brown;background-color: #6999b1;">Delete</button>
               </div>
             </div>
           </div>
@@ -2407,16 +2411,22 @@ const onFileChange = (event) => {
 }
 
 .profileinput {
-  background-color: rgb(209 213 219);
-  color: rgb(30 58 138);
+  background-color: rgb(226 232 240);
+  color: rgb(32, 35, 39);
   border-radius: 0.125rem;
+  max-width: 280px;
+  padding: 5px;
+}
+
+.profileinput1 {
+  color: brown;
   max-width: 280px;
   padding: 5px;
 }
 
 .inputdivs {
   display: flex;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
   gap: 10px;
 }
