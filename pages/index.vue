@@ -469,6 +469,7 @@ const toggleprofile = () => {
   showStartChat.value = false;
   showprofile.value = true;
   isCollapsed.value = true;
+  showinbox.value = false;
 };
 
 
@@ -591,6 +592,7 @@ const toggleinbox = () => {
   showinbox.value = true;
   hide1.value = false;
   showStartChat.value = false;
+  showprofile.value = false;
 };
 const togglestartChat = () => {
   showStartChat.value = true;
@@ -1913,11 +1915,11 @@ const onFileChange = (event) => {
         </div>
         <div class="mx-auto py-2 flex flex-col gap-8 regbox mt-6">
           <div class="flex flex-col">
-            <label for="username">Username</label>
+            <label for="username">Enter your username</label>
             <input type="text" v-model="username" maxlength="20" id="username" />
           </div>
           <div class="flex flex-col">
-            <label for="email">Email</label>
+            <label for="email">Enter your email</label>
             <input type="text" v-model="email" maxlength="50" id="email" @blur="changeCase" />
           </div>
           <button @click="resetPassword"
@@ -2032,7 +2034,7 @@ const onFileChange = (event) => {
                 <input type="text" :value="user.username" class="profileinput" v-if="user" disabled>
               </div>
               <div class="inputdivs">
-                <label for="email1">Email Address:</label>
+                <label for="email1">Email:</label>
                 <input type="text" :value="user.email" class="profileinput" v-if="user" disabled>
               </div>
               <div class="inputdivs">
@@ -2075,7 +2077,7 @@ const onFileChange = (event) => {
               </button>
               &nbsp;&nbsp;
               <button @click="passwordCancel"
-                class="my-5 px-2 bg-[#d35656] font-bold font-[quicksand] w-[40%] rounded-[5px] text-[16px] text-white h-[40px]">
+                class="my-5 px-2 bg-[#44a9b1] font-bold font-[quicksand] w-[40%] rounded-[5px] text-[16px] text-white h-[40px]">
                 CANCEL
               </button>
             </div>
@@ -2087,7 +2089,7 @@ const onFileChange = (event) => {
           </div>
           <div class="mx-auto py-2 flex flex-col gap-8 regbox mt-6">
             <div class="flex flex-col">
-              <label for="account1" v-if="user">Type:&nbsp;&nbsp; <span class="text-[brown]">I want to delete {{
+              <label for="account1" v-if="user">Type:&nbsp;<span class="text-[brown]">I want to delete {{
     user.username }}
                   account</span></label>
               <label for="account1" v-else>Type: <span class="text-[brown]">I want to delete account</span></label>
