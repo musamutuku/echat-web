@@ -2093,11 +2093,11 @@ const onFileChange = (event) => {
     user.username }}
                   account</span></label>
               <label for="account1" v-else>Type: <span class="text-[brown]">I want to delete account</span></label>
-              <input type="text" v-model="accountDel" maxlength="20">
+              <input type="text" v-model="accountDel" maxlength="100">
             </div>
             <div class="flex flex-col">
               <label for="account2">Enter your password</label>
-              <input type="password" v-model="pswd1" maxlength="20">
+              <input type="password" v-model="pswd1" maxlength="100">
             </div>
             <div class="flex justify-between">
               <button @click="deleteAccount"
