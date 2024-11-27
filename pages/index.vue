@@ -3,7 +3,7 @@ import io from "socket.io-client";
 import { useAuthStore } from "@/stores/myStore";
 // import { jwtDecode } from "jwt-decode";
 const config = useRuntimeConfig();
-const host_server = config.public.apiHOST1;
+const host_server = config.public.apiHOST;
 const socket = io(`${host_server}`);
 
 onMounted(() => {
