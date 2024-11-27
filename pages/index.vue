@@ -3,8 +3,8 @@ import io from "socket.io-client";
 import { useAuthStore } from "@/stores/myStore";
 // import { jwtDecode } from "jwt-decode";
 const config = useRuntimeConfig();
-const host_server = config.public.apiHOST;
-// const socket = io(`${host_server}`);
+const host_server = config.public.apiHOST1;
+const socket = io(`${host_server}`);
 
 onMounted(() => {
   const newuser = "a user joined link";
