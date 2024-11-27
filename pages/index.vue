@@ -776,57 +776,74 @@ const registerUser = () => {
   loadingMsg.value = true;
   loading.value = true;
   hideWaitMsg1.value = "";
-  if (email.value.includes("@")) {
-    if (password.value == confirm.value) {
-      fetch(`${host_server}/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: username.value,
-          email: email.value,
-          password: password.value,
-          confirm: confirm.value,
-        }),
-      })
-        .then((response) => {
-          if (response) {
-            if (response.status === 200) {
-              return response.json();
-            } else if (response.status === 400) {
-              return response.json();
-            } else if (response.status === 500) {
-              return response.json();
+  if(isConnected.value == true){
+    if (email.value.includes("@")) {
+      if (password.value == confirm.value) {
+        fetch(`${host_server}/register`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: username.value,
+            email: email.value,
+            password: password.value,
+            confirm: confirm.value,
+          }),
+        })
+          .then((response) => {
+            if (response) {
+              if (response.status === 200) {
+                return response.json();
+              } else if (response.status === 400) {
+                return response.json();
+              } else if (response.status === 500) {
+                return response.json();
+              }
+            } else {
+              errormsg.value = "Internal Server Error";
+              throw new Error("Server Error");
             }
-          } else {
-            errormsg.value = "Internal Server Error";
-            throw new Error("Server Error");
-          }
-        })
-        .then((data) => {
-          if (data.regUserMsg) {
-            return registerError1(data.regUserMsg);
-          }
-          if (data.regUserMsg01) {
-            return registerVerify(data.regUserMsg01);
-          }
-          else if (data.OTPmessage) {
-            return popupMessage(data.OTPmessage);
-          }
-          else if (data.OTPmessage1) {
-            return popupMessage1(data.OTPmessage1);
-          }
-        })
-        .catch((error) => registerError(error.error));
+          })
+          .then((data) => {
+            if (data.regUserMsg) {
+              return registerError1(data.regUserMsg);
+            }
+            if (data.regUserMsg01) {
+              return registerVerify(data.regUserMsg01);
+            }
+            else if (data.OTPmessage) {
+              return popupMessage(data.OTPmessage);
+            }
+            else if (data.OTPmessage1) {
+              return popupMessage1(data.OTPmessage1);
+            }
+          })
+          .catch((error) => registerError(error.error));
+      } else {
+        const msg = "Password does not match!";
+        return registerError1(msg);
+      }
     } else {
-      const msg = "Password does not match!";
+      const msg = "Enter a valid Email!";
       return registerError1(msg);
     }
-  } else {
-    const msg = "Enter a valid Email!";
-    return registerError1(msg);
   }
+else{
+    setTimeout(() => {
+    popupMessage2();
+    setTimeout(() => {
+      loading.value = false;
+      loadingMsg.value = false;
+      hideWaitMsg1.value = "SIGN UP";
+      loadingMsg1.value = false;
+      username.value = "";
+      email.value = "";
+      password.value = "";
+      confirm.value = "";  
+   }, 2000);
+  }, 10000);
+}
 };
 
 function popupMessage(OTPmessage) {
