@@ -796,11 +796,10 @@ const registerUser = () => {
               if (response.status === 200) {
                 return response.json();
               } else if (response.status === 400) {
-                popupMessage2();
-                errormsg.value = "Internal Server Error";
+                popupMessage22();
                 return response.json();
               } else if (response.status === 500) {
-                popupMessage2();
+                popupMessage22();
                 // errormsg.value = "Internal Server Error";
                 return response.json();
               }
@@ -909,6 +908,27 @@ function popupMessage2() {
   }
 }
 
+function popupMessage22() {
+  if (showpopupMessage.value != true && showpopupMessage1.value != true) {
+    loading.value = false;
+    setTimeout(() => {
+      popupText2.value = "Sever or internet connection failure!";
+      showpopupMessage2.value = true;
+      loading.value = false;
+      loadingMsg.value = false;
+      hideWaitMsg1.value = "SIGN UP";
+      loadingMsg1.value = false;
+      username.value = "";
+      email.value = "";
+      password.value = "";
+      confirm.value = "";
+      setTimeout(() => {
+        popupText2.value = "";
+        showpopupMessage2.value = false;
+      }, 8000);
+    }, 2000);
+  }
+}
 const popupText3 = ref("");
 const popupText4 = ref("");
 const showpopupMessage3 = ref(false);
