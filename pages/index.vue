@@ -940,6 +940,7 @@ function popupMessage33() {
       loadingMsg.value = false;
       hideWaitMsg3.value = "RESET";
       loadingMsg1.value = false;
+      loadingMsg2.value = false;
       username.value = "";
       email.value = "";
       setTimeout(() => {
