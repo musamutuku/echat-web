@@ -796,13 +796,16 @@ const registerUser = () => {
               if (response.status === 200) {
                 return response.json();
               } else if (response.status === 400) {
+                popupMessage2();
                 errormsg.value = "Internal Server Error";
                 return response.json();
               } else if (response.status === 500) {
-                errormsg.value = "Internal Server Error";
+                popupMessage2();
+                // errormsg.value = "Internal Server Error";
                 return response.json();
               }
             } else {
+              popupMessage2();
               errormsg.value = "Internal Server Error";
               throw new Error("Server Error");
             }
