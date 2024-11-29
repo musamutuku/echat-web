@@ -929,6 +929,26 @@ function popupMessage22() {
     }, 2000);
   }
 }
+
+function popupMessage33() {
+  if (showpopupMessage.value != true && showpopupMessage1.value != true) {
+    loading.value = false;
+    setTimeout(() => {
+      popupText2.value = "Sever or internet connection failure!";
+      showpopupMessage2.value = true;
+      loading.value = false;
+      loadingMsg.value = false;
+      hideWaitMsg3.value = "RESET";
+      loadingMsg1.value = false;
+      username.value = "";
+      email.value = "";
+      setTimeout(() => {
+        popupText2.value = "";
+        showpopupMessage2.value = false;
+      }, 8000);
+    }, 2000);
+  }
+}
 const popupText3 = ref("");
 const popupText4 = ref("");
 const showpopupMessage3 = ref(false);
