@@ -1317,8 +1317,10 @@ const resetPassword = () => {
           if (response.status === 200) {
             return response.json();
           } else if (response.status === 400) {
+            popupMessage33();
             return response.json();
           } else if (response.status === 500) {
+            popupMessage33();
             return response.json();
           }
         } else {
