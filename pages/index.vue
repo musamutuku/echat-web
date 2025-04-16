@@ -795,16 +795,14 @@ const registerUser = () => {
             if (response) {
               if (response.status === 200) {
                 return response.json();
-              } else if (response.status === 400) {
-                popupMessage22();
-                return response.json();
               } else if (response.status === 500) {
                 popupMessage22();
                 // errormsg.value = "Internal Server Error";
                 return response.json();
               }
             } else {
-              popupMessage2();
+              // popupMessage2();
+              alert("error");
               errormsg.value = "Internal Server Error";
               throw new Error("Server Error");
             }
