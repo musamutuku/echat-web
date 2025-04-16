@@ -803,8 +803,8 @@ const registerUser = () => {
             } else {
               // popupMessage2();
               alert("error");
-              errormsg.value = "Internal Server Error";
-              throw new Error("Server Error");
+              // errormsg.value = "Internal Server Error";
+              // throw new Error("Server Error");
             }
           })
           .then((data) => {
