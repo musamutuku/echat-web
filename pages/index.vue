@@ -2448,7 +2448,7 @@ const inputClass = computed(() =>
   color: #3d3e68;
 }
 
-.regbox input {
+/* .regbox input {
   border: 1px solid #3d3e68;
   width: 320px;
   height: 45px;
@@ -2456,7 +2456,7 @@ const inputClass = computed(() =>
   outline: none;
   padding-left: 10px;
   padding-right: 10px;
-}
+} */
 
 .loadingMsg {
   display: flex;
