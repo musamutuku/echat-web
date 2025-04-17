@@ -1839,7 +1839,6 @@ const onFileChange = (event) => {
 const usernameInput = ref(null);
 const hasError = ref(false);
 function validate() {
-  hasError.value = true;
   nextTick(() => {
       const inputEl = usernameInput.value
       inputEl.focus()
@@ -1847,6 +1846,7 @@ function validate() {
       // 👇 Set cursor to the end of the input
       const length = inputEl.value.length
       inputEl.setSelectionRange(length, length)
+      hasError.value = true;
     });
 }
 function onInput() {
