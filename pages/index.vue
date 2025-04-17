@@ -1835,8 +1835,11 @@ const onFileChange = (event) => {
   imageFile.value = event.target.files[0];
   uploadImage();
 }
+
 const usernameInput = ref(null);
+const hasError = ref(false);
 function validate() {
+  hasError.value = true;
   nextTick(() => {
       const inputEl = usernameInput.value
       inputEl.focus()
@@ -1846,6 +1849,14 @@ function validate() {
       inputEl.setSelectionRange(length, length)
     });
 }
+function onInput() {
+  hasError.value = false; // Remove red border on user input
+}
+
+const inputClass = computed(() =>
+  hasError.value ? 'border-2 border-red-500 p-2 rounded outline-none' : 'border p-2 rounded outline-none'
+)
+
 
 </script>
 
@@ -1902,7 +1913,7 @@ function validate() {
         <div class="mx-auto py-2 flex flex-col gap-8 regbox">
           <div class="flex flex-col">
             <label for="username">Username</label>
-            <input type="text" ref="usernameInput" class="placeholder:text-[14px]" v-model="username" maxlength="20" id="username"
+            <input type="text" ref="usernameInput" @input="onInput" :class="inputClass" class="placeholder:text-[14px]" v-model="username" maxlength="20" id="username"
               placeholder="max. 20 characters e.g musajoseph" />
           </div>
           <div class="flex flex-col">
