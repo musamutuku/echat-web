@@ -1853,11 +1853,11 @@ function onInput() {
   hasError.value = false; // Remove red border on user input
 }
 
-const inputClass = computed(() =>
-  hasError.value
-    ? 'border-2 border-red-500 p-2 rounded outline-none'
-    : 'border p-2 rounded outline-none'
-)
+// const inputClass = computed(() =>
+//   hasError.value
+//     ? 'border-2 border-red-500 p-2 rounded outline-none'
+//     : 'border p-2 rounded outline-none'
+// )
 
 
 </script>
@@ -1915,21 +1915,21 @@ const inputClass = computed(() =>
         <div class="mx-auto py-2 flex flex-col gap-8 regbox">
           <div class="flex flex-col">
             <label for="username">Username</label>
-            <input type="text" ref="usernameInput" @input="onInput" :class="inputClass" class="placeholder:text-[14px]" v-model="username" maxlength="20" id="username"
+            <input type="text" ref="usernameInput" @input="onInput" :class="[hasError ? 'input-error' : '', 'custom-input']" class="placeholder:text-[14px]" v-model="username" maxlength="20" id="username"
               placeholder="max. 20 characters e.g musajoseph" />
           </div>
           <div class="flex flex-col">
             <label for="email">Email</label>
-            <input type="text" class="placeholder:text-[14px]" v-model="email" maxlength="50" id="email"
+            <input type="text" class="placeholder:text-[14px]" class="custom-input" v-model="email" maxlength="50" id="email"
               placeholder="e.g musa@gmail.com" @blur="changeCase" />
           </div>
           <div class="flex flex-col">
             <label for="password">Password</label>
-            <input type="password" v-model="password" maxlength="30" id="password" />
+            <input type="password" v-model="password" class="custom-input" maxlength="30" id="password" />
           </div>
           <div class="flex flex-col">
             <label for="confirm">Confirm Password</label>
-            <input type="password" v-model="confirm" maxlength="30" id="confirm" />
+            <input type="password" v-model="confirm" class="custom-input" maxlength="30" id="confirm" />
           </div>
           <button @click="registerUser"
             class="my-5 bg-[#E0DEEA] font-bold font-[quicksand] rounded-[5px] text-[18px] text-white h-[45px]"
@@ -2448,7 +2448,7 @@ const inputClass = computed(() =>
   color: #3d3e68;
 }
 
-/* .regbox input {
+.custom-input {
   border: 1px solid #3d3e68;
   width: 320px;
   height: 45px;
@@ -2456,7 +2456,10 @@ const inputClass = computed(() =>
   outline: none;
   padding-left: 10px;
   padding-right: 10px;
-} */
+} 
+.input-error {
+  border-color: red !important;
+}
 
 .loadingMsg {
   display: flex;
