@@ -1854,7 +1854,9 @@ function onInput() {
 }
 
 const inputClass = computed(() =>
-  hasError.value ? 'border-2 border-red-500 p-2 rounded outline-none' : 'border p-2 rounded outline-none'
+  hasError.value
+    ? 'border-2 border-red-500 p-2 rounded outline-none'
+    : 'border p-2 rounded outline-none'
 )
 
 
