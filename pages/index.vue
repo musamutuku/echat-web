@@ -1920,7 +1920,7 @@ function onInput() {
           </div>
           <div class="flex flex-col">
             <label for="email">Email</label>
-            <input type="text" class="placeholder:text-[14px]" class="custom-input" v-model="email" maxlength="50" id="email"
+            <input type="text" class="placeholder:text-[14px] custom-input" v-model="email" maxlength="50" id="email"
               placeholder="e.g musa@gmail.com" @blur="changeCase" />
           </div>
           <div class="flex flex-col">
