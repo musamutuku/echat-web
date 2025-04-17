@@ -796,6 +796,7 @@ const registerUser = () => {
               if (response.status === 200) {
                 return response.json();
               } else if (response.status === 400) {
+                validate();
                 // popupMessage22();
                 return response.json();
               } else if (response.status === 500) {
@@ -804,10 +805,9 @@ const registerUser = () => {
                 return response.json();
               }
             } else {
-              // popupMessage2();
-              alert("error");
+              popupMessage2();
               // errormsg.value = "Internal Server Error";
-              // throw new Error("Server Error");
+              throw new Error("Server Error");
             }
           })
           .then((data) => {
@@ -1835,11 +1835,21 @@ const onFileChange = (event) => {
   imageFile.value = event.target.files[0];
   uploadImage();
 }
+const usernameInput = ref(null);
+function validate() {
+  nextTick(() => {
+      const inputEl = usernameInput.value
+      inputEl.focus()
+
+      // 👇 Set cursor to the end of the input
+      const length = inputEl.value.length
+      inputEl.setSelectionRange(length, length)
+    });
+}
 
 </script>
 
 <template>
-
   <!-- message popup at the top div either error or success -->
   <div v-show="showpopupMessage"
     class="flex items-center absolute left-1 right-1 mx-auto w-fit top-2 justify-center z-20 bg-[#b5cab8] px-2.5 py-2 text-[13px] rounded-sm font-medium font-[quicksand] text-green-800">
@@ -1892,8 +1902,8 @@ const onFileChange = (event) => {
         <div class="mx-auto py-2 flex flex-col gap-8 regbox">
           <div class="flex flex-col">
             <label for="username">Username</label>
-            <input type="text" class="placeholder:text-[14px]" v-model="username" maxlength="20" id="username"
-              placeholder="max. 20 characters e.g musamutuku" />
+            <input type="text" ref="usernameInput" class="placeholder:text-[14px]" v-model="username" maxlength="20" id="username"
+              placeholder="max. 20 characters e.g musajoseph" />
           </div>
           <div class="flex flex-col">
             <label for="email">Email</label>
