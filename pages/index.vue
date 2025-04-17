@@ -1912,7 +1912,7 @@ function onInput() {
           <h2 class="text-[25px] text-[#A4A716]">CREATE eCHAT ACCOUNT</h2>
         </div>
         <span class="font-semibold text-[#970606] font-[quicksand] text-center text-[13px]">{{ userError }}</span>
-        <div class="mx-auto py-2 flex flex-col gap-8 regbox">
+        <div class="mx-auto py-2 flex flex-col gap-8 regbox1">
           <div class="flex flex-col">
             <label for="username">Username</label>
             <input type="text" ref="usernameInput" @input="onInput" :class="[hasError ? 'input-error' : '', 'custom-input']" class="placeholder:text-[14px]" v-model="username" maxlength="20" id="username"
@@ -2447,7 +2447,21 @@ function onInput() {
   font-weight: bold;
   color: #3d3e68;
 }
+.regbox1 label {
+  font-size: 15px;
+  font-weight: bold;
+  color: #3d3e68;
+}
 
+.regbox input {
+  border: 1px solid #3d3e68;
+  width: 320px;
+  height: 45px;
+  border-radius: 5px;
+  outline: none;
+  padding-left: 10px;
+  padding-right: 10px;
+} 
 .custom-input {
   border: 1px solid #3d3e68;
   width: 320px;
