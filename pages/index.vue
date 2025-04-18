@@ -634,6 +634,7 @@ const toggleLogReg = () => {
   otp2.value = "";
   otp3.value = "";
   otp4.value = "";
+  hasError.value = false;
 };
 
 const toggleLogReg2 = () => {
@@ -649,6 +650,7 @@ const toggleLogReg2 = () => {
   otp2.value = "";
   otp3.value = "";
   otp4.value = "";
+  hasError.value = false;
 };
 
 const toggleLogReg1 = () => {
@@ -667,6 +669,7 @@ const toggleLogReg1 = () => {
   isdisabledOtpInput2.value = true;
   isdisabledOtpInput3.value = true;
   isdisabledOtpInput4.value = true;
+  hasError.value = false;
 };
 
 const changeCase = computed(() => (email.value = email.value.toLowerCase()));
@@ -1852,13 +1855,6 @@ function validate() {
 function onInput() {
   hasError.value = false; // Remove red border on user input
 }
-
-// const inputClass = computed(() =>
-//   hasError.value
-//     ? 'border-2 border-red-500 p-2 rounded outline-none'
-//     : 'border p-2 rounded outline-none'
-// )
-
 
 </script>
 
