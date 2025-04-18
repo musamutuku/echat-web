@@ -27,6 +27,7 @@ export default defineNuxtConfig({
   },
   pwa: {
     registerType: "autoUpdate",
+    includeAssets: ['offline.html'],
     manifest: {
       name: "eChat Beta",
       short_name: "eChat",
@@ -72,7 +73,8 @@ export default defineNuxtConfig({
       ],
     },
     workbox: {
-      navigateFallback: "/",
+      navigateFallback: '/offline.html',
+      globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
     },
     // workbox: {
     //   navigateFallback: "/",
