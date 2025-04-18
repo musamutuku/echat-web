@@ -2065,8 +2065,8 @@ function onInput() {
               wait...</span>
           </button>
           <div class="flex justify-between text-[#0912DB] font-bold text-sm">
-            <span class="hover:cursor-pointer" @click="toggleForgot">Forgot Password?</span>
-            <span @click="toggleLogReg" class="hover:cursor-pointer">Create an Account?</span>
+            <span class="hover:cursor-pointer" @click="toggleForgot">Forgot Password</span>
+            <span @click="toggleLogReg" class="hover:cursor-pointer">Create an Account</span>
           </div>
         </div>
       </div>
