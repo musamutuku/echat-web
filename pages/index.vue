@@ -2292,7 +2292,7 @@ function onInput() {
           <ul class="ml-2 mr-1 bg-white overflow-y-auto h-[100%]">
             <li v-for="(msg, index) in messages1" :key="index" class="relative">
               <div v-if="selectedMessage1 === msg" v-show="showDelete"
-                class="bg-white text-sm border-[1px] gap-6 py-2 flex flex-col  border-[#dfd1d155] px-2 absolute top-10 right-10 z-20">
+                class="bg-white text-sm border-[1px] gap-6 py-2 flex flex-col  border-[#dfd1d155] px-2 absolute top-10 left-3 z-20">
                 <span>Delete conversation?</span>
                 <div class="flex justify-between mx-2">
                   <span @click="DelMsg" class="pr-2 hover:cursor-pointer">OK</span>
