@@ -248,28 +248,30 @@ const showDel = (index) => {
   showDelete.value = true;
   msgindex.value = index;
 }
-//longpress
+//longpress edited
 let isLongPress = false;
-let pressTimer
+let pressTimer;
 const selectedMessage1 = ref(null);
+
 const startPress = (msg, event) => {
+  if (event.touches && event.touches.length > 1) return; // ignore multi-touch
+
   selectedMessage1.value = msg;
   showDelete.value = false;
   isLongPress = false;
-  if (event.button === 0) {
-    pressTimer = setTimeout(() => {
-      // Long press detected, delete the message
-      const index = messages1.value.indexOf(msg)
-      if (index !== -1) {
-        showDel(index);
-      }
-      isLongPress = true
-    }, 1000)
-  }
-}
+
+  pressTimer = setTimeout(() => {
+    const index = messages1.value.indexOf(msg);
+    if (index !== -1) {
+      showDel(index);
+    }
+    isLongPress = true;
+  }, 1000);
+};
+
 const cancelPress = () => {
-  clearTimeout(pressTimer)
-}
+  clearTimeout(pressTimer);
+};
 
 
 //Delete a message in the messenger page
