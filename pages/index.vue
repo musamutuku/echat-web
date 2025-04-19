@@ -2274,7 +2274,7 @@ const modalOpen = ref(false);
       </div>
 
       <!-- inbox messages div -->
-      <div v-if="modalOpen" class="fixed inset-0 bg-black opacity-50 z-40"></>
+      <div v-if="modalOpen" class="fixed inset-0 bg-black opacity-50 z-40"></div>
       <div v-show="showinbox" class="h-screen flex flex-col justify-between">
         <div class="h-full flex flex-col overflow-y-hidden">
           <div class="flex flex-col">
