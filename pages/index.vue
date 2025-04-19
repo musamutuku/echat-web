@@ -254,7 +254,7 @@ let pressTimer
 const selectedMessage1 = ref(null);
 const startPress = (msg, event) => {
   selectedMessage1.value = msg;
-  showDelete.value = true;
+  showDelete.value = false;
   isLongPress = false;
   if (event.button === 0) {
     pressTimer = setTimeout(() => {
