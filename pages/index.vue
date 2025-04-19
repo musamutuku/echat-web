@@ -254,7 +254,7 @@ let pressTimer
 const selectedMessage1 = ref(null);
 const startPress = (msg, event) => {
   selectedMessage1.value = msg;
-  showDelete.value = false;
+  showDelete.value = true;
   isLongPress = false;
   if (event.button === 0) {
     pressTimer = setTimeout(() => {
@@ -2219,7 +2219,7 @@ function onInput() {
                 class="rounded-[100%] h-[100%] w-[100%]" /></span>
           </div>
           <span class="font-[quicksand] text-[30px] text-[#A4A716] my-5 leading-10 font-bold">Welcome to Fast Chat
-            Mobile
+            Web
             App</span>
           <div class="flex w-fit mx-auto gap-8">
             <div class="flex flex-col hover:cursor-pointer" @click="togglestartChat">
