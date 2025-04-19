@@ -222,6 +222,7 @@ const CancelDel2 = () => {
 const showDelete = ref(false);
 const msgindex = ref();
 const DelMsg = () => {
+  modalOpen.value = false;
   const senderToDelMsg = messages1.value[msgindex.value].senderUsername;
   // loop through the array backwards to avoid index shifting when splicing
   for (let i = chatMessages.value.length - 1; i >= 0; i--) {
@@ -243,6 +244,7 @@ const DelMsg = () => {
 const CancelDel = () => {
   showDelete.value = false;
   isLongPress = false;
+  modalOpen.value = false;
 }
 const showDel = (index) => {
   showDelete.value = true;
@@ -264,6 +266,7 @@ const startPress = (msg, event) => {
     const index = messages1.value.indexOf(msg);
     if (index !== -1) {
       showDel(index);
+      modalOpen.value = true;
     }
     isLongPress = true;
   }, 1000);
@@ -2271,7 +2274,7 @@ const modalOpen = ref(false);
       </div>
 
       <!-- inbox messages div -->
-      <div class="fixed inset-0 bg-black opacity-50 z-40">
+      <div v-if="modalOpen" class="fixed inset-0 bg-black opacity-50 z-40">
       <div v-show="showinbox" class="h-screen flex flex-col justify-between">
         <div class="h-full flex flex-col overflow-y-hidden">
           <div class="flex flex-col">
