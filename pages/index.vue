@@ -505,7 +505,7 @@ const getSender = (index, totalmsgs) => {
     else {
       popupMessage2();
     }
-
+    
     showmessenger.value = true;
     showinbox.value = false;
     messages.value = chatMessages.value;
@@ -532,22 +532,22 @@ const getTotalInbox = (totalmsgs) => {
 }
 
 
-const getRecipient = (item) => {
+const getRecipient = (item, index) => {
   //after click start chat or a user to send msg you head to show messager page hence viewing all the unread msgs for that sender 
   // so reduce the number of messages in the inbox button
   const newsenderarray = [...messages1.value];
   for (let i = 0; i < newsenderarray.length; i++) {
     if (newsenderarray[i].senderUsername == item.username) {
-      alert(newsenderarray[i].senderUsername);
       const unread = newsenderarray[i].totalUnreadMsgs;
       getTotalInbox(unread);
-
+      getSender(index,unread);
     }
   }
 
   //after click start chat or a user to send msg you head to show messager page hence viewing all the unread msgs for that sender 
   // so delete the unread msgs for that sender in inbox page 
   for (let i = 0; i < messages1.value.length; i++) {
+
     if (messages1.value[i].senderUsername == item.username) {
       messages1.value[i].totalUnreadMsgs = 0;
       if (isConnected.value == true) {
@@ -2262,8 +2262,8 @@ const modalOpen = ref(false);
               :class="{ 'loadingrefresh': pauseRefresh }" /></button>
         </div>
         <ul class="ml-2 mr-1 overflow-y-auto mb-2 flex-1">
-          <li class="flex gap-3 hover:cursor-pointer mt-0.5 h-[60px] bg-[#f8f5f5]" v-for="item in filteredUsers"
-            :key="item.username" @click="getRecipient(item)" ref="recipientRefs">
+          <li class="flex gap-3 hover:cursor-pointer mt-0.5 h-[60px] bg-[#f8f5f5]" v-for="(item, index) in filteredUsers"
+            :key="index" @click="getRecipient(item, index)" ref="recipientRefs">
             <div class="w-[48px] self-center h-[48px] rounded-[100%] p-1">
               <img src="@/assets/images/user_profile.svg" class="w-[100%] h-[100%]" />
             </div>
