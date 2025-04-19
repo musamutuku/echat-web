@@ -1857,7 +1857,7 @@ function validate() {
 function onInput() {
   hasError.value = false; // Remove red border on user input
 }
-
+const modalOpen = ref(false);
 </script>
 
 <template>
@@ -2271,6 +2271,7 @@ function onInput() {
       </div>
 
       <!-- inbox messages div -->
+      <div class="blur-sm opacity-50 pointer-events-none">
       <div v-show="showinbox" class="h-screen flex flex-col justify-between">
         <div class="h-full flex flex-col overflow-y-hidden">
           <div class="flex flex-col">
@@ -2327,6 +2328,7 @@ function onInput() {
           <p>inbox messages</p>
         </div>
       </div>
+     </div>
 
       <!-- messages conversation div -->
       <div v-show="showmessenger" class="flex flex-col justify-between h-screen" ref="messengeContainler">
