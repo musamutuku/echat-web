@@ -538,6 +538,7 @@ const getRecipient = (item) => {
   const newsenderarray = [...messages1.value];
   for (let i = 0; i < newsenderarray.length; i++) {
     if (newsenderarray[i].senderUsername == item.username) {
+      alert(newsenderarray[i]);
       const unread = newsenderarray[i].totalUnreadMsgs;
       getTotalInbox(unread);
 
