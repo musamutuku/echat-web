@@ -2,6 +2,12 @@
 export default defineNuxtConfig({
   app: {
     head: {
+      htmlAttrs: {
+        class: 'select-none', // Applies to <html>
+      },
+      bodyAttrs: {
+        class: 'select-none', // Applies to <body>
+      },
       link: [
         {
           rel: "stylesheet",
