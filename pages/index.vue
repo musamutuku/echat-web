@@ -539,7 +539,7 @@ const getRecipient = (item, index) => {
   for (let i = 0; i < newsenderarray.length; i++) {
     if (newsenderarray[i].senderUsername == item.username) {
       const unread = newsenderarray[i].totalUnreadMsgs;
-      getTotalInbox(unread);
+      // getTotalInbox(unread);
       getSender(index,unread);
     }
   }
