@@ -597,11 +597,11 @@ const goback = () => {
 // Handle back button
 const handlePopState = () => {
   // Only call goback if in the messenger view
-  if (showmessenger.value && showinbox.value == false) {
+  //if (showmessenger.value && showinbox.value == false) {
     goback()
     // Push another dummy state to stay in history
     history.pushState(null, '')
-  }
+  
 }
 
 // Setup and cleanup
