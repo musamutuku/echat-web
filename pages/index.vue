@@ -589,8 +589,8 @@ const goback = () => {
   showDelete1.value = false;
   delMessage.value = false;
   scrollToTop1();
-  showmessenger.value = !showmessenger.value;
-  showinbox.value = !showinbox.value;
+  showmessenger.value = false;
+  showinbox.value = true;
   message.value = "";
   msgSender.value.innerText = "";
 };
