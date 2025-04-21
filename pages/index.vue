@@ -594,26 +594,7 @@ const goback = () => {
   message.value = "";
   msgSender.value.innerText = "";
 };
-// Handle back button
-const handlePopState = () => {
-  // Only call goback if in the messenger view
-  //if (showmessenger.value && showinbox.value == false) {
-    goback()
-    // Push another dummy state to stay in history
-    history.pushState(null, '')
-  
-}
 
-// Setup and cleanup
-onMounted(() => {
-  // When entering this view, push a dummy state so back button becomes active
-  history.pushState(null, '')
-  window.addEventListener('popstate', handlePopState)
-})
-
-onBeforeUnmount(() => {
-  window.removeEventListener('popstate', handlePopState)
-})
   
 const toggleinbox = () => {
   showinbox.value = true;
