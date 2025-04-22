@@ -269,7 +269,7 @@ const startPress = (msg, event) => {
       modalOpen.value = true;
     }
     isLongPress = true;
-  }, 1000);
+  }, 2000);
 };
 
 const cancelPress = () => {
@@ -335,7 +335,7 @@ const startPress1 = (msg) => {
       msgToCopy.value = msg.message;
       isLongPress1 = true;
     }
-  }, 1000)
+  }, 2000)
 }
 const cancelPress1 = () => {
   clearTimeout(pressTimer1)
