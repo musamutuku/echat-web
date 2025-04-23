@@ -1894,7 +1894,7 @@ function onInput() {
   hasError.value = false; // Remove red border on user input
 }
 const modalOpen = ref(false);
-const showtest = true;
+const showtest = ref(true);
 </script>
 
 <template>
