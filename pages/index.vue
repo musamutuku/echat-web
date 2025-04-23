@@ -454,6 +454,7 @@ onMounted(() => {
   if (process.client) {
     const usertoken1 = localStorage.getItem('user')
     if (usertoken1) {
+      hide2.value = true;
       togglehome();
     }
   }
@@ -474,7 +475,6 @@ const togglehome = () => {
 };
 
 const toggleprofile = () => {
-  hide2.value = true;
   isActive3.value = true;
   isActive.value = false;
   isActive1.value = false;
