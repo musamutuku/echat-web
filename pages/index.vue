@@ -466,12 +466,9 @@ const togglehome = () => {
 
 onMounted(() => {
   const token = localStorage.getItem('user')
-  if (user) {
+  if (token) {
     togglehome();
   }
-  else {
-    alert("hello, no user");
- }
 })
 
 const toggleprofile = () => {
