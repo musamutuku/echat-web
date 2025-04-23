@@ -451,13 +451,13 @@ const toggleshown = () => {
 };
 
 onMounted(() => {
-  const usertoken1 = localStorage.getItem('user')
-  const userdatas = localStorage.getItem('userDatas')
-  if (usertoken1) {
-    hide.value = false;
-    hide1.value = true;
+  if (process.client) {
+    const usertoken1 = localStorage.getItem('user')
+    if (usertoken1) {
+      togglehome();
+    }
   }
-})
+});
   
 const togglehome = () => {
   isActive.value = true;
