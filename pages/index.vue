@@ -454,8 +454,7 @@ onMounted(() => {
   if (process.client) {
     const usertoken1 = localStorage.getItem('user')
     if (usertoken1) {
-      // togglehome();
-      alert(usertoken1);
+      showtest.value = false;
     }
   }
 });
