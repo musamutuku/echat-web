@@ -464,6 +464,13 @@ const togglehome = () => {
   isCollapsed.value = true;
 };
 
+onMounted(() => {
+  const token = localStorage.getItem('user')
+  if (user) {
+    toggleHome();
+  }
+})
+
 const toggleprofile = () => {
   isActive3.value = true;
   isActive.value = false;
