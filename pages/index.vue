@@ -1528,9 +1528,7 @@ onMounted(() => {
     token.value = userToken;
     localStorage.setItem("user", user.value.username);
     localStorage.setItem("token", token.value);
-    localStorage.setItem("userdatas", user.value);
-    console.log("test1", userData);
-    console.log("test2", user.value);
+    localStorage.setItem("userdatas", userData);
     hide.value = false;
     hide1.value = true;
     isActive.value = true;
