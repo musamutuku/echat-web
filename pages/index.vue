@@ -450,6 +450,15 @@ const toggleshown = () => {
   loading.value = true;
 };
 
+onMounted(() => {
+  const usertoken1 = localStorage.getItem('user')
+  const userdatas = localStorage.getItem('userDatas')
+  if (usertoken1) {
+    console.log("my tokenw", usertoken1);
+    socket.emit("loginSuccess", (usertoken1, userdatas);
+  }
+})
+  
 const togglehome = () => {
   isActive.value = true;
   isActive1.value = false;
@@ -463,13 +472,6 @@ const togglehome = () => {
   showprofile.value = false;
   isCollapsed.value = true;
 };
-
-onMounted(() => {
-  const usertoken1 = localStorage.getItem('user')
-  if (usertoken1) {
-    console.log("my tokenw", usertoken1);
-  }
-})
 
 const toggleprofile = () => {
   isActive3.value = true;
@@ -1523,6 +1525,7 @@ onMounted(() => {
     token.value = userToken;
     localStorage.setItem("user", user.value.username);
     localStorage.setItem("token", token.value);
+    localStorage.setItem("userDatas", userData);
     hide.value = false;
     hide1.value = true;
     isActive.value = true;
