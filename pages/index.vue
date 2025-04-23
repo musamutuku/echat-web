@@ -455,7 +455,7 @@ onMounted(() => {
     const usertoken1 = localStorage.getItem('user')
     if (usertoken1) {
       // togglehome();
-      alert(usertoken);
+      alert(usertoken1);
     }
   }
 });
