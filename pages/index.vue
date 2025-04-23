@@ -454,8 +454,7 @@ onMounted(() => {
   const usertoken1 = localStorage.getItem('user')
   const userdatas = localStorage.getItem('userDatas')
   if (usertoken1) {
-    console.log("my tokenw", usertoken1);
-    socket.emit("loginSuccess", (usertoken1, userdatas);
+    socket.emit("loginSuccess", usertoken1, userdatas);
   }
 })
   
