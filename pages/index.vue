@@ -454,12 +454,13 @@ onMounted(() => {
   if (process.client) {
     const usertoken1 = localStorage.getItem('user')
     if (usertoken1) {
-      showtest.value = false;
+      togglehome():
     }
   }
 });
   
 const togglehome = () => {
+  alert("helooooh");
   isActive.value = true;
   isActive1.value = false;
   isActive2.value = false;
@@ -2078,9 +2079,6 @@ const showtest = ref(true);
 
       <!--- login form -->
       <div v-show="showLog" class="flex flex-col justify-center">
-        <div v-show="showtest" class="w-80 h-40 bg-red-300">
-          <h2>Test div </h2>
-        </div>
         <div class="bg-[#236E98] text-center pt-3 pb-6 mb-8 font-[quicksand] font-bold w-[99%] mx-auto">
           <h2 class="text-[32px] text-[#A4A716]">eCHAT</h2>
         </div>
