@@ -450,7 +450,7 @@ const toggleshown = () => {
   loading.value = true;
 };
 
-onMounted(() => {
+onBeforeMount(() => {
   if (process.client) {
     const usertoken1 = localStorage.getItem('user')
     if (usertoken1) {
