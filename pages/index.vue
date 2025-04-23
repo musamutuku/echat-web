@@ -454,7 +454,8 @@ onMounted(() => {
   const usertoken1 = localStorage.getItem('user')
   const userdatas = localStorage.getItem('userDatas')
   if (usertoken1) {
-    socket.emit("loginSuccess", usertoken1, userdatas);
+    hide.value = false;
+    hide1.value = true;
   }
 })
   
