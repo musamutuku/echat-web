@@ -467,7 +467,7 @@ const togglehome = () => {
 onMounted(() => {
   const token = localStorage.getItem('user')
   if (user) {
-    toggleHome();
+    togglehome();
   }
 })
 
