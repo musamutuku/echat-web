@@ -469,6 +469,9 @@ onMounted(() => {
   if (user) {
     togglehome();
   }
+  else {
+    alert("hello, no user");
+ }
 })
 
 const toggleprofile = () => {
