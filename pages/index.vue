@@ -61,8 +61,8 @@ const isdisabledOtpInput3 = ref(true);
 const isdisabledOtpInput4 = ref(true);
 const isFocused = ref(false);
 const isFocused1 = ref(false);
-const hide = ref(false);
-const hide1 = ref(true);
+const hide = ref(true);
+const hide1 = ref(false);
 const hide2 = ref(false);
 const showsuccess = ref(false);
 const showerror = ref(false);
@@ -450,14 +450,14 @@ const toggleshown = () => {
   loading.value = true;
 };
 
-// onMounted(() => {
-//   if (process.client) {
-//     const usertoken1 = localStorage.getItem('user')
-//     if (usertoken1) {
-//       togglehome();
-//     }
-//   }
-// });
+onMounted(() => {
+  if (process.client) {
+    const usertoken1 = localStorage.getItem('user')
+    if (usertoken1) {
+      togglehome();
+    }
+  }
+});
   
 const togglehome = () => {
   isActive.value = true;
@@ -474,6 +474,7 @@ const togglehome = () => {
 };
 
 const toggleprofile = () => {
+  hide2.value = true;
   isActive3.value = true;
   isActive.value = false;
   isActive1.value = false;
@@ -1525,7 +1526,6 @@ onMounted(() => {
     token.value = userToken;
     localStorage.setItem("user", user.value.username);
     localStorage.setItem("token", token.value);
-    localStorage.setItem("userDatas", userData);
     hide.value = false;
     hide1.value = true;
     isActive.value = true;
