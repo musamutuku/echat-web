@@ -457,8 +457,8 @@ onMounted(() => {
     const userdt = localStorage.getItem('userdt');
     if (usertoken1) {
       hide2.value = true;
-      console.log("user001", userdatas);
-      console.log("user002", userdt)
+      console.log("user001", userdatas.username);
+      console.log("user002", userdt.username)
       togglehome();
     }
   }
