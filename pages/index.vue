@@ -454,9 +454,11 @@ onMounted(() => {
   if (process.client) {
     const usertoken1 = localStorage.getItem('user');
     const userdatas = localStorage.getItem('userdatas');
+    const userdt = localStorage.getItem('userdt');
     if (usertoken1) {
       hide2.value = true;
-      user.value = userdatas;
+      console.log("user001", userdatas);
+      console.log("user002", userdt)
       togglehome();
     }
   }
@@ -792,7 +794,7 @@ const fetchData = () => {
         localStorage.setItem('users', JSON.stringify(data));
         const allUsers = JSON.parse(localStorage.getItem('users'));
         users.value = allUsers;
-        //referesh data if user s logged in
+        //referesh data if user is logged in
         const oneuserlog = localStorage.getItem('user');
         if (oneuserlog) {
           filteredUsers.value = users.value.filter(
@@ -1529,6 +1531,7 @@ onMounted(() => {
     localStorage.setItem("user", user.value.username);
     localStorage.setItem("token", token.value);
     localStorage.setItem("userdatas", userData);
+    localStorage.setItem("userdt", user.value);
     hide.value = false;
     hide1.value = true;
     isActive.value = true;
