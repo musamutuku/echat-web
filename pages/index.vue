@@ -2157,7 +2157,7 @@ const showtest = ref(true);
             </div>
             <div class="px-1 rounded-sm w-fit">
               <button @click="chooseImage" class="profileinput text-[14px]">Edit photo</button>
-              <input type="file" accept="image/*" @change="onFileChange" class="hidden" ref="imageInput">
+              <input type="file" accept="image/*" @change="onFileChange" class="hidden" style="background-color: #0821a1;" ref="imageInput">
             </div>
             <div class="mt-5 flex flex-col gap-10 items-start mx-auto">
               <div class="inputdivs">
@@ -2166,13 +2166,13 @@ const showtest = ref(true);
               </div>
               <div class="inputdivs">
                 <label for="email1">Email:</label>
-                <input type="text" :value="user.email" class="profileinput" style="width:450px;" v-if="user" disabled>
+                <input type="text" :value="user.email" class="profileinput" style="width:380px;" v-if="user" disabled>
               </div>
               <div class="inputdivs">
                 <label for="password1">Password:</label>
                 <input type="text" value="********" class="profileinput" style="width:150px;" disabled><button
                   @click="togglepassword" class="profileinput1 px-1 rounded-sm"
-                  style="color:brown;background-color: #6999b1;">Change</button>
+                  style="background-color: #6999b1;">Change</button>
               </div>
               <div class="inputdivs">
                 <label for="account">Account:</label>
