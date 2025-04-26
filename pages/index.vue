@@ -1896,7 +1896,7 @@ const uploadImage = async () => {
   formData.append('username', username);
   
   try {
-    const response = await fetch(`${host_server}/upload`, {
+    const response = await fetch(`${host_server}/uploads`, {
       method: 'POST',
       body: formData,
     });
