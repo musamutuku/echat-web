@@ -459,13 +459,6 @@ onMounted(() => {
     if (usertoken1) {
       hide2.value = true;
       togglehome();
-      if (user.value.profile_image) {
-        // imageUrl.value = `${host_server}/uploads/${user.value.profile_image}`
-        imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
-      }
-      else {
-        imageUrl.value = profileImage;
-      }
     }
   }
 });
@@ -1542,13 +1535,13 @@ onMounted(() => {
     hide1.value = true;
     isActive.value = true;
     hide2.value = true;
-    if (user.value.profile_image) {
-      // imageUrl.value = `${host_server}/uploads/${user.value.profile_image}`
-      imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
-    }
-    else {
-      imageUrl.value = profileImage;
-    }
+    // if (user.value.profile_image) {
+    //   // imageUrl.value = `${host_server}/uploads/${user.value.profile_image}`
+    //   imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
+    // }
+    // else {
+    //   imageUrl.value = profileImage;
+    // }
     setTimeout(() => {
       hideFeedback.value = false;
     }, 3000);
