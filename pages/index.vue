@@ -459,6 +459,12 @@ onMounted(() => {
     if (usertoken1) {
       hide2.value = true;
       togglehome();
+      if (user.value.profile_image) {
+        imageUrl.value = `${host_server}/uploads/${user.value.profile_image}`
+      }
+      else {
+        imageUrl.value = profileImage;
+      }
     }
   }
 });
@@ -2164,7 +2170,7 @@ const showtest = ref(true);
               </div>
               <div class="inputdivs">
                 <label for="email1">Email:</label>
-                <input type="text" :value="user.email" class="profileinput" style="width:250px;" v-if="user" disabled>
+                <input type="text" :value="user.email" class="profileinput" style="width:240px;" v-if="user" disabled>
               </div>
               <div class="inputdivs">
                 <label for="password1">Password:</label>
