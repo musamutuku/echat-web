@@ -2166,19 +2166,19 @@ const showtest = ref(true);
               </div>
               <div class="inputdivs">
                 <label for="email1">Email:</label>
-                <input type="text" :value="user.email" class="profileinput" v-if="user" disabled>
+                <input type="text" :value="user.email" class="profileinput" style="width:450px;" v-if="user" disabled>
               </div>
               <div class="inputdivs">
                 <label for="password1">Password:</label>
                 <input type="text" value="********" class="profileinput" style="width:150px;" disabled><button
                   @click="togglepassword" class="profileinput1 px-1 rounded-sm"
-                  style="color:brown;background-color: #bbb1ff;">Change</button>
+                  style="color:brown;background-color: #6999b1;">Change</button>
               </div>
               <div class="inputdivs">
                 <label for="account">Account:</label>
                 <input type="text" value="active" class="profileinput" style="width:150px;" disabled><button
                   @click="toggledelete" class="profileinput1 px-1 rounded-sm"
-                  style="color:brown;background-color: #6999b1;">Delete</button>
+                  style="background-color: brown;">Delete</button>
               </div>
             </div>
           </div>
@@ -2565,12 +2565,12 @@ const showtest = ref(true);
   background-color: rgb(226 232 240);
   color: rgb(32, 35, 39);
   border-radius: 0.125rem;
-  max-width: 380px;
+  max-width: 280px;
   padding: 5px;
 }
 
 .profileinput1 {
-  color: brown;
+  color: white;
   max-width: 280px;
   padding: 5px;
 }
