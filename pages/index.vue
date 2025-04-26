@@ -457,7 +457,7 @@ onMounted(() => {
     if (usertoken1) {
       hide2.value = true;
       user.value = userinfo;
-      console.log("userddtt", userinfo.username);
+      console.log("userddtt", user.value.username);
       togglehome();
     }
   }
