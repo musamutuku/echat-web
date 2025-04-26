@@ -454,10 +454,13 @@ onMounted(() => {
   if (process.client) {
     const usertoken1 = localStorage.getItem('user');
     const userinfo = localStorage.getItem('userinfo');
+    const userinfo1 = localStorage.getItem('userinfo1');
     if (usertoken1) {
       hide2.value = true;
-      user.value = userinfo;
-      console.log("userddtt", user.value.username);
+      console.log("userddtt", userinfo.username);
+      console.log("userddtt", userinfo1.username);
+      console.log("userddtt", userinfo);
+      console.log("userddtt", userinfo1);
       togglehome();
     }
   }
@@ -1531,6 +1534,7 @@ onMounted(() => {
     localStorage.setItem("token", token.value);
     localStorage.setItem("email", user.value.email);
     localStorage.setItem("userinfo", user.value);
+    localStorage.setItem("userinfo1", userData);
     hide.value = false;
     hide1.value = true;
     isActive.value = true;
