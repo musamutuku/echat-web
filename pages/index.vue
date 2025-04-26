@@ -458,8 +458,6 @@ onMounted(() => {
     user.value = userObject;
     if (usertoken1) {
       hide2.value = true;
-      console.log("userinnffo", user.value);
-      console.log("usernnamme", user.value.username);
       togglehome();
     }
   }
@@ -2156,8 +2154,8 @@ const showtest = ref(true);
               <img :src="imageUrl" class="rounded-[100%] w-[100%] h-[100%]" /><br>
             </div>
             <div class="px-1 rounded-sm w-fit">
-              <button @click="chooseImage" class="profileinput text-[14px]">Edit photo</button>
-              <input type="file" accept="image/*" @change="onFileChange" class="hidden" style="background-color: #0821a1;" ref="imageInput">
+              <button @click="chooseImage" class="profileinput text-[14px]" style="color: #0821a1;">Edit photo</button>
+              <input type="file" accept="image/*" @change="onFileChange" class="hidden" ref="imageInput">
             </div>
             <div class="mt-5 flex flex-col gap-10 items-start mx-auto">
               <div class="inputdivs">
