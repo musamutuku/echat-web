@@ -460,7 +460,8 @@ onMounted(() => {
       hide2.value = true;
       togglehome();
       if (user.value.profile_image) {
-        imageUrl.value = `${host_server}/uploads/${user.value.profile_image}`
+        // imageUrl.value = `${host_server}/uploads/${user.value.profile_image}`
+        imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
       }
       else {
         imageUrl.value = profileImage;
@@ -1542,7 +1543,8 @@ onMounted(() => {
     isActive.value = true;
     hide2.value = true;
     if (user.value.profile_image) {
-      imageUrl.value = `${host_server}/uploads/${user.value.profile_image}`
+      // imageUrl.value = `${host_server}/uploads/${user.value.profile_image}`
+      imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
     }
     else {
       imageUrl.value = profileImage;
@@ -1856,30 +1858,66 @@ const logout = () => {
 };
 
 //upload or edit profile photo
+// import profileImage from '~/assets/images/user_profile.svg'
+
+// const imageUrl = ref(profileImage);
+// const imageFile = ref(null);
+// const imageInput = ref(null);
+// const uploadImage = async () => {
+//   const username = user.value.username;
+//   const formData = new FormData();
+//   formData.append('image', imageFile.value)
+//   formData.append('username', username)
+//   try {
+//     const response = await fetch(`${host_server}/upload`,
+//       {
+//         method: 'POST',
+//         body: formData,
+//       })
+//     const data = await response.json()
+//     imageUrl.value = `${host_server}/uploads/${data.filename}`
+//   } catch (error) {
+//     console.error("Error in uploading image:", error);
+//   }
+// }
+
+// const chooseImage = (event) => {
+//   imageInput.value.click();
+// }
+
+// const onFileChange = (event) => {
+//   imageFile.value = event.target.files[0];
+//   uploadImage();
+// }
+
 import profileImage from '~/assets/images/user_profile.svg'
 
 const imageUrl = ref(profileImage);
 const imageFile = ref(null);
 const imageInput = ref(null);
+
 const uploadImage = async () => {
   const username = user.value.username;
   const formData = new FormData();
-  formData.append('image', imageFile.value)
-  formData.append('username', username)
+  formData.append('image', imageFile.value);
+  formData.append('username', username);
+  
   try {
-    const response = await fetch(`${host_server}/upload`,
-      {
-        method: 'POST',
-        body: formData,
-      })
-    const data = await response.json()
-    imageUrl.value = `${host_server}/uploads/${data.filename}`
+    const response = await fetch(`${host_server}/upload`, {
+      method: 'POST',
+      body: formData,
+    });
+    const data = await response.json();
+
+    // IMPORTANT: update how we set the image now
+    imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
+
   } catch (error) {
     console.error("Error in uploading image:", error);
   }
 }
 
-const chooseImage = (event) => {
+const chooseImage = () => {
   imageInput.value.click();
 }
 
@@ -1887,7 +1925,7 @@ const onFileChange = (event) => {
   imageFile.value = event.target.files[0];
   uploadImage();
 }
-
+  
 const usernameInput = ref(null);
 const hasError = ref(false);
 function validate() {
