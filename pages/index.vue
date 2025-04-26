@@ -2565,7 +2565,7 @@ const showtest = ref(true);
   background-color: rgb(226 232 240);
   color: rgb(32, 35, 39);
   border-radius: 0.125rem;
-  max-width: 280px;
+  max-width: 380px;
   padding: 5px;
 }
 
