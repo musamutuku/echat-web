@@ -2164,7 +2164,7 @@ const showtest = ref(true);
               </div>
               <div class="inputdivs">
                 <label for="email1">Email:</label>
-                <input type="text" :value="user.email" class="profileinput" style="width:340px;" v-if="user" disabled>
+                <input type="text" :value="user.email" class="profileinput" style="width:300px;" v-if="user" disabled>
               </div>
               <div class="inputdivs">
                 <label for="password1">Password:</label>
