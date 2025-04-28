@@ -1858,43 +1858,38 @@ const logout = () => {
 };
 
 //upload or edit profile photo
-// import profileImage from '~/assets/images/user_profile.svg'
-
-// const imageUrl = ref(profileImage);
-// const imageFile = ref(null);
-// const imageInput = ref(null);
-// const uploadImage = async () => {
-//   const username = user.value.username;
-//   const formData = new FormData();
-//   formData.append('image', imageFile.value)
-//   formData.append('username', username)
-//   try {
-//     const response = await fetch(`${host_server}/upload`,
-//       {
-//         method: 'POST',
-//         body: formData,
-//       })
-//     const data = await response.json()
-//     imageUrl.value = `${host_server}/uploads/${data.filename}`
-//   } catch (error) {
-//     console.error("Error in uploading image:", error);
-//   }
-// }
-
-// const chooseImage = (event) => {
-//   imageInput.value.click();
-// }
-
-// const onFileChange = (event) => {
-//   imageFile.value = event.target.files[0];
-//   uploadImage();
-// }
-
 import profileImage from '~/assets/images/user_profile.svg'
 
 const imageUrl = ref(profileImage);
 const imageFile = ref(null);
 const imageInput = ref(null);
+
+// const uploadImage = async () => {
+//   const username = user.value.username;
+//   const formData = new FormData();
+//   formData.append('image', imageFile.value);
+//   formData.append('username', username);
+
+//   try {
+//     const response = await fetch(`${host_server}/upload`, {
+//       method: 'POST',
+//       body: formData,
+//     });
+
+//     if (!response.ok) {
+//       const errorData = await response.json();
+//       console.error('Server Error:', errorData.error);
+//       return;
+//     }
+
+//     const data = await response.json();
+//     // Now we are receiving base64 image data
+//     imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
+
+//   } catch (error) {
+//     console.error("Error in uploading image:", error);
+//   }
+// }
 
 const uploadImage = async () => {
   const username = user.value.username;
@@ -1903,25 +1898,26 @@ const uploadImage = async () => {
   formData.append('username', username);
 
   try {
+    isImageLoading.value = true; // Start loading when uploading
     const response = await fetch(`${host_server}/upload`, {
       method: 'POST',
       body: formData,
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Server Error:', errorData.error);
-      return;
+    const data = await response.json();
+
+    // After uploading, fetch the new profile image
+    if (data.filename) {
+      await fetchProfileImage(); // Refresh the profile image after upload
     }
 
-    const data = await response.json();
-    // Now we are receiving base64 image data
-    imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
-
+    isImageLoading.value = false; // Stop loading after upload and fetch
   } catch (error) {
-    console.error("Error in uploading image:", error);
+    console.error('Error in uploading image:', error);
+    isImageLoading.value = false; // Stop loading even if error happens
   }
-}
+};
+
 
 const chooseImage = (event) => {
   imageInput.value.click();
@@ -1932,6 +1928,23 @@ const onFileChange = (event) => {
   uploadImage();
 }
 
+// const fetchProfileImage = async () => {
+//   const username = user.value.username;
+//   try {
+//     const response = await fetch(`${host_server}/get-profile-image/${username}`);
+//     const data = await response.json();
+//     if (data.imageData) {
+//       imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
+//     } else {
+//       imageUrl.value = profileImage; // default local image
+//     }
+//   } catch (error) {
+//     console.error('Error fetching profile image:', error);
+//   }
+// };
+
+const isImageLoading = ref(true); // Add a loading flag
+
 const fetchProfileImage = async () => {
   const username = user.value.username;
   try {
@@ -1940,22 +1953,16 @@ const fetchProfileImage = async () => {
     if (data.imageData) {
       imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
     } else {
-      imageUrl.value = profileImage; // default local image
+      imageUrl.value = profileImage; // fallback to default
     }
+    isImageLoading.value = false; // Set loading flag to false once image is loaded
   } catch (error) {
     console.error('Error fetching profile image:', error);
+    isImageLoading.value = false; // Set loading flag to false even if there's an error
   }
 };
 
-// onMounted(async () => {
-//   if (user.value.username) {
-//     await fetchProfileImage();
-//   }
-// });
 
-
-
-  
 const usernameInput = ref(null);
 const hasError = ref(false);
 function validate() {
@@ -2225,7 +2232,8 @@ const showtest = ref(true);
           </div>
           <div class="flex flex-col items-center">
             <div class="w-[20%] rounded-[50%] h-[75px] flex flex-col">
-              <img :src="imageUrl" class="rounded-[100%] w-[100%] h-[100%]" /><br>
+              <img v-if="isImageLoading" src="/imgloader.gif" alt="Loading..." />
+              <img v-else :src="imageUrl" class="rounded-[100%] w-[100%] h-[100%]" /><br>
             </div>
             <div class="px-1 rounded-sm w-fit">
               <button @click="chooseImage" class="profileinput text-[14px]" style="color: #0821a1;">Edit photo</button>
