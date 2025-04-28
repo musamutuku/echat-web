@@ -1519,6 +1519,7 @@ const deleteAccount = () => {
 onMounted(() => {
   // Listen for login success or failure events
   socket.on("loginSuccess", (userData, userToken) => {
+    await fetchProfileImage();
     loadingMsg.value = false;
     loading.value = false;
     hideWaitMsg.value = "SIGN IN";
@@ -1924,6 +1925,28 @@ const onFileChange = (event) => {
   imageFile.value = event.target.files[0];
   uploadImage();
 }
+
+const fetchProfileImage = async () => {
+  const username = user.value.username;
+  try {
+    const response = await fetch(`${host_server}/get-profile-image/${username}`);
+    const data = await response.json();
+    if (data.imageData) {
+      imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
+    } else {
+      imageUrl.value = profileImage; // default local image
+    }
+  } catch (error) {
+    console.error('Error fetching profile image:', error);
+  }
+};
+
+onMounted(() => {
+  if (user.value.username) {
+    fetchProfileImage();
+  }
+});
+
 
   
 const usernameInput = ref(null);
