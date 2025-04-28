@@ -1519,7 +1519,7 @@ const deleteAccount = () => {
 onMounted(() => {
   // Listen for login success or failure events
   socket.on("loginSuccess", (userData, userToken) => {
-    await fetchProfileImage();
+    fetchProfileImage();
     loadingMsg.value = false;
     loading.value = false;
     hideWaitMsg.value = "SIGN IN";
@@ -1941,11 +1941,12 @@ const fetchProfileImage = async () => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
   if (user.value.username) {
-    fetchProfileImage();
+    await fetchProfileImage();
   }
 });
+
 
 
   
