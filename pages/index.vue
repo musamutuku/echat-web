@@ -1894,15 +1894,21 @@ const uploadImage = async () => {
   const formData = new FormData();
   formData.append('image', imageFile.value);
   formData.append('username', username);
-  
+
   try {
     const response = await fetch(`${host_server}/upload`, {
       method: 'POST',
       body: formData,
     });
-    const data = await response.json();
 
-    // IMPORTANT: update how we set the image now
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Server Error:', errorData.error);
+      return;
+    }
+
+    const data = await response.json();
+    // Now we are receiving base64 image data
     imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
 
   } catch (error) {
@@ -1910,7 +1916,7 @@ const uploadImage = async () => {
   }
 }
 
-const chooseImage = () => {
+const chooseImage = (event) => {
   imageInput.value.click();
 }
 
@@ -1918,6 +1924,7 @@ const onFileChange = (event) => {
   imageFile.value = event.target.files[0];
   uploadImage();
 }
+
   
 const usernameInput = ref(null);
 const hasError = ref(false);
