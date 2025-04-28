@@ -455,6 +455,7 @@ onMounted(() => {
     const usertoken1 = localStorage.getItem('user');
     const storedUser = localStorage.getItem('userinfo');
     const userObject = JSON.parse(storedUser);
+    fetchProfileImage();
     user.value = userObject;
     if (usertoken1) {
       hide2.value = true;
@@ -1941,11 +1942,11 @@ const fetchProfileImage = async () => {
   }
 };
 
-onMounted(async () => {
-  if (user.value.username) {
-    await fetchProfileImage();
-  }
-});
+// onMounted(async () => {
+//   if (user.value.username) {
+//     await fetchProfileImage();
+//   }
+// });
 
 
 
