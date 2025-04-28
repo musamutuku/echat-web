@@ -450,20 +450,25 @@ const toggleshown = () => {
   loading.value = true;
 };
 
-onMounted(() => {
+onMounted(async () => {
   if (process.client) {
     const usertoken1 = localStorage.getItem('user');
     const storedUser = localStorage.getItem('userinfo');
     const userObject = JSON.parse(storedUser);
-    fetchProfileImage();
     user.value = userObject;
+    
     if (usertoken1) {
       hide2.value = true;
       togglehome();
+      
+      // Add this to fetch the profile image if user exists
+      if (userObject.username) {
+        await fetchProfileImage();
+      }
     }
   }
 });
-  
+
 const togglehome = () => {
   isActive.value = true;
   isActive1.value = false;
