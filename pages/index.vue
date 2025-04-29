@@ -1999,7 +1999,8 @@ const uploadImage = async () => {
     const data = await response.json();
 
     if (response.ok) {
-      await fetchProfileImage(); // Immediately refresh the new profile image
+      // await fetchProfileImage(); // Immediately refresh the new profile image
+      console.log("upload success");
     } else {
       console.error('Error uploading:', data.error);
     }
@@ -2027,7 +2028,6 @@ const fetchProfileImage = async () => {
     const data = await response.json();
     if (response.ok && data.imageData) {
       imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
-      console.log("here is img", imageUrl.value)
     } else {
       imageUrl.value = profileImage; // fallback if no image
     }
