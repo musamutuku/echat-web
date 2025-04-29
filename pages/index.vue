@@ -462,8 +462,7 @@ onMounted(async () => {
       togglehome();
 
       // 🔄 Fetch image after user is loaded
-      console.log("user here", user.value.username)
-      await fetchProfileImage();
+      // await fetchProfileImage();
     }
   }
 });
