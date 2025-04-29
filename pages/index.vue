@@ -462,7 +462,7 @@ onMounted(async () => {
       togglehome();
 
       // 🔄 Fetch image after user is loaded
-      await fetchProfileImage();
+      // await fetchProfileImage();
     }
   }
 });
@@ -1524,7 +1524,7 @@ const deleteAccount = () => {
 onMounted(() => {
   // Listen for login success or failure events
   socket.on("loginSuccess", (userData, userToken) => {
-    fetchProfileImage();
+    // fetchProfileImage();
     loadingMsg.value = false;
     loading.value = false;
     hideWaitMsg.value = "SIGN IN";
