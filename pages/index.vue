@@ -2021,20 +2021,20 @@ const onFileChange = (event) => {
   uploadImage();
 };
 
-// const fetchProfileImage = async () => {
-//   const username = user.value.username;
-//   try {
-//     const response = await fetch(`${host_server}/get-profile-image/${username}`);
-//     const data = await response.json();
-//     if (response.ok && data.imageData) {
-//       imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
-//     } else {
-//       imageUrl.value = profileImage; // fallback if no image
-//     }
-//   } catch (error) {
-//     console.error('Error fetching profile image:', error);
-//   }
-// };
+const fetchProfileImage = async () => {
+  const username = user.value.username;
+  try {
+    const response = await fetch(`${host_server}/get-profile-image/${username}`);
+    const data = await response.json();
+    if (response.ok && data.imageData) {
+      imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
+    } else {
+      imageUrl.value = profileImage; // fallback if no image
+    }
+  } catch (error) {
+    console.error('Error fetching profile image:', error);
+  }
+};
 
 const usernameInput = ref(null);
 const hasError = ref(false);
