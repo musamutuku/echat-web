@@ -451,7 +451,6 @@ const toggleshown = () => {
 };
 
 onMounted( async() => {
-  await fetchProfileImage();
   if (process.client) {
     const usertoken1 = localStorage.getItem('user');
     const storedUser = localStorage.getItem('userinfo');
@@ -461,6 +460,7 @@ onMounted( async() => {
     if (usertoken1) {
       hide2.value = true;
       togglehome();
+      await fetchProfileImage();
     }
   }
 });
@@ -1519,10 +1519,10 @@ const deleteAccount = () => {
 };
 
 
-onMounted(() => {
+onMounted( async() => {
   // Listen for login success or failure events
   socket.on("loginSuccess", (userData, userToken) => {
-    // fetchProfileImage();
+    await fetchProfileImage();
     loadingMsg.value = false;
     loading.value = false;
     hideWaitMsg.value = "SIGN IN";
@@ -2413,8 +2413,7 @@ const showtest = ref(true);
           <div class="flex justify-between mx-3 mt-3">
             <span class="w-[10%] cursor-pointer" @click="showmenu"><img src="@/assets/images/menu.svg" /></span>
             <span class="w-[18%] rounded-[50%] h-[70px] hover:cursor-pointer">
-              <img v-if="isImageLoading" src="/imgloader.gif" alt="Loading..." />
-              <img v-else :src="imageUrl"
+              <img :src="imageUrl"
                 class="rounded-[100%] h-[100%] w-[100%]" /></span>
           </div>
           <span class="font-[quicksand] text-[30px] text-[#A4A716] my-5 leading-10 font-bold">Welcome to Fast Chat
