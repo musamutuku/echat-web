@@ -1998,7 +1998,6 @@ const uploadImage = async () => {
 
     if (response.ok) {
       await fetchProfileImage(); // Immediately refresh the new profile image
-      console.log("upload success");
     } else {
       console.error('Error uploading:', data.error);
     }
@@ -2031,6 +2030,8 @@ const fetchProfileImage = async () => {
     }
   } catch (error) {
     console.error('Error fetching profile image:', error);
+  } finally {
+    isImageLoading.value = false;
   }
 };
 
