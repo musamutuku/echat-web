@@ -1542,13 +1542,6 @@ onMounted(() => {
     hide1.value = true;
     isActive.value = true;
     hide2.value = true;
-    // if (user.value.profile_image) {
-    //   // imageUrl.value = `${host_server}/uploads/${user.value.profile_image}`
-    //   imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
-    // }
-    // else {
-    //   imageUrl.value = profileImage;
-    // }
     setTimeout(() => {
       hideFeedback.value = false;
     }, 3000);
@@ -1858,12 +1851,11 @@ const logout = () => {
 };
 
 //upload or edit profile photo
-import profileImage from '~/assets/images/user_profile.svg'
+// import profileImage from '~/assets/images/user_profile.svg'
 
-const imageUrl = ref(profileImage);
-const imageFile = ref(null);
-const imageInput = ref(null);
-
+// const imageUrl = ref(profileImage);
+// const imageFile = ref(null);
+// const imageInput = ref(null);
 // const uploadImage = async () => {
 //   const username = user.value.username;
 //   const formData = new FormData();
@@ -1871,62 +1863,38 @@ const imageInput = ref(null);
 //   formData.append('username', username);
 
 //   try {
+//     isImageLoading.value = true; // Start loading when uploading
 //     const response = await fetch(`${host_server}/upload`, {
 //       method: 'POST',
 //       body: formData,
 //     });
 
-//     if (!response.ok) {
-//       const errorData = await response.json();
-//       console.error('Server Error:', errorData.error);
-//       return;
+//     const data = await response.json();
+
+//     // After uploading, fetch the new profile image
+//     if (data.filename) {
+//       await fetchProfileImage(); // Refresh the profile image after upload
 //     }
 
-//     const data = await response.json();
-//     // Now we are receiving base64 image data
-//     imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
-
+//     isImageLoading.value = false; // Stop loading after upload and fetch
 //   } catch (error) {
-//     console.error("Error in uploading image:", error);
+//     console.error('Error in uploading image:', error);
+//     isImageLoading.value = false; // Stop loading even if error happens
 //   }
+// };
+
+
+// const chooseImage = (event) => {
+//   imageInput.value.click();
 // }
 
-const uploadImage = async () => {
-  const username = user.value.username;
-  const formData = new FormData();
-  formData.append('image', imageFile.value);
-  formData.append('username', username);
-
-  try {
-    isImageLoading.value = true; // Start loading when uploading
-    const response = await fetch(`${host_server}/upload`, {
-      method: 'POST',
-      body: formData,
-    });
-
-    const data = await response.json();
-
-    // After uploading, fetch the new profile image
-    if (data.filename) {
-      await fetchProfileImage(); // Refresh the profile image after upload
-    }
-
-    isImageLoading.value = false; // Stop loading after upload and fetch
-  } catch (error) {
-    console.error('Error in uploading image:', error);
-    isImageLoading.value = false; // Stop loading even if error happens
-  }
-};
+// const onFileChange = (event) => {
+//   imageFile.value = event.target.files[0];
+//   uploadImage();
+// }
 
 
-const chooseImage = (event) => {
-  imageInput.value.click();
-}
-
-const onFileChange = (event) => {
-  imageFile.value = event.target.files[0];
-  uploadImage();
-}
+// const isImageLoading = ref(true); // Add a loading flag
 
 // const fetchProfileImage = async () => {
 //   const username = user.value.username;
@@ -1936,32 +1904,137 @@ const onFileChange = (event) => {
 //     if (data.imageData) {
 //       imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
 //     } else {
-//       imageUrl.value = profileImage; // default local image
+//       imageUrl.value = profileImage; // fallback to default
 //     }
+//     isImageLoading.value = false; // Set loading flag to false once image is loaded
 //   } catch (error) {
 //     console.error('Error fetching profile image:', error);
+//     isImageLoading.value = false; // Set loading flag to false even if there's an error
 //   }
 // };
 
-const isImageLoading = ref(true); // Add a loading flag
+// upload or edit profile photo
+// import profileImage from '~/assets/images/user_profile.svg';
+
+// const imageUrl = ref(profileImage);
+// const imageFile = ref(null);
+// const imageInput = ref(null);
+// const isImageLoading = ref(true); // loading state for image
+
+// // Choose image from file input
+// const chooseImage = () => {
+//   imageInput.value.click();
+// };
+
+// // On file selection
+// const onFileChange = (event) => {
+//   imageFile.value = event.target.files[0];
+//   uploadImage();
+// };
+
+// // Upload the image to backend
+// const uploadImage = async () => {
+//   const username = user.value.username;
+//   const formData = new FormData();
+//   formData.append('image', imageFile.value);
+//   formData.append('username', username);
+
+//   try {
+//     isImageLoading.value = true;
+//     const response = await fetch(`${host_server}/upload`, {
+//       method: 'POST',
+//       body: formData,
+//     });
+//     const data = await response.json();
+
+//     if (data.filename) {
+//       await fetchProfileImage(); // Refresh image from server
+//     }
+//   } catch (error) {
+//     console.error('Error in uploading image:', error);
+//   } finally {
+//     isImageLoading.value = false;
+//   }
+// };
+
+// // Fetch the image from the backend
+// const fetchProfileImage = async () => {
+//   const username = user.value.username;
+//   try {
+//     const response = await fetch(`${host_server}/get-profile-image/${username}`);
+//     const data = await response.json();
+//     if (data.imageData) {
+//       imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
+//     } else {
+//       imageUrl.value = profileImage; // default fallback
+//     }
+//   } catch (error) {
+//     console.error('Error fetching profile image:', error);
+//     imageUrl.value = profileImage;
+//   } finally {
+//     isImageLoading.value = false;
+//   }
+// };
+
+
+import profileImage from '~/assets/images/user_profile.svg';
+
+const imageUrl = ref(profileImage);
+const imageFile = ref(null);
+const imageInput = ref(null);
+const isImageLoading = ref(true);
+
+const uploadImage = async () => {
+  const username = user.value.username;
+  const formData = new FormData();
+  formData.append('image', imageFile.value);
+  formData.append('username', username);
+
+  try {
+    isImageLoading.value = true;
+    const response = await fetch(`${host_server}/upload`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      await fetchProfileImage(); // Immediately refresh the new profile image
+    } else {
+      console.error('Error uploading:', data.error);
+    }
+
+  } catch (error) {
+    console.error('Error in uploading image:', error);
+  } finally {
+    isImageLoading.value = false;
+  }
+};
+
+const chooseImage = () => {
+  imageInput.value.click();
+};
+
+const onFileChange = (event) => {
+  imageFile.value = event.target.files[0];
+  uploadImage();
+};
 
 const fetchProfileImage = async () => {
   const username = user.value.username;
   try {
     const response = await fetch(`${host_server}/get-profile-image/${username}`);
     const data = await response.json();
-    if (data.imageData) {
+    if (response.ok && data.imageData) {
       imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
     } else {
-      imageUrl.value = profileImage; // fallback to default
+      imageUrl.value = profileImage; // fallback if no image
     }
-    isImageLoading.value = false; // Set loading flag to false once image is loaded
   } catch (error) {
     console.error('Error fetching profile image:', error);
-    isImageLoading.value = false; // Set loading flag to false even if there's an error
   }
 };
-
 
 const usernameInput = ref(null);
 const hasError = ref(false);
