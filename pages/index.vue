@@ -2416,7 +2416,8 @@ const showtest = ref(true);
           <div class="flex justify-between mx-3 mt-3">
             <span class="w-[10%] cursor-pointer" @click="showmenu"><img src="@/assets/images/menu.svg" /></span>
             <span class="w-[18%] rounded-[50%] h-[70px] hover:cursor-pointer">
-              <img :src="imageUrl"
+              <img v-if="isImageLoading" src="/imgloader.gif" alt="Loading..." />
+              <img v-else :src="imageUrl"
                 class="rounded-[100%] h-[100%] w-[100%]" /></span>
           </div>
           <span class="font-[quicksand] text-[30px] text-[#A4A716] my-5 leading-10 font-bold">Welcome to Fast Chat
