@@ -456,18 +456,17 @@ onMounted(async () => {
     const storedUser = localStorage.getItem('userinfo');
     const userObject = JSON.parse(storedUser);
     user.value = userObject;
-    
+
     if (usertoken1) {
       hide2.value = true;
       togglehome();
-      
-      // Add this to fetch the profile image if user exists
-      if (userObject.username) {
-        await fetchProfileImage();
-      }
+
+      // 🔄 Fetch image after user is loaded
+      await fetchProfileImage();
     }
   }
 });
+
 
 const togglehome = () => {
   isActive.value = true;
