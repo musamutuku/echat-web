@@ -1848,132 +1848,6 @@ const logout = () => {
 };
 
 //upload or edit profile photo
-// import profileImage from '~/assets/images/user_profile.svg'
-
-// const imageUrl = ref(profileImage);
-// const imageFile = ref(null);
-// const imageInput = ref(null);
-// const uploadImage = async () => {
-//   const username = user.value.username;
-//   const formData = new FormData();
-//   formData.append('image', imageFile.value);
-//   formData.append('username', username);
-
-//   try {
-//     isImageLoading.value = true; // Start loading when uploading
-//     const response = await fetch(`${host_server}/upload`, {
-//       method: 'POST',
-//       body: formData,
-//     });
-
-//     const data = await response.json();
-
-//     // After uploading, fetch the new profile image
-//     if (data.filename) {
-//       await fetchProfileImage(); // Refresh the profile image after upload
-//     }
-
-//     isImageLoading.value = false; // Stop loading after upload and fetch
-//   } catch (error) {
-//     console.error('Error in uploading image:', error);
-//     isImageLoading.value = false; // Stop loading even if error happens
-//   }
-// };
-
-
-// const chooseImage = (event) => {
-//   imageInput.value.click();
-// }
-
-// const onFileChange = (event) => {
-//   imageFile.value = event.target.files[0];
-//   uploadImage();
-// }
-
-
-// const isImageLoading = ref(true); // Add a loading flag
-
-// const fetchProfileImage = async () => {
-//   const username = user.value.username;
-//   try {
-//     const response = await fetch(`${host_server}/get-profile-image/${username}`);
-//     const data = await response.json();
-//     if (data.imageData) {
-//       imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
-//     } else {
-//       imageUrl.value = profileImage; // fallback to default
-//     }
-//     isImageLoading.value = false; // Set loading flag to false once image is loaded
-//   } catch (error) {
-//     console.error('Error fetching profile image:', error);
-//     isImageLoading.value = false; // Set loading flag to false even if there's an error
-//   }
-// };
-
-// upload or edit profile photo
-// import profileImage from '~/assets/images/user_profile.svg';
-
-// const imageUrl = ref(profileImage);
-// const imageFile = ref(null);
-// const imageInput = ref(null);
-// const isImageLoading = ref(true); // loading state for image
-
-// // Choose image from file input
-// const chooseImage = () => {
-//   imageInput.value.click();
-// };
-
-// // On file selection
-// const onFileChange = (event) => {
-//   imageFile.value = event.target.files[0];
-//   uploadImage();
-// };
-
-// // Upload the image to backend
-// const uploadImage = async () => {
-//   const username = user.value.username;
-//   const formData = new FormData();
-//   formData.append('image', imageFile.value);
-//   formData.append('username', username);
-
-//   try {
-//     isImageLoading.value = true;
-//     const response = await fetch(`${host_server}/upload`, {
-//       method: 'POST',
-//       body: formData,
-//     });
-//     const data = await response.json();
-
-//     if (data.filename) {
-//       await fetchProfileImage(); // Refresh image from server
-//     }
-//   } catch (error) {
-//     console.error('Error in uploading image:', error);
-//   } finally {
-//     isImageLoading.value = false;
-//   }
-// };
-
-// // Fetch the image from the backend
-// const fetchProfileImage = async () => {
-//   const username = user.value.username;
-//   try {
-//     const response = await fetch(`${host_server}/get-profile-image/${username}`);
-//     const data = await response.json();
-//     if (data.imageData) {
-//       imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
-//     } else {
-//       imageUrl.value = profileImage; // default fallback
-//     }
-//   } catch (error) {
-//     console.error('Error fetching profile image:', error);
-//     imageUrl.value = profileImage;
-//   } finally {
-//     isImageLoading.value = false;
-//   }
-// };
-
-
 import profileImage from '~/assets/images/user_profile.svg';
 
 const imageUrl = ref(profileImage);
@@ -2414,7 +2288,8 @@ const showtest = ref(true);
           <div class="flex justify-between mx-3 mt-3">
             <span class="w-[10%] cursor-pointer" @click="showmenu"><img src="@/assets/images/menu.svg" /></span>
             <span class="w-[18%] rounded-[50%] h-[70px] hover:cursor-pointer">
-              <img :src="imageUrl"
+              <img v-if="isImageLoading" src="/imgloader.gif" alt="Loading..." />
+              <img v-else :src="imageUrl"
                 class="rounded-[100%] h-[100%] w-[100%]" /></span>
           </div>
           <span class="font-[quicksand] text-[30px] text-[#A4A716] my-5 leading-10 font-bold">Welcome to Fast Chat
