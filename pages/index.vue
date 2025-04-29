@@ -450,7 +450,8 @@ const toggleshown = () => {
   loading.value = true;
 };
 
-onMounted(() => {
+onMounted( async() => {
+  await fetchProfileImage();
   if (process.client) {
     const usertoken1 = localStorage.getItem('user');
     const storedUser = localStorage.getItem('userinfo');
@@ -460,9 +461,6 @@ onMounted(() => {
     if (usertoken1) {
       hide2.value = true;
       togglehome();
-
-      // 🔄 Fetch image after user is loaded
-      fetchProfileImage();
     }
   }
 });
