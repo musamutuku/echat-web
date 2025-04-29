@@ -462,6 +462,7 @@ onMounted(async () => {
       togglehome();
 
       // 🔄 Fetch image after user is loaded
+      console.log("user here", user.value.username)
       await fetchProfileImage();
     }
   }
@@ -2027,7 +2028,6 @@ const fetchProfileImage = async () => {
     const data = await response.json();
     if (response.ok && data.imageData) {
       imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
-      console.log("fetched image", imageUrl.value.slice(0, 30));
     } else {
       imageUrl.value = profileImage; // fallback if no image
     }
