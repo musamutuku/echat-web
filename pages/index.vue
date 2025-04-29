@@ -1519,10 +1519,10 @@ const deleteAccount = () => {
 };
 
 
-onMounted( async() => {
+onMounted(() => {
   // Listen for login success or failure events
   socket.on("loginSuccess", (userData, userToken) => {
-    await fetchProfileImage();
+    fetchProfileImage();
     loadingMsg.value = false;
     loading.value = false;
     hideWaitMsg.value = "SIGN IN";
