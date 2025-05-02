@@ -1828,7 +1828,8 @@ const currenttime = () => {
   return currenttime;
 };
 const logout = () => {
-  imageUrl.value = profileImage;
+  imageUrl.value = "";
+  localStorage.clear();
   localStorage.removeItem("user");
   hide.value = true;
   hide2.value = false;
