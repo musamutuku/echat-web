@@ -460,7 +460,7 @@ onMounted( async() => {
     if (usertoken1) {
       hide2.value = true;
       togglehome();
-      await fetchProfileImage();
+      await fetchProfileImage(usertoken1);
     }
   }
 });
@@ -1521,7 +1521,7 @@ const deleteAccount = () => {
 onMounted(() => {
   // Listen for login success or failure events
   socket.on("loginSuccess", async (userData, userToken) => {
-    await fetchProfileImage(); // Await here
+    await fetchProfileImage(userData.username);
     loadingMsg.value = false;
     loading.value = false;
     hideWaitMsg.value = "SIGN IN";
@@ -1874,7 +1874,7 @@ const uploadImage = async () => {
     const data = await response.json();
 
     if (response.ok) {
-      await fetchProfileImage(); // Immediately refresh the new profile image
+      await fetchProfileImage(username); // Immediately refresh the new profile image
     } else {
       console.error('Error uploading:', data.error);
     }
@@ -1895,17 +1895,33 @@ const onFileChange = (event) => {
   uploadImage();
 };
 
-const fetchProfileImage = async () => {
-  const username = localStorage.getItem('user');
-  // const username = user.value.username;
-  console.log("myuser", username);
+// const fetchProfileImage = async () => {
+//   const username = localStorage.getItem('user');
+//   // const username = user.value.username;
+//   console.log("myuser", username);
+//   try {
+//     const response = await fetch(`${host_server}/get-profile-image/${username}`);
+//     const data = await response.json();
+//     if (response.ok && data.imageData) {
+//       imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
+//     } else {
+//       imageUrl.value = profileImage; // fallback if no image
+//     }
+//   } catch (error) {
+//     console.error('Error fetching profile image:', error);
+//   } finally {
+//     isImageLoading.value = false;
+//   }
+// };
+
+const fetchProfileImage = async (username) => {
   try {
     const response = await fetch(`${host_server}/get-profile-image/${username}`);
     const data = await response.json();
     if (response.ok && data.imageData) {
       imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
     } else {
-      imageUrl.value = profileImage; // fallback if no image
+      imageUrl.value = profileImage; // fallback
     }
   } catch (error) {
     console.error('Error fetching profile image:', error);
@@ -1913,6 +1929,7 @@ const fetchProfileImage = async () => {
     isImageLoading.value = false;
   }
 };
+
 
 const usernameInput = ref(null);
 const hasError = ref(false);
