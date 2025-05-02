@@ -1830,6 +1830,7 @@ const currenttime = () => {
 const logout = () => {
   imageUrl.value = "";
   localStorage.clear();
+  user.value = null;
   localStorage.removeItem("user");
   hide.value = true;
   hide2.value = false;
