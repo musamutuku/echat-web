@@ -1894,7 +1894,8 @@ const onFileChange = (event) => {
 };
 
 const fetchProfileImage = async () => {
-  const username = user.value.username;
+  const username = localStorage.getItem('user');
+  // const username = user.value.username;
   console.log("myuser", username);
   try {
     const response = await fetch(`${host_server}/get-profile-image/${username}`);
