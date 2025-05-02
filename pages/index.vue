@@ -554,7 +554,6 @@ const getRecipient = (item, index) => {
   const newsenderarray = [...messages1.value];
   for (let i = 0; i < newsenderarray.length; i++) {
     if (newsenderarray[i].senderUsername == item.username) {
-      console.log("arryy", newsenderarray[i]);
       const unread = newsenderarray[i].totalUnreadMsgs;
       // getTotalInbox(unread);
       getSender(index, unread);
@@ -1521,8 +1520,8 @@ const deleteAccount = () => {
 
 onMounted(() => {
   // Listen for login success or failure events
-  socket.on("loginSuccess", (userData, userToken) => {
-    fetchProfileImage();
+  socket.on("loginSuccess", async (userData, userToken) => {
+    await fetchProfileImage(); // Await here
     loadingMsg.value = false;
     loading.value = false;
     hideWaitMsg.value = "SIGN IN";
@@ -1534,7 +1533,7 @@ onMounted(() => {
     localStorage.setItem("user", user.value.username);
     localStorage.setItem("token", token.value);
     localStorage.setItem("email", user.value.email);
-    localStorage.setItem('userinfo', JSON.stringify(user.value))
+    localStorage.setItem('userinfo', JSON.stringify(user.value));
     hide.value = false;
     hide1.value = true;
     isActive.value = true;
@@ -1543,6 +1542,7 @@ onMounted(() => {
       hideFeedback.value = false;
     }, 3000);
   });
+});
 
   socket.on("loginFailure", (error) => {
     loadingMsg.value = false;
@@ -1829,6 +1829,7 @@ const currenttime = () => {
   return currenttime;
 };
 const logout = () => {
+  imageUrl.value = profileImage;
   localStorage.removeItem("user");
   hide.value = true;
   hide2.value = false;
