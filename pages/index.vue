@@ -1542,7 +1542,6 @@ onMounted(() => {
       hideFeedback.value = false;
     }, 3000);
   });
-});
 
   socket.on("loginFailure", (error) => {
     loadingMsg.value = false;
