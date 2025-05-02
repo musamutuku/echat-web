@@ -1526,6 +1526,7 @@ onMounted(() => {
     loading.value = false;
     hideWaitMsg.value = "SIGN IN";
     user.value = userData;
+    username.value = user.value.username;
     filteredUsers.value = users.value.filter(
       (msg) => msg.username !== user.value.username
     );
