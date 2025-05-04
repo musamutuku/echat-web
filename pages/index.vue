@@ -1970,7 +1970,7 @@ const resetApp = async () => {
         @click="resetApp"
         class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
       >
-        Update App
+        Reload App
       </button>
     </div>
   </div>
