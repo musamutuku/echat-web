@@ -1895,24 +1895,6 @@ const onFileChange = (event) => {
   uploadImage();
 };
 
-// const fetchProfileImage = async () => {
-//   const username = localStorage.getItem('user');
-//   // const username = user.value.username;
-//   console.log("myuser", username);
-//   try {
-//     const response = await fetch(`${host_server}/get-profile-image/${username}`);
-//     const data = await response.json();
-//     if (response.ok && data.imageData) {
-//       imageUrl.value = `data:image/jpeg;base64,${data.imageData}`;
-//     } else {
-//       imageUrl.value = profileImage; // fallback if no image
-//     }
-//   } catch (error) {
-//     console.error('Error fetching profile image:', error);
-//   } finally {
-//     isImageLoading.value = false;
-//   }
-// };
 
 const fetchProfileImage = async (username) => {
   try {
@@ -1949,9 +1931,49 @@ function onInput() {
 }
 const modalOpen = ref(false);
 const showtest = ref(true);
+
+const showResetOverlay = ref(false)
+
+onMounted(() => {
+  const alreadyCleaned = localStorage.getItem('nuxtAppCleaned')
+  if (!alreadyCleaned) {
+    showResetOverlay.value = true
+  }
+})
+
+const resetApp = async () => {
+    // Clear all local storage
+    localStorage.clear()
+  
+    // Unregister all service workers
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations()
+      for (const reg of registrations) {
+        await reg.unregister()
+      }
+    }
+  
+    // Mark cleanup done
+    localStorage.setItem('nuxtAppCleaned', 'true')
+  
+    // Hide overlay and reload
+    showResetOverlay.value = false
+    location.reload()
+  }
 </script>
 
 <template>
+  <div v-if="showResetOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
+    <div class="bg-white rounded-lg p-6 shadow-lg text-center max-w-md w-full">
+      <p class="mb-4 text-lg font-semibold">App updated. Click below to reset and reload.</p>
+      <button
+        @click="resetApp"
+        class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+      >
+        Update App
+      </button>
+    </div>
+  </div>
   <!-- message popup at the top div either error or success -->
   <div v-show="showpopupMessage"
     class="flex items-center absolute left-1 right-1 mx-auto w-fit top-2 justify-center z-20 bg-[#b5cab8] px-2.5 py-2 text-[13px] rounded-sm font-medium font-[quicksand] text-green-800">
